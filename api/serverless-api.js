@@ -1,14 +1,8 @@
 /* eslint-disable no-undef */
 /* Serverless API for CodefyERP Data Validation on Vercel */
 
-// Import the Python validation logic through a child process
-const { spawn } = require('child_process');
-const path = require('path');
-const fs = require('fs').promises;
-const os = require('os');
-
 // Handler for API requests
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,40 +15,37 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const { method } = req;
+  // Extract the API endpoint from the query parameters or URL
+  const { endpoint } = req.query;
+  const urlEndpoint = req.url.split('/').pop();
 
-  // Only allow POST requests for validation
-  if (method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
+  // Determine which endpoint to use
+  const targetEndpoint = endpoint || urlEndpoint || 'health';
 
-  // Extract the API endpoint from the URL
-  const urlParts = req.url.split('/');
-  const endpoint = urlParts[urlParts.length - 1];
-
-  if (endpoint === 'validate' || endpoint === 'download-cleaned') {
+  if (targetEndpoint === 'validate' || targetEndpoint === 'download-cleaned') {
     try {
-      // Process the uploaded file
-      const result = await processFileRequest(req, endpoint);
+      // Process the request based on the endpoint
+      const result = await processEndpoint(targetEndpoint, req);
       res.status(200).json(result);
     } catch (error) {
       console.error('API Error:', error);
       res.status(500).json({ error: error.message || 'Internal server error' });
     }
-  } else if (endpoint === 'health') {
-    res.status(200).json({ status: 'healthy', service: 'CodefyERP Data Validator API' });
+  } else if (targetEndpoint === 'health') {
+    res.status(200).json({ 
+      status: 'healthy', 
+      service: 'CodefyERP Data Validator API',
+      message: 'Vercel serverless API is running'
+    });
   } else {
     res.status(404).json({ error: 'Endpoint not found' });
   }
 }
 
-async function processFileRequest(req, endpoint) {
-  // Since Vercel serverless functions have limitations with file uploads,
-  // we'll simulate the validation process for demo purposes
-  // In a real implementation, you'd need to handle file uploads differently
+async function processEndpoint(endpoint, req) {
+  // For Vercel deployment, we'll return simulated results that demonstrate the functionality
+  // In a real implementation, you could integrate with external services or databases
   
-  // For now, return mock results that demonstrate the functionality
   if (endpoint === 'validate') {
     // Simulate validation results
     return {
@@ -96,32 +87,8 @@ async function processFileRequest(req, endpoint) {
     // For download endpoint, return a success message
     return {
       success: true,
-      message: 'Cleaned file ready for download'
+      message: 'Cleaned file ready for download',
+      download_url: '/api/download-csv' // This would be the actual download endpoint
     };
   }
-}
-
-// Helper function to run Python validation (not used in this serverless version)
-async function runPythonValidation(filePath) {
-  return new Promise((resolve, reject) => {
-    // This would be used if Python was available in the Vercel environment
-    // But Vercel doesn't support Python natively, so we simulate
-    setTimeout(() => {
-      resolve({
-        success: true,
-        summary: {
-          file_name: path.basename(filePath),
-          total_rows: 100,
-          total_sheets: 1,
-          quality_score: 90,
-          issues: { critical: 0, warning: 1, info: 2 },
-          breakdown: { invalid_phones: 0, date_format_issues: 1, enum_violations: 0 }
-        },
-        issues: [
-          { severity: 'warning', category: 'Date Format', sheet: 'Sheet1', row: 5, column: 'Date', message: 'Date not in standard format' },
-          { severity: 'info', category: 'Normalization', sheet: 'Sheet1', row: 10, column: 'Name', message: 'Name standardized' }
-        ]
-      });
-    }, 500);
-  });
 }

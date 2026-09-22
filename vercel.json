@@ -28,6 +28,10 @@
     {
       "source": "/api/(.*)",
       "destination": "/api/serverless-api.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/Temp/index.html"
     }
   ],
   "builds": [

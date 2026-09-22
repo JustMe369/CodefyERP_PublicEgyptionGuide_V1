@@ -722,13 +722,16 @@ function initializeValidationTool() {
     const bulkImportSection = document.getElementById('bulk-import');
     if (!bulkImportSection) return;
     
-    // Determine if we're running locally or on Vercel (moved to function scope)
-    const isLocalhost = window.location.hostname === 'localhost' || 
+    // Determine if we're running via file:// protocol or HTTP(S)
+    const isFileProtocol = window.location.protocol === 'file:';
+    const isLocalhost = !isFileProtocol && (
+                       window.location.hostname === 'localhost' || 
                        window.location.hostname === '127.0.0.1' ||
-                       window.location.hostname === '0.0.0.0';
+                       window.location.hostname === '0.0.0.0');
     
     // Set API endpoints based on environment
-    const apiBase = isLocalhost ? 'http://localhost:5000/api' : '/api';
+    // When running via file:// protocol, we cannot make API calls, so we'll use simulation
+    const apiBase = isFileProtocol ? null : (isLocalhost ? 'http://localhost:5000/api' : '/api');
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -817,16 +820,16 @@ function initializeValidationTool() {
         formData.append('file', file);
 
         try {
+            // If we're running via file:// protocol, skip API call and go straight to simulation
+            if (isFileProtocol) {
+                console.warn('Running in file:// protocol, cannot make API calls. Using simulation mode.');
+                alert('التطبيق يعمل في وضع الملف المحلي، لا يمكن الاتصال بالخادم. سيتم استخدام نتائج تجريبية.');
+                simulateAnalysis(file);
+                return;
+            }
+            
             // Update progress to show API call is happening
             if (progressFill) progressFill.style.width = '20%';
-            
-            // Determine if we're running locally or on Vercel
-            const isLocalhost = window.location.hostname === 'localhost' || 
-                               window.location.hostname === '127.0.0.1' ||
-                               window.location.hostname === '0.0.0.0';
-            
-            // Set API endpoints based on environment
-            const apiBase = isLocalhost ? 'http://localhost:5000/api' : '/api';
             
             // Use the appropriate API endpoint based on environment
             const endpoint = `${apiBase}/validate`;
@@ -869,6 +872,56 @@ function initializeValidationTool() {
             
             // Fallback to simulated results if API is not available
             simulateAnalysis(file);
+        }
+    }
+
+    async function downloadCleanedFile(originalFile) {
+        // If we're running via file:// protocol, skip API call
+        if (isFileProtocol) {
+            alert('لا يمكن تحميل الملف بعد التنظيف عند التشغيل من الملف المحلي. يرجى استخدام الخادم المحلي.');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('file', originalFile);
+        
+        try {
+            // Use the appropriate API endpoint based on environment
+            const endpoint = `${apiBase}/download-cleaned`;
+            console.log(`Using download endpoint: ${endpoint}`);
+            
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                body: formData,
+                mode: 'cors',  // Enable CORS mode
+                credentials: 'omit' // Don't include credentials for CORS requests
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            // Create a blob from the response and trigger download
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `cleaned_${originalFile.name}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Download error:', error);
+            
+            // Provide appropriate error message based on environment
+            if (isLocalhost) {
+                alert('حدث خطأ أثناء تحميل الملف بعد التنظيف. يرجى التأكد من أن خادم API يعمل على localhost:5000.\n\n' +
+                      'للتشغيل: انتقل إلى مجلد Statics/PY وشغل: python api_server.py');
+            } else {
+                alert('حدث خطأ أثناء تحميل الملف بعد التنظيف. يتم الآن استخدام نتائج تجريبية.');
+            }
         }
     }
 
