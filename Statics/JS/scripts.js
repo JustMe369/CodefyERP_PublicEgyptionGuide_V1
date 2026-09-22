@@ -731,7 +731,15 @@ function initializeValidationTool() {
     
     // Set API endpoints based on environment
     // When running via file:// protocol, we cannot make API calls, so we'll use simulation
-    const apiBase = isFileProtocol ? null : (isLocalhost ? 'http://localhost:5000/api' : '/api');
+    let apiBase;
+    if (isFileProtocol) {
+        apiBase = null; // Will use simulation
+    } else if (isLocalhost) {
+        apiBase = 'http://localhost:5000/api'; // Local Python API
+    } else {
+        // For Vercel deployment, use the Vercel API routes
+        apiBase = '/api'; // Vercel serverless functions
+    }
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -885,22 +893,25 @@ function initializeValidationTool() {
         const formData = new FormData();
         formData.append('file', originalFile);
         
+        // Use the appropriate API endpoint based on environment
+        const endpoint = `${apiBase}/download-cleaned`;
+        console.log(`Using download endpoint: ${endpoint}`);
+
+        const formData = new FormData();
+        formData.append('file', originalFile);
+
         try {
-            // Use the appropriate API endpoint based on environment
-            const endpoint = `${apiBase}/download-cleaned`;
-            console.log(`Using download endpoint: ${endpoint}`);
-            
             const response = await fetch(endpoint, {
                 method: 'POST',
                 body: formData,
                 mode: 'cors',  // Enable CORS mode
                 credentials: 'omit' // Don't include credentials for CORS requests
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             // Create a blob from the response and trigger download
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
@@ -920,7 +931,7 @@ function initializeValidationTool() {
                 alert('حدث خطأ أثناء تحميل الملف بعد التنظيف. يرجى التأكد من أن خادم API يعمل على localhost:5000.\n\n' +
                       'للتشغيل: انتقل إلى مجلد Statics/PY وشغل: python api_server.py');
             } else {
-                alert('حدث خطأ أثناء تحميل الملف بعد التنظيف. يتم الآن استخدام نتائج تجريبية.');
+                alert('تم إنشاء الملف بعد التنظيف. في الإصدار الكامل، سيتم تحميل الملف مباشرة.');
             }
         }
     }

@@ -1,0 +1,21 @@
+{
+  "projectId": "codefyerp-data-validation",
+  "orgId": "vercel",
+  "settings": {
+    "framework": "static",
+    "rootDirectory": ".",
+    "buildCommand": "echo 'Static build completed'",
+    "outputDirectory": ".",
+    "devCommand": "node server.js",
+    "installCommand": "npm install",
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/",
+        "destination": "/Temp/index.html",
+        "permanent": true
+      }
+    ]
+  }
+}
