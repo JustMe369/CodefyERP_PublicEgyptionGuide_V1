@@ -56,8 +56,37 @@ function initApp() {
     // Initialize Keyboard Shortcuts
     initKeyboardShortcuts();
     
+    // Initialize Scroll Reveal Animations
+    initScrollReveal();
+    
     // Render initial progress
     updateProgressUI();
+}
+
+/**
+ * Scroll Reveal Animation Observer
+ * Elements with .reveal class start hidden (opacity:0) and fade in when scrolled into view
+ */
+function initScrollReveal() {
+    const revealElements = document.querySelectorAll('.reveal');
+    if (!revealElements.length) return;
+
+    const revealObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        },
+        {
+            threshold: 0.08,
+            rootMargin: '0px 0px -40px 0px',
+        }
+    );
+
+    revealElements.forEach((el) => revealObserver.observe(el));
 }
 
 /**
@@ -865,7 +894,7 @@ function initializeValidationTool() {
                 displayResults(result);
             } else {
                 alert(`خطأ في التحليل: ${result.error || 'حدث خطأ غير معروف'}`);
-                if (progressBar) progressBar.style.style = 'none';
+                if (progressBar) progressBar.style.display = 'none';
             }
         } catch (error) {
             console.error('Analysis error:', error);
@@ -892,13 +921,10 @@ function initializeValidationTool() {
         
         const formData = new FormData();
         formData.append('file', originalFile);
-        
+
         // Use the appropriate API endpoint based on environment
         const endpoint = `${apiBase}/download-cleaned`;
         console.log(`Using download endpoint: ${endpoint}`);
-
-        const formData = new FormData();
-        formData.append('file', originalFile);
 
         try {
             const response = await fetch(endpoint, {
@@ -1070,75 +1096,6 @@ function initializeValidationTool() {
 
         if (analysisResults) analysisResults.style.display = 'block';
         if (progressBar) progressBar.style.display = 'none';
-    }
-
-    async function downloadCleanedFile(originalFile) {
-        const formData = new FormData();
-        formData.append('file', originalFile);
-
-        try {
-            // Try multiple API endpoints as fallbacks for download
-            const apiEndpoints = [
-                'http://localhost:5000/api/download-cleaned',
-                'http://127.0.0.1:5000/api/download-cleaned',
-                'http://0.0.0.0:5000/api/download-cleaned',
-                '/api/download-cleaned' // Relative path as final fallback
-            ];
-            
-            let response = null;
-            let lastError = null;
-            let retryCount = 3;
-            
-            for (const endpoint of apiEndpoints) {
-                for (let i = 0; i < retryCount; i++) {
-                    try {
-                        console.log(`Trying download endpoint: ${endpoint} (attempt ${i+1}/${retryCount})`);
-                        response = await fetch(endpoint, {
-                            method: 'POST',
-                            body: formData,
-                            mode: 'cors',
-                            cache: 'no-cache'
-                        });
-                        
-                        if (response.ok) {
-                            break; // Success, exit retry loop
-                        } else {
-                            console.warn(`Download endpoint failed: ${endpoint}, status: ${response.status}`);
-                            lastError = `HTTP error! status: ${response.status}`;
-                            // Wait before retrying
-                            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-                        }
-                    } catch (error) {
-                        console.warn(`Download endpoint failed: ${endpoint}, error: ${error.message}`);
-                        lastError = error.message;
-                        // Wait before retrying
-                        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-                    }
-                }
-                
-                if (response && response.ok) break; // Exit endpoint loop if successful
-            }
-            
-            if (!response || !response.ok) {
-                throw new Error(lastError || 'All download endpoints failed after retries');
-            }
-
-            // Create a blob from the response and trigger download
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `cleaned_${originalFile.name}`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } catch (error) {
-            console.error('Download error:', error);
-            alert('حدث خطأ أثناء تحميل الملف بعد التنظيف. يرجى التأكد من أن خادم API يعمل على localhost:5000.\n\n' +
-                  'للتشغيل: انتقل إلى مجلد Statics/PY وشغل: python api_server.py');
-        }
     }
 }
 

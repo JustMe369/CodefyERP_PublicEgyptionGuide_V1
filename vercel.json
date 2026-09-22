@@ -30,7 +30,7 @@
       "destination": "/Temp/index.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|Statics/|Temp/).*)",
       "destination": "/Temp/index.html"
     }
   ],
