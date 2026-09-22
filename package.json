@@ -1,0 +1,26 @@
+{
+  "name": "codefyerp-data-validation",
+  "version": "1.0.0",
+  "description": "CodefyERP Data Validation System for Egyptian Business Operations",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Build completed'",
+    "start": "node server.js",
+    "local-server": "node server.js",
+    "api": "cd Statics/PY && python api_server.py"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "http-proxy-middleware": "^2.0.6"
+  },
+  "devDependencies": {
+    "@vercel/node": "^2.10.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "CodefyERP Team",
+  "license": "MIT"
+}

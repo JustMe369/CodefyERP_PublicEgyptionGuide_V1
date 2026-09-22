@@ -499,8 +499,12 @@
 
                 <!-- Tabs -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-2 mb-6 shadow-sm">
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-4 gap-2">
                         <button type="button" class="tab-btn active rounded-xl py-3 px-3 text-sm font-bold transition-all"
+                            data-tab="validation">
+                            <span class="block text-lg mb-1" aria-hidden="true">🔍</span> التحقق
+                        </button>
+                        <button type="button" class="tab-btn rounded-xl py-3 px-3 text-sm font-bold transition-all"
                             data-tab="routes">
                             <span class="block text-lg mb-1" aria-hidden="true">🛣️</span> Routes
                         </button>
@@ -519,7 +523,82 @@
 
                 <!-- Tab content -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
-                    <div class="tab-content fade-in" data-content="routes">
+                    <!-- Validation Tab Content -->
+                    <div class="tab-content fade-in" data-content="validation">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" aria-hidden="true">🔍</span>
+                            <div>
+                                <h3 class="font-black text-slate-900 text-lg">التحقق من جودة البيانات</h3>
+                                <p class="text-sm text-slate-500">افحص ملف الإكسل قبل الرفع للتأكد من جاهزيته</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>التحقق من تنسيق الأرقام</strong> — التأكد من أرقام الهواتف المصرية</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>التحقق من التنسيقات التاريخية</strong> — تحويل التواريخ إلى الشكل الصحيح</span>
+                            </li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>تحليل الورديات</strong> — التحقق من تعارضات الورديات</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>إدارة الموردين</strong> — التحقق من معلومات الموردين</span></li>
+                        </ul>
+                        
+                        <!-- Validation Tool Container -->
+                        <div id="validation-container" class="mt-6">
+                            <div class="upload-section" id="dropZone" style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 8px; margin-bottom: 20px; transition: border-color 0.3s;">
+                                <h4 style="margin-bottom: 15px;">📁 رفع ملف الإكسل للتحليل</h4>
+                                <p style="margin-bottom: 20px;">اسحب الملف هنا أو انقر لاختياره</p>
+                                <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+                                <button class="upload-btn" onclick="document.getElementById('fileInput').click()" style="background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px;">اختر ملف</button>
+                            </div>
+                            
+                            <div id="fileInfo" class="file-info" style="display: none; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;"></div>
+                            
+                            <div class="progress-bar" id="progressBar" style="display: none; width: 100%; height: 20px; background-color: #e9ecef; border-radius: 10px; overflow: hidden; margin: 20px 0;">
+                                <div class="progress-fill" id="progressFill" style="height: 100%; background-color: #28a745; width: 0%; transition: width 0.3s;"></div>
+                            </div>
+                            
+                            <div class="analysis-results" id="analysisResults" style="display: none; margin-top: 20px;">
+                                <h4 style="margin-bottom: 15px;">📈 نتائج التحليل</h4>
+                                
+                                <div class="summary-card" id="summaryCard" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
+                                    <!-- Summary cards will be populated here -->
+                                </div>
+                                
+                                <div class="action-buttons" style="text-align: center; margin: 20px 0;">
+                                    <button class="btn btn-primary" id="downloadCleanBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #007bff; color: white;">📥 تحميل الملف بعد التنظيف</button>
+                                    <button class="btn btn-success" id="proceedImportBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #28a745; color: white;">✅ الاستمرار في الرفع</button>
+                                    <button class="btn btn-secondary" id="resetBtn" style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #6c757d; color: white;">🔄 إعادة</button>
+                                </div>
+                                
+                                <h5 style="margin: 20px 0 10px;">⚠️ المشاكل المكتشفة</h5>
+                                <div style="overflow-x: auto;">
+                                    <table class="issues-table" id="issuesTable" style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                                        <thead>
+                                            <tr style="background-color: #f8f9fa;">
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الشدة</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">النوع</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الورقة</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الصف</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">العمود</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الوصف</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="issuesTableBody">
+                                            <!-- Issues will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content hidden fade-in" data-content="routes">
                         <div class="flex items-center gap-3 mb-4">
                             <span class="text-3xl" aria-hidden="true">🛣️</span>
                             <div>

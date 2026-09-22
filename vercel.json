@@ -1,9 +1,39 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
+  "version": 2,
+  "public": false,
+  "github": {
+    "enabled": true,
+    "autoJobCancelation": true
+  },
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/temp/$1"
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/serverless-api.js"
+    }
+  ],
+  "builds": [
+    {
+      "src": "api/serverless-api.js",
+      "use": "@vercel/node"
     }
   ]
 }

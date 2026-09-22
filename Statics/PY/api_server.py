@@ -8,10 +8,12 @@ Provides endpoints for Excel file validation and analysis
 import os
 import tempfile
 from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS  # Add CORS support
 from werkzeug.utils import secure_filename
 from CodefyDataValidator import validate_excel_file
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Configure upload folder
 UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), 'codefy_uploads')
@@ -24,10 +26,18 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/api/validate', methods=['POST'])
+@app.route('/api/validate', methods=['POST', 'OPTIONS'])
 def validate_file():
     """Validate uploaded Excel file and return analysis results."""
     try:
+        if request.method == 'OPTIONS':
+            # Handle preflight request
+            response = jsonify()
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+            return response
+            
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
         
@@ -51,17 +61,31 @@ def validate_file():
         os.remove(temp_path)
         
         if results['success']:
-            return jsonify(results)
+            response = jsonify(results)
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
         else:
-            return jsonify({'error': results['error']}), 500
+            response = jsonify({'error': results['error']}), 500
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
             
     except Exception as e:
-        return jsonify({'error': f'Server error: {str(e)}'}), 500
+        response = jsonify({'error': f'Server error: {str(e)}'}), 500
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
-@app.route('/api/download-cleaned', methods=['POST'])
+@app.route('/api/download-cleaned', methods=['POST', 'OPTIONS'])
 def download_cleaned_file():
     """Generate and return a cleaned version of the validated file."""
     try:
+        if request.method == 'OPTIONS':
+            # Handle preflight request
+            response = jsonify()
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+            return response
+            
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
         
@@ -105,17 +129,24 @@ def download_cleaned_file():
                 except:
                     pass  # Ignore errors during cleanup
             threading.Thread(target=cleanup).start()
+            response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         else:
-            return jsonify({'error': 'Failed to clean the file'}), 500
+            response = jsonify({'error': 'Failed to clean the file'}), 500
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
             
     except Exception as e:
-        return jsonify({'error': f'Server error: {str(e)}'}), 500
+        response = jsonify({'error': f'Server error: {str(e)}'}), 500
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint."""
-    return jsonify({'status': 'healthy', 'service': 'CodefyERP Data Validator API'})
+    response = jsonify({'status': 'healthy', 'service': 'CodefyERP Data Validator API'})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

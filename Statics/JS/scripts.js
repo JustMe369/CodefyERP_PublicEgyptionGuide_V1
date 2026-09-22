@@ -24,6 +24,7 @@ let currentValidationResult = null;
 document.addEventListener('DOMContentLoaded', function() {
     initApp();
     initializeValidationTool();
+    initializeTabSwitching();
 });
 
 function initApp() {
@@ -583,20 +584,43 @@ function initTabs() {
             if (!tabName) return;
 
             tabBtns.forEach(b => {
-                b.classList.remove('active', 'bg-primary-600', 'text-white');
-                b.classList.add('bg-slate-100', 'text-slate-700');
+                b.classList.remove('active');
             });
-
-            this.classList.add('active', 'bg-primary-600', 'text-white');
-            this.classList.remove('bg-slate-100', 'text-slate-700');
 
             tabContents.forEach(content => {
-                if (content.getAttribute('data-content') === tabName) {
-                    content.classList.remove('hidden');
-                } else {
-                    content.classList.add('hidden');
-                }
+                content.classList.add('hidden');
             });
+
+            this.classList.add('active');
+            document.querySelector(`.tab-content[data-content="${tabName}"]`).classList.remove('hidden');
+        });
+    });
+}
+
+/**
+ * Tab Switching Functionality for Bulk Import
+ */
+function initializeTabSwitching() {
+    // Add event listeners for bulk import tabs
+    const tabButtons = document.querySelectorAll('#bulk-import .tab-btn');
+    if (!tabButtons.length) return;
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            
+            // Remove active class from all buttons and content
+            document.querySelectorAll('#bulk-import .tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.querySelectorAll('#bulk-import .tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Add active class to clicked button and corresponding content
+            this.classList.add('active');
+            document.querySelector(`#bulk-import .tab-content[data-content="${tabName}"]`).classList.remove('hidden');
         });
     });
 }
@@ -697,6 +721,14 @@ function initializeValidationTool() {
     // Only initialize if we're on the bulk-import section
     const bulkImportSection = document.getElementById('bulk-import');
     if (!bulkImportSection) return;
+    
+    // Determine if we're running locally or on Vercel (moved to function scope)
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname === '0.0.0.0';
+    
+    // Set API endpoints based on environment
+    const apiBase = isLocalhost ? 'http://localhost:5000/api' : '/api';
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
@@ -785,31 +817,67 @@ function initializeValidationTool() {
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:5000/api/validate', {
+            // Update progress to show API call is happening
+            if (progressFill) progressFill.style.width = '20%';
+            
+            // Determine if we're running locally or on Vercel
+            const isLocalhost = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1' ||
+                               window.location.hostname === '0.0.0.0';
+            
+            // Set API endpoints based on environment
+            const apiBase = isLocalhost ? 'http://localhost:5000/api' : '/api';
+            
+            // Use the appropriate API endpoint based on environment
+            const endpoint = `${apiBase}/validate`;
+            console.log(`Using API endpoint: ${endpoint}`);
+            
+            const response = await fetch(endpoint, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                mode: 'cors',  // Enable CORS mode
+                credentials: 'omit', // Don't include credentials for CORS requests
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                }
             });
-
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+            
             const result = await response.json();
             
             if (result.success) {
                 displayResults(result);
             } else {
-                alert(`Error: ${result.error || 'Unknown error occurred'}`);
-                if (progressBar) progressBar.style.display = 'none';
+                alert(`خطأ في التحليل: ${result.error || 'حدث خطأ غير معروف'}`);
+                if (progressBar) progressBar.style.style = 'none';
             }
         } catch (error) {
             console.error('Analysis error:', error);
+            
+            // Provide appropriate error message based on environment
+            if (isLocalhost) {
+                alert('خطأ في الاتصال بالخادم. يرجى التأكد من أن خادم API يعمل على localhost:5000.\n\n' +
+                      'للتشغيل: انتقل إلى مجلد Statics/PY وشغل: python api_server.py');
+            } else {
+                alert('خطأ في الاتصال بالخادم. يتم الآن استخدام نتائج تجريبية.');
+            }
+            
             // Fallback to simulated results if API is not available
             simulateAnalysis(file);
         }
     }
 
     function simulateAnalysis(file) {
+        // Show that we're simulating because API is unavailable
+        if (fileInfo) {
+            fileInfo.textContent += ' (API غير متاح - استخدام نتائج تجريبية)';
+        }
+
         // Simulate analysis progress
         let progress = 0;
         const interval = setInterval(() => {
@@ -817,7 +885,7 @@ function initializeValidationTool() {
             if (progress >= 100) {
                 progress = 100;
                 clearInterval(interval);
-                // Mock analysis results
+                // Mock analysis results with realistic data
                 const mockResult = {
                     success: true,
                     summary: {
@@ -837,14 +905,20 @@ function initializeValidationTool() {
                             missing_data: Math.floor(Math.random() * 3),
                             duplicate_phones: Math.floor(Math.random() * 2),
                             time_conflicts: Math.floor(Math.random() * 2),
-                            shift_upgrades: Math.floor(Math.random() * 4)
+                            shift_upgrades: Math.floor(Math.random() * 4),
+                            shift_conflicts: Math.floor(Math.random() * 2),
+                            supplier_issues: Math.floor(Math.random() * 2),
+                            capacity_issues: Math.floor(Math.random() * 2)
                         }
                     },
                     issues: [
                         { severity: 'critical', category: 'Invalid Phone', sheet: 'Drivers', row: 45, column: 'Phone', message: 'Invalid Egyptian phone number format' },
                         { severity: 'warning', category: 'Date Format', sheet: 'Schedule', row: 12, column: 'Start_Date', message: 'Date not in YYYY-MM-DD format' },
                         { severity: 'info', category: 'Normalization', sheet: 'Routes', row: 67, column: 'Direction', message: 'Direction inferred from schedule' },
-                        { severity: 'critical', category: 'Missing Data', sheet: 'Vehicles', row: 89, column: 'Driver_Name', message: 'Required field missing' }
+                        { severity: 'critical', category: 'Missing Data', sheet: 'Vehicles', row: 89, column: 'Driver_Name', message: 'Required field missing' },
+                        { severity: 'warning', category: 'Capacity Issue', sheet: 'Vehicles', row: 156, column: 'Capacity', message: 'Capacity value seems unusually high for vehicle type' },
+                        { severity: 'warning', category: 'Shift Conflict', sheet: 'Schedule', row: 23, column: 'Shift', message: 'Shift type conflicts with scheduled times' },
+                        { severity: 'warning', category: 'Supplier Issue', sheet: 'Suppliers', row: 78, column: 'Tax_ID', message: 'Invalid Egyptian tax ID format' }
                     ]
                 };
                 displayResults(mockResult);
@@ -910,7 +984,9 @@ function initializeValidationTool() {
         if (downloadCleanBtn) {
             downloadCleanBtn.disabled = false;
             downloadCleanBtn.onclick = function() {
-                downloadCleanedFile();
+                if (fileInput.files.length > 0) {
+                    downloadCleanedFile(fileInput.files[0]);
+                }
             };
         }
         
@@ -932,24 +1008,55 @@ function initializeValidationTool() {
         if (progressBar) progressBar.style.display = 'none';
     }
 
-    async function downloadCleanedFile() {
-        if (!currentFile || !currentValidationResult) {
-            alert('لا يوجد ملف لتنزيله. من فضلك قم برفع ملف أولاً.');
-            return;
-        }
-
+    async function downloadCleanedFile(originalFile) {
         const formData = new FormData();
-        formData.append('file', currentFile);
-        formData.append('validation_result', JSON.stringify(currentValidationResult));
+        formData.append('file', originalFile);
 
         try {
-            const response = await fetch('http://localhost:5000/api/download-cleaned', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Try multiple API endpoints as fallbacks for download
+            const apiEndpoints = [
+                'http://localhost:5000/api/download-cleaned',
+                'http://127.0.0.1:5000/api/download-cleaned',
+                'http://0.0.0.0:5000/api/download-cleaned',
+                '/api/download-cleaned' // Relative path as final fallback
+            ];
+            
+            let response = null;
+            let lastError = null;
+            let retryCount = 3;
+            
+            for (const endpoint of apiEndpoints) {
+                for (let i = 0; i < retryCount; i++) {
+                    try {
+                        console.log(`Trying download endpoint: ${endpoint} (attempt ${i+1}/${retryCount})`);
+                        response = await fetch(endpoint, {
+                            method: 'POST',
+                            body: formData,
+                            mode: 'cors',
+                            cache: 'no-cache'
+                        });
+                        
+                        if (response.ok) {
+                            break; // Success, exit retry loop
+                        } else {
+                            console.warn(`Download endpoint failed: ${endpoint}, status: ${response.status}`);
+                            lastError = `HTTP error! status: ${response.status}`;
+                            // Wait before retrying
+                            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                        }
+                    } catch (error) {
+                        console.warn(`Download endpoint failed: ${endpoint}, error: ${error.message}`);
+                        lastError = error.message;
+                        // Wait before retrying
+                        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+                    }
+                }
+                
+                if (response && response.ok) break; // Exit endpoint loop if successful
+            }
+            
+            if (!response || !response.ok) {
+                throw new Error(lastError || 'All download endpoints failed after retries');
             }
 
             // Create a blob from the response and trigger download
@@ -958,14 +1065,15 @@ function initializeValidationTool() {
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = `cleaned_${currentFile.name}`;
+            a.download = `cleaned_${originalFile.name}`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
         } catch (error) {
             console.error('Download error:', error);
-            alert('حدث خطأ أثناء تحميل الملف بعد التنظيف');
+            alert('حدث خطأ أثناء تحميل الملف بعد التنظيف. يرجى التأكد من أن خادم API يعمل على localhost:5000.\n\n' +
+                  'للتشغيل: انتقل إلى مجلد Statics/PY وشغل: python api_server.py');
         }
     }
 }

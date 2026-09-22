@@ -1,132 +1,148 @@
-# CodefyERP Data Validation Tool
+# CodefyERP Data Validation System
 
 This repository contains the CodefyERP system with an integrated data validation tool for Excel files before import.
 
 ## Overview
 
-The CodefyERP Data Validation Tool provides comprehensive analysis and validation of Excel files before they are imported into the CodefyERP system. It includes:
-
-- Advanced validation for Egyptian phone numbers
-- Date format validation and correction
-- Data quality scoring
-- Issue detection and reporting
-- Automated fixes for common issues
-- Pre-upload validation to prevent import errors
+The CodefyERP Data Validation System is an advanced Excel data validation tool designed specifically for Egyptian business operations. It provides comprehensive validation, analysis, and data quality improvement capabilities with a focus on Egyptian business requirements.
 
 ## Features
 
-### Data Validation
-- Egyptian phone number validation with proper carrier prefixes (010, 011, 012, 015)
-- Date format validation and automatic conversion to standard format
-- Missing data detection for critical fields
-- Enum value validation against allowed sets
-- Time conflict detection and resolution
+### Core Validation Features
+- **Egyptian Phone Number Validation**: Validates Egyptian mobile numbers (010, 011, 012, 015 prefixes)
+- **Date Format Validation**: Supports multiple date formats with automatic conversion to standard format
+- **Data Quality Scoring**: Assigns quality scores (0-100) based on various validation criteria
+- **Issue Detection**: Identifies and categorizes issues as critical, warning, or informational
+- **Automated Fixes**: Applies automatic corrections for common issues with audit trails
 
-### Automated Corrections
-- Phone number formatting fixes
-- Date format standardization
-- Time format normalization
-- Schedule direction inference
-- Working day normalization
+### Advanced Features
 
-### Quality Assessment
-- Overall quality scoring (0-100)
-- Detailed issue categorization (critical, warning, info)
-- Summary statistics for quick assessment
-- Export of cleaned files with applied fixes
+#### 1. Shift Engine
+- **Shift Pattern Recognition**: Identifies shift types (Morning, Evening, Night, Day, Special)
+- **Ordinal Processing**: Handles shift ordinals (Primary, Secondary, Tertiary, Express, VIP)
+- **Conflict Detection**: Identifies conflicts between scheduled times and shift assignments
+- **Automatic Improvement Suggestions**: Enhances shift descriptions with proper formatting
 
-## Components
+#### 2. Time Control Center
+- **Time Range Validation**: Ensures times fall within specified ranges
+- **Duration Calculation**: Computes work durations automatically
+- **Overtime Tracking**: Monitors overtime hours and compliance
+- **Attendance Recording**: Manages employee attendance records
 
-### Frontend
-- Located in the bulk import section of index.html
-- Drag-and-drop file upload interface
-- Real-time analysis results display
-- Issue visualization with severity indicators
-- Download cleaned file functionality
+#### 3. Main Suppliers Form
+- **Egyptian Tax ID Validation**: Validates 14-digit Egyptian tax IDs
+- **Supplier Category Management**: Organizes suppliers by category (Raw Materials, Services, Equipment, etc.)
+- **Payment Terms Support**: Handles various payment terms (Cash, Credit, Net 7/15/30/60)
+- **Credit Limit Management**: Tracks and validates credit limits
+- **Delivery Time Monitoring**: Manages expected delivery times
 
-### Backend
-- Python-based validation engine (`CodefyDataValidator.py`)
-- Flask API server (`api_server.py`) for handling requests
-- Comprehensive data analysis algorithms
-- Excel file processing capabilities
+#### 4. Vehicle and Capacity Management
+- **Capacity Validation**: Ensures vehicle capacity aligns with vehicle type
+- **Insurance Expiry Tracking**: Monitors insurance expiry dates
+- **Maintenance Scheduling**: Tracks maintenance schedules
+- **Status Management**: Manages vehicle operational status
 
-## Setup Instructions
+#### 5. Working Days Normalization
+- **Arabic Day Support**: Recognizes Arabic day names and abbreviations
+- **Custom Day Separators**: Handles various separator formats
+- **Order Normalization**: Orders days according to Egyptian work week
 
-1. Install required dependencies:
+## Deployment Options
+
+### Option 1: Local Development (Full Functionality)
+
+1. Clone the repository:
+   ```
+   git clone <repository-url>
+   ```
+
+2. Install dependencies:
    ```
    pip install -r requirements.txt
    ```
 
-2. Start the API server:
+3. Start the API server:
    ```
    cd Statics/PY
-   python start_api.py
+   python api_server.py
    ```
 
-3. Access the validation tool through the bulk import section of the main application
+4. Open the main index.html file in your browser
 
-## API Endpoints
+### Option 2: Vercel Deployment (Frontend Only with Simulated API)
 
-- `POST /api/validate` - Validate an uploaded Excel file
-- `POST /api/download-cleaned` - Generate and download a cleaned version of the file
-- `GET /api/health` - Health check endpoint
+1. Push the codebase to a Git repository (GitHub, GitLab, or Bitbucket)
+2. Import the repository into Vercel
+3. The system will automatically deploy with simulated API functionality
+4. For full Python-powered validation, run the local API server separately
+
+See [README.VERCEL.md](README.VERCEL.md) for detailed Vercel deployment instructions.
 
 ## Usage
 
-1. Navigate to the Bulk Import section in the application
-2. Use the validation tool to upload and analyze your Excel file
-3. Review the analysis results and identified issues
-4. Download the cleaned file if needed
-5. Proceed with the import to CodefyERP
+### Running the Validation Tool
+1. Start the API server:
+   ```
+   cd Statics/PY
+   python api_server.py
+   ```
 
-## Supported File Formats
+2. Open the main index.html file in your browser
+3. Navigate to the "Bulk Import" section
+4. Select the "Validation" tab
+5. Upload your Excel file
+6. Review the analysis results
+7. Download the cleaned file if needed
+8. Proceed with the import to CodefyERP
 
-- `.xlsx` (Excel Workbook)
-- `.xls` (Excel 97-2003 Workbook)
+### Using Advanced Features
+- **Shift Engine**: Access through the dedicated tab in the validation interface
+- **Time Control**: Available in the time management section
+- **Supplier Management**: Use the suppliers form for managing supplier data
 
-## Validation Rules
+## API Endpoints
 
-### Phone Numbers
-- Must be 11 digits
-- Must start with valid Egyptian carrier prefixes (010, 011, 012, 015)
-- Supports conversion from various formats (with country codes, missing leading zeros)
+### Local Development Server
+- `GET /api/health`: Health check endpoint
+- `POST /api/validate`: Validate uploaded Excel file
+- `POST /api/download-cleaned`: Download cleaned version of file
 
-### Dates
-- Standard format: YYYY-MM-DD
-- Automatic conversion from common alternative formats
-- Recognition of date-like values in text form
+### Vercel Serverless Functions (Simulated)
+- `GET /api/health`: Health check endpoint
+- `POST /api/validate`: Validate uploaded Excel file (simulated)
+- `POST /api/download-cleaned`: Download cleaned version of file (simulated)
 
-### Critical Fields
-- Driver name
-- Driver phone
-- Plate number
-- Shift
-- Route
-- All must be present for valid records
+## File Structure
 
-## Quality Scoring
+```
+CodefyERP/
+├── Temp/
+│   ├── index.html              # Main application page
+│   └── section-data-validation.html  # Dedicated validation interface
+├── Statics/
+│   ├── PY/
+│   │   ├── CodefyDataValidator.py  # Core validation engine
+│   │   ├── api_server.py       # Flask API server
+│   │   └── start_api.py        # API startup script
+│   └── JS/
+│       ├── scripts.js          # Main JavaScript functionality
+│       └── validation-tool.js  # Validation-specific scripts
+├── api/
+│   └── serverless-api.js      # Vercel-compatible API
+├── requirements.txt            # Python dependencies
+├── start_server.bat           # Windows startup script
+├── start_server.sh            # Linux/Mac startup script
+├── vercel.json                # Vercel configuration
+└── package.json               # NPM configuration
 
-The tool calculates a quality score from 0-100 based on:
-- Number and severity of issues found
-- Completeness of required data
-- Consistency of data formats
-- Adherence to business rules
+## Configuration
 
-## Troubleshooting
+The system is pre-configured for Egyptian business operations. Customization options include:
+- Adding new validation rules in CodefyDataValidator.py
+- Modifying column specifications in the ERP_COLUMN_SPEC dictionary
+- Extending the shift pattern recognition in SHIFT_BASE_PATTERNS
 
-If the API server fails to start:
-1. Ensure all dependencies are installed
-2. Check that the required ports are available
-3. Verify file permissions
 
-For validation issues:
-1. Check that Excel files follow the expected format
-2. Ensure required columns are present
-3. Verify data types match expected formats
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
