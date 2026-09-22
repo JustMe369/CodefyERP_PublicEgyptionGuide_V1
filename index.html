@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="دليل شامل لنظام كوديفاي: تسجيل الدخول، استيراد المشاريع، علاقات السائق والمورد والمركبة، تعيين الجداول، مراجعة الجاهزية، والتسعير">
+    <meta name="theme-color" content="#2563eb">
+    <title>دليل نظام كوديفاي - دليل المستخدم الشامل</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        },
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#eff6ff',
+                primaryTextColor: '#1e3a8a',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#94a3b8',
+                fontFamily: 'Cairo, sans-serif'
+            }
+        });
+    </script>
+
+    <link rel="stylesheet" href="./../Statics/CSS/styles.css">
+    <link rel="stylesheet" href="./../Statics/CSS/navbar.css">
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
+    <!-- Skip navigation link for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:z-50">
+        تخطي إلى المحتوى الرئيسي
+    </a>
+
+    <!-- ============ Scroll Progress Bar ============ -->
+    <div id="scroll-progress"
+        class="fixed top-0 start-0 z-[60] h-1 w-0 bg-gradient-to-l from-primary-500 to-primary-700 transition-[width] duration-150 ease-out">
+    </div>
+
+    <!-- ============ Mobile Header ============ -->
+    <div id="mobile-header"
+        class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur-md lg:hidden">
+        <div class="flex items-center gap-2.5">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white shadow-md shadow-primary-600/20">
+                <img src="../Statics/img/CodefyLogo.png" alt="كوديفاي" class="h-6 w-6 object-contain" onerror="this.src='../Statics/img/login.png'">
+            </div>
+            <div>
+                <span class="text-lg font-black text-slate-900">كوديفاي<span class="text-primary-600">.</span></span>
+                <span id="mobile-current-section" class="block text-[11px] font-bold text-primary-600 truncate max-w-[170px]">دليل المستخدم</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button id="mobile-menu-btn" type="button" aria-label="فتح القائمة" aria-controls="sidebar"
+                aria-expanded="false" class="text-slate-600 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
+                <svg id="icon-menu" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <svg id="icon-close" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex">
+        <!-- ============ Sidebar ============ -->
+        <aside id="sidebar"
+            class="fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto border-e border-slate-200 bg-white pt-5 pb-8 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:pt-6"
+            aria-label="قائمة الدليل والتنقل">
+
+            <!-- Brand Header -->
+            <div class="px-5 mb-6 hidden lg:flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25">
+                        <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain" onerror="this.src='../Statics/img/login.png'">
+                    </div>
+                    <div>
+                        <span class="text-xl font-black text-slate-900 tracking-tight">كوديفاي<span class="text-primary-600">.</span></span>
+                        <span class="block text-[11px] font-bold text-slate-400">دليل المستخدم الذكي 🇪🇬</span>
+                    </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-md bg-primary-50 text-primary-700 text-[11px] font-black border border-primary-100">v3.0</span>
+            </div>
+
+            <!-- Mobile Drawer Brand -->
+            <div class="px-5 mb-5 flex lg:hidden items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white">
+                        <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-6 w-6 object-contain" onerror="this.src='../Statics/img/login.png'">
+                    </div>
+                    <div>
+                        <span class="text-lg font-black text-slate-900">كوديفاي</span>
+                        <span class="block text-xs text-slate-400">دليل التشغيل والنقل</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Search Box -->
+            <div class="px-4 mb-4 relative">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="دوّر في الدليل... (Ctrl+K)" autocomplete="off"
+                        class="w-full py-2.5 ps-10 pe-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs font-medium transition-all">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-slate-400">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Search Suggestions Dropdown -->
+                <div id="search-suggestions"
+                    class="absolute z-30 mt-1.5 start-4 end-4 bg-white border border-slate-200 rounded-xl shadow-xl hidden overflow-hidden">
+                    <ul id="suggestions-list" class="py-1 max-h-64 overflow-y-auto divide-y divide-slate-50"></ul>
+                </div>
+            </div>
+
+            <!-- Progress Card -->
+            <div class="px-4 mb-5">
+                <div class="p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <span>📊</span> إنجازك في الدليل
+                        </span>
+                        <span id="progress-percent" class="text-xs font-black text-emerald-400">0%</span>
+                    </div>
+                    <div class="h-2 w-full bg-slate-700/80 rounded-full overflow-hidden p-0.5 mb-2">
+                        <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-primary-400 to-emerald-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <span id="progress-count">0 من 6 أقسام</span>
+                        <span class="text-slate-400">خطوة بخطوة للقمة 🚀</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Mode Switcher -->
+            <div class="px-4 mb-4">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">طريقة العرض المفضلة</div>
+                <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/70 text-center">
+                    <button type="button" class="btn-mode-single view-mode-pill active justify-center py-1.5 text-xs">
+                        <span>🎯</span> قسم بقسم
+                    </button>
+                    <button type="button" class="btn-mode-all view-mode-pill justify-center py-1.5 text-xs">
+                        <span>📜</span> الكل ورا بعض
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Section Links -->
+            <div class="px-3 flex-1">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">خطوات العمل في النظام</div>
+                <ul id="navigation-links" class="space-y-1">
+                    <li>
+                        <a href="#login" data-section="login"
+                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg flex-shrink-0">🔐</span>
+                                <div>
+                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">تسجيل الدخول</div>
+                                    <div class="text-[11px] text-slate-400">الخطوة الأولى بالباسورد</div>
+                                </div>
+                            </div>
+                            <span class="section-check-badge" data-badge-section="login">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#bulk-import" data-section="bulk-import"
+                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg flex-shrink-0">📦</span>
+                                <div>
+                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">رفع المشاريع بالجملة</div>
+                                    <div class="text-[11px] text-slate-400">شيت الإكسيل يخلصك في ثواني</div>
+                                </div>
+                            </div>
+                            <span class="section-check-badge" data-badge-section="bulk-import">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#relationships" data-section="relationships"
+                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg flex-shrink-0">🤝</span>
+                                <div>
+                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">المورد والمركبة والسائق</div>
+                                    <div class="text-[11px] text-slate-400">ربط الشغل بالرجالة والعربيات</div>
+                                </div>
+                            </div>
+                            <span class="section-check-badge" data-badge-section="relationships">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#assignments" data-section="assignments"
+                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg flex-shrink-0">📋</span>
+                                <div>
+                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">توزيع الشغل (الجداول)</div>
+                                    <div class="text-[11px] text-slate-400">مين هيطلع أنهي مشوار</div>
+                                </div>
+                            </div>
+                            <span class="section-check-badge" data-badge-section="assignments">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#pricing" data-section="pricing"
+                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg flex-shrink-0">💰</span>
+                                <div>
+                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">حسبة التسعير والمكسب</div>
+                                    <div class="text-[11px] text-slate-400">حسبة دكان بسيطة بين المورد والعميل</div>
+                                </div>
+                            </div>
+                            <span class="section-check-badge" data-badge-section="pricing">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#readiness" data-section="readiness"
+                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <span class="text-lg flex-shrink-0">✅</span>
+                                <div>
+                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">مراجعة الجاهزية</div>
+                                    <div class="text-[11px] text-slate-400">التأكيد ع كل حاجة قبل الانطلاق</div>
+                                </div>
+                            </div>
+                            <span class="section-check-badge" data-badge-section="readiness">○</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sidebar Bottom -->
+            <div class="px-5 pt-4 mt-auto border-t border-slate-100 text-center">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 mb-2">
+                    <p class="text-[11px] font-medium text-slate-600 leading-normal m-0">
+                        💡 <span class="font-bold text-slate-800">معلومة ع الماشي:</span> تقدر تستخدم الأسهم في الكيبورد عشان تقلب بين الأقسام!
+                    </p>
+                </div>
+                <p class="text-[11px] text-slate-400 m-0">
+                    كوديفاي مصر © 2026 — بالبلدي كده كل حاجة سهلة 🇪🇬
+                </p>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div id="sidebar-overlay"
+            class="fixed inset-0 z-40 hidden bg-slate-950/50 backdrop-blur-sm transition-opacity lg:hidden"></div>
+
+        <!-- ============ Main Content ============ -->
+        <main id="main-content" class="mx-auto max-w-5xl px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:ms-72 flex-grow min-h-screen">
+            
+            <!-- ===== Modern Interactive Control & Breadcrumb Bar ===== -->
+            <div class="sticky top-2 z-30 mb-8 p-3.5 rounded-2xl bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2 text-xs sm:text-sm">
+                    <span class="text-slate-400 font-bold">الرئيسية</span>
+                    <span class="text-slate-300">/</span>
+                    <span id="active-section-breadcrumb" class="font-black text-primary-700 flex items-center gap-1.5">
+                        🔐 تسجيل الدخول
+                    </span>
+                    <span id="section-counter" class="ms-2 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-black hidden sm:inline-block">
+                        القسم 1 من 6
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl border border-slate-200/60">
+                    <button type="button" class="btn-mode-single view-mode-pill active text-xs py-1 px-3">
+                        <span>🎯</span> قسم بقسم
+                    </button>
+                    <button type="button" class="btn-mode-all view-mode-pill text-xs py-1 px-3">
+                        <span>📜</span> الكل
+                    </button>
+                </div>
+            </div>
+
+            <!-- =================== HERO =================== -->
+            <header class="relative mb-8 rounded-2xl overflow-hidden hero-gradient bg-grid border border-slate-200/70 p-6 sm:p-8">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1 text-xs font-bold text-primary-700 mb-2 border border-primary-100 shadow-sm">
+                            <span>🇪🇬</span> دليلك في جيبك — إصدار 3.0
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                            دليل نظام كوديفاي من الألف للياء
+                        </h1>
+                        <p class="text-sm text-slate-600 leading-relaxed mt-2 max-w-2xl">
+                            بص يا سيدي، الدليل ده معمول مخصوص عشان يسهل عليك الشغل. من أول ما تفتح النظام وتدخل، لغاية ما ترفع كل بياناتك مرة واحدة، وتوزع شغلك على السواقين والعربيات، وتحسب فلوسك ومكسبك.
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ======================================================== -->
+            <!-- SECTION 1: LOGIN -->
+            <!-- ======================================================== -->
+            <section id="login" class="mb-24 section-content reveal">
+                <div class="flex items-start gap-4 mb-8">
+                    <div
+                        class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white text-2xl shadow-lg shadow-primary-500/30"
+                        aria-hidden="true">
+                        🔐
+                    </div>
+                    <div>
+                        <div class="pill bg-primary-50 text-primary-700 mb-2">أولاً كده</div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">تسجيل الدخول</h2>
+                        <p class="text-slate-500 font-medium mt-1">عشان تبدأ وتشوف شغلك</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info mb-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                        <div>
+                            <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                            <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                بتفتح المتصفح، بتكتب الإيميل والباسورد بتاعك، وبتدوس دخول. خلاص كده إنت بقيت جوه النظام.
+                                الموضوع سهل جداً — زي ما بتفتح فيسبوك أو واتساب بالظبط.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                    <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                        <span class="text-xl" aria-hidden="true">🪜</span> الخطوات واحدة واحدة
+                    </h3>
+
+                    <ol class="space-y-6">
+                        <li class="flex gap-4 relative">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                                1</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">افتح المتصفح</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">أي متصفح عندك (كروم، فايرفوكس، إيدج) —
+                                    كله تمام. وروح على رابط كوديفاي.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                                2</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">اكتب الإيميل أو رقم الموبايل</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">نفس البيانات اللي سجلت بيها. مش لازم
+                                    تحفظ — تقدر تخلي المتصفح يفتكرها.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                                3</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">اكتب كلمة السر</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">خد بالك من الكابس لوك (Caps Lock) — دي
+                                    أكتر حاجة بتغلط الناس.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-emerald-600 text-white font-black shadow-md shadow-emerald-600/30">
+                                ✓</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">دوس "تسجيل الدخول"</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">وخلاص! هتلاقي نفسك جوه النظام على لوحة
+                                    التحكم.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <!-- Diagram -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
+                    <h3 class="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="text-lg" aria-hidden="true">🗺️</span> شكل الرحلة دي في رسمة
+                    </h3>
+                    <div class="mermaid flex justify-center" dir="ltr">
+                        graph LR
+                        A["🌐 فتح المتصفح"] --> B["🔗 صفحة الدخول"]
+                        B --> C["✉️ إيميل/موبايل"]
+                        C --> D["🔑 كلمة السر"]
+                        D --> E["👆 دوس دخول"]
+                        E --> F["🏠 لوحة التحكم"]
+                        style A fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+                        style F fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="aspect-video bg-slate-100 overflow-hidden">
+                            <img src="../Statics/img/login.png" alt="صفحة تسجيل الدخول"
+                                class="lightbox-trigger object-contain w-full h-full" loading="lazy">
+                        </div>
+                        <figcaption class="p-4 border-t border-slate-100 bg-slate-50/50">
+                            <div class="font-bold text-slate-900 text-sm">🔐 صفحة الدخول</div>
+                            <p class="text-xs text-slate-500 mt-1">شكل الشاشة اللي هتشوفها أول ما تفتح اللينك</p>
+                        </figcaption>
+                    </figure>
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="aspect-video bg-slate-100 overflow-hidden">
+                            <img src="../Statics/img/dashboard.png" alt="لوحة التحكم"
+                                class="lightbox-trigger object-contain w-full h-full" loading="lazy">
+                        </div>
+                        <figcaption class="p-4 border-t border-slate-100 bg-slate-50/50">
+                            <div class="font-bold text-slate-900 text-sm">🏠 لوحة التحكم</div>
+                            <p class="text-xs text-slate-500 mt-1">هنا هتلاقي كل الشغل بتاعك بعد ما تدخل</p>
+                        </figcaption>
+                    </figure>
+                </div>
+
+                <!-- Tips -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="callout callout-tip">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl flex-shrink-0" aria-hidden="true">💡</span>
+                            <div>
+                                <div class="font-black text-amber-900 text-sm mb-1">نصيحة على السريع</div>
+                                <p class="text-amber-800 text-xs leading-relaxed m-0">لو بتستخدم النظام كتير، خلي المتصفح
+                                    يحفظ الباسورد. مش هتحتاج تكتبه كل مرة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout callout-warn">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl flex-shrink-0" aria-hidden="true">⚠️</span>
+                            <div>
+                                <div class="font-black text-red-900 text-sm mb-1">نسيت الباسورد؟</div>
+                                <p class="text-red-800 text-xs leading-relaxed m-0">ولا يهمك يا باشا. دوس على "نسيت كلمة السر"
+                                    وهنبعتلك لينك على الإيميل ترجع بيه حسابك في ثواني.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================================================== -->
+            <!-- SECTION 2: BULK IMPORT -->
+            <!-- ======================================================== -->
+            <section id="bulk-import" class="mb-24 section-content reveal">
+                <div class="flex items-start gap-4 mb-8">
+                    <div
+                        class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-2xl shadow-lg shadow-indigo-500/30"
+                        aria-hidden="true">
+                        📦</div>
+                    <div>
+                        <div class="pill bg-indigo-50 text-indigo-700 mb-2">القسم التاني</div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">رفع المشاريع بالجملة
+                        </h2>
+                        <p class="text-slate-500 font-medium mt-1">وفّر وقتك — ارفع كله مرة واحدة</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info mb-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                        <div>
+                            <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                            <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                بدل ما تقعد تدخل كل حاجة لوحدها وتضيع وقتك، بتعمل ملف إكسل واحد فيه كل الداتا
+                                وترفعه كله مرة واحدة. شغلانة تخلص في ثواني يا باشا.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-2 mb-6 shadow-sm">
+                    <div class="grid grid-cols-4 gap-2">
+                        <button type="button" class="tab-btn active rounded-xl py-3 px-3 text-sm font-bold transition-all"
+                            data-tab="validation">
+                            <span class="block text-lg mb-1" aria-hidden="true">🔍</span> التحقق
+                        </button>
+                        <button type="button" class="tab-btn rounded-xl py-3 px-3 text-sm font-bold transition-all"
+                            data-tab="routes">
+                            <span class="block text-lg mb-1" aria-hidden="true">🛣️</span> Routes
+                        </button>
+                        <button type="button"
+                            class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
+                            data-tab="schedules">
+                            <span class="block text-lg mb-1" aria-hidden="true">📅</span> الجداول
+                        </button>
+                        <button type="button"
+                            class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
+                            data-tab="trips">
+                            <span class="block text-lg mb-1" aria-hidden="true">🚐</span> الرحلات
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab content -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                    <!-- Validation Tab Content -->
+                    <div class="tab-content fade-in" data-content="validation">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" aria-hidden="true">🔍</span>
+                            <div>
+                                <h3 class="font-black text-slate-900 text-lg">التحقق من جودة البيانات</h3>
+                                <p class="text-sm text-slate-500">افحص ملف الإكسل قبل الرفع للتأكد من جاهزيته</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>التحقق من تنسيق الأرقام</strong> — التأكد من أرقام الهواتف المصرية</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>التحقق من التنسيقات التاريخية</strong> — تحويل التواريخ إلى الشكل الصحيح</span>
+                            </li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>تحليل الورديات</strong> — التحقق من تعارضات الورديات</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>إدارة الموردين</strong> — التحقق من معلومات الموردين</span></li>
+                        </ul>
+                        
+                        <!-- Validation Tool Container -->
+                        <div id="validation-container" class="mt-6">
+                            <div class="upload-section" id="dropZone" style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 8px; margin-bottom: 20px; transition: border-color 0.3s;">
+                                <h4 style="margin-bottom: 15px;">📁 رفع ملف الإكسل للتحليل</h4>
+                                <p style="margin-bottom: 20px;">اسحب الملف هنا أو انقر لاختياره</p>
+                                <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+                                <button class="upload-btn" onclick="document.getElementById('fileInput').click()" style="background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px;">اختر ملف</button>
+                            </div>
+                            
+                            <div id="fileInfo" class="file-info" style="display: none; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;"></div>
+                            
+                            <div class="progress-bar" id="progressBar" style="display: none; width: 100%; height: 20px; background-color: #e9ecef; border-radius: 10px; overflow: hidden; margin: 20px 0;">
+                                <div class="progress-fill" id="progressFill" style="height: 100%; background-color: #28a745; width: 0%; transition: width 0.3s;"></div>
+                            </div>
+                            
+                            <div class="analysis-results" id="analysisResults" style="display: none; margin-top: 20px;">
+                                <h4 style="margin-bottom: 15px;">📈 نتائج التحليل</h4>
+                                
+                                <div class="summary-card" id="summaryCard" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
+                                    <!-- Summary cards will be populated here -->
+                                </div>
+                                
+                                <div class="action-buttons" style="text-align: center; margin: 20px 0;">
+                                    <button class="btn btn-primary" id="downloadCleanBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #007bff; color: white;">📥 تحميل الملف بعد التنظيف</button>
+                                    <button class="btn btn-success" id="proceedImportBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #28a745; color: white;">✅ الاستمرار في الرفع</button>
+                                    <button class="btn btn-secondary" id="resetBtn" style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #6c757d; color: white;">🔄 إعادة</button>
+                                </div>
+                                
+                                <h5 style="margin: 20px 0 10px;">⚠️ المشاكل المكتشفة</h5>
+                                <div style="overflow-x: auto;">
+                                    <table class="issues-table" id="issuesTable" style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                                        <thead>
+                                            <tr style="background-color: #f8f9fa;">
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الشدة</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">النوع</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الورقة</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الصف</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">العمود</th>
+                                                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الوصف</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="issuesTableBody">
+                                            <!-- Issues will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content hidden fade-in" data-content="routes">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" aria-hidden="true">🛣️</span>
+                            <div>
+                                <h3 class="font-black text-slate-900 text-lg">رفع الـ Routes</h3>
+                                <p class="text-sm text-slate-500">خطوط السير — يعني العربية هتمشي منين لفين</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>اربط الـ Route بالمشروع</strong> — يعني الخط ده تابع
+                                    لمين</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>اسم الخط</strong> — زي "خط المعادي - وسط البلد"</span>
+                            </li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>البداية والنهاية</strong> — منين وفي أي مكان</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                    class="text-slate-700"><strong>الحالة</strong> — نشط ولا متوقف</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content hidden fade-in" data-content="schedules">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" aria-hidden="true">📅</span>
+                            <div>
+                                <h3 class="font-black text-slate-900 text-lg">رفع الجداول</h3>
+                                <p class="text-sm text-slate-500">أوقات التشغيل — يعني العربية هتمشي إمتى</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                    class="text-slate-700"><strong>اربط الجدول بالـ Route</strong> — الجدول ده بتاع أنهي
+                                    خط</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                    class="text-slate-700"><strong>أيام التشغيل</strong> — السبت والأحد بس؟ ولا كل
+                                    يوم؟</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                    class="text-slate-700"><strong>وقت البداية والنهاية</strong> — من الساعة كام لكام</span>
+                            </li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                    class="text-slate-700"><strong>فترة الصلاحية</strong> — من تاريخ لتاريخ</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content hidden fade-in" data-content="trips">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" aria-hidden="true">🚐</span>
+                            <div>
+                                <h3 class="font-black text-slate-900 text-lg">رفع الرحلات</h3>
+                                <p class="text-sm text-slate-500">السجلات التنفيذية — الرحلة الفعلية اللي حصلت</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                    class="text-slate-700"><strong>وقت الرحلة</strong> — بدأت الساعة كام</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                    class="text-slate-700"><strong>اربطها بالجدول</strong> — الرحلة دي تابعة لجدول
+                                    إيه</span></li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                    class="text-slate-700"><strong>السائق والمركبة</strong> — مين ساق وأنهي عربية</span>
+                            </li>
+                            <li class="flex gap-3 items-start"><span
+                                    class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                    class="text-slate-700"><strong>الحالة</strong> — اتمت؟ اتلغت؟ متأخرة؟</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Workflow Order -->
+                <div class="callout callout-example mb-8">
+                    <div class="flex items-start gap-3 mb-4">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                        <div>
+                            <div class="font-black text-green-900">رتب شغلك صح! امشي بالترتيب ده</div>
+                            <p class="text-green-800 text-xs mt-1">لو عكست الدنيا هتبوظ منك. زي ما بتبني بيت — الأساس بييجي الأول.
+                            </p>
+                        </div>
+                    </div>
+                    <ol class="space-y-2 text-sm text-slate-700">
+                        <li class="flex gap-3 items-start"><span class="num-dot bg-green-600 text-white">1</span><span>ارفع
+                                الـ <strong>Routes</strong> الأول — الخطوط</span></li>
+                        <li class="flex gap-3 items-start"><span class="num-dot bg-green-600 text-white">2</span><span>بعدها
+                                ارفع <strong>الجداول</strong> المرتبطة بالخطوط دي</span></li>
+                        <li class="flex gap-3 items-start"><span class="num-dot bg-green-600 text-white">3</span><span><strong>راجع الأخطاء</strong> لو ظهرت
+                                أي حاجة</span></li>
+                        <li class="flex gap-3 items-start"><span class="num-dot bg-green-600 text-white">4</span><span>اعمل
+                                <strong>الرحلات</strong> وعيّن السواقين والعربيات</span></li>
+                        <li class="flex gap-3 items-start"><span
+                                class="num-dot bg-green-600 text-white">5</span><span><strong>راجع الرحلات</strong> قبل ما
+                                تشغّلها فعليًا</span></li>
+                    </ol>
+                </div>
+
+                <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                        <span class="text-lg" aria-hidden="true">🖼️</span>
+                        <span class="font-bold text-slate-800 text-sm">شكل عملية الرفع</span>
+                    </div>
+                    <img src="../Statics/img/BulkAll.png" alt="عملية رفع المشاريع"
+                        class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                    <figcaption class="p-4 bg-slate-50/50 text-sm text-slate-600 border-t border-slate-100">
+                        الصورة دي بتوضح إزاي بترفع ملف CSV فيه كل البيانات مرة واحدة.
+                    </figcaption>
+                </figure>
+                
+                <!-- Codefy Data Validation Tool Integration -->
+                <div class="mt-12 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="text-3xl" aria-hidden="true">🔍</div>
+                        <div>
+                            <h3 class="font-black text-slate-900 text-xl">التحقق من جودة البيانات</h3>
+                            <p class="text-sm text-slate-500">افحص ملف الإكسل قبل الرفع للتأكد من جاهزيته</p>
+                        </div>
+                    </div>
+                    
+                    <div id="validation-container">
+                        <div class="upload-section" id="dropZone" style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 8px; margin-bottom: 20px; transition: border-color 0.3s;">
+                            <h4 style="margin-bottom: 15px;">📁 رفع ملف الإكسل للتحليل</h4>
+                            <p style="margin-bottom: 20px;">اسحب الملف هنا أو انقر لاختياره</p>
+                            <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+                            <button class="upload-btn" onclick="document.getElementById('fileInput').click()" style="background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px;">اختر ملف</button>
+                        </div>
+                        
+                        <div id="fileInfo" class="file-info" style="display: none; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;"></div>
+                        
+                        <div class="progress-bar" id="progressBar" style="display: none; width: 100%; height: 20px; background-color: #e9ecef; border-radius: 10px; overflow: hidden; margin: 20px 0;">
+                            <div class="progress-fill" id="progressFill" style="height: 100%; background-color: #28a745; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                        
+                        <div class="analysis-results" id="analysisResults" style="display: none; margin-top: 20px;">
+                            <h4 style="margin-bottom: 15px;">📈 نتائج التحليل</h4>
+                            
+                            <div class="summary-card" id="summaryCard" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
+                                <!-- Summary cards will be populated here -->
+                            </div>
+                            
+                            <div class="action-buttons" style="text-align: center; margin: 20px 0;">
+                                <button class="btn btn-primary" id="downloadCleanBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #007bff; color: white;">📥 تحميل الملف بعد التنظيف</button>
+                                <button class="btn btn-success" id="proceedImportBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #28a745; color: white;">✅ الاستمرار في الرفع</button>
+                                <button class="btn btn-secondary" id="resetBtn" style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #6c757d; color: white;">🔄 إعادة</button>
+                            </div>
+                            
+                            <h5 style="margin: 20px 0 10px;">⚠️ المشاكل المكتشفة</h5>
+                            <div style="overflow-x: auto;">
+                                <table class="issues-table" id="issuesTable" style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                                    <thead>
+                                        <tr style="background-color: #f8f9fa;">
+                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الشدة</th>
+                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">النوع</th>
+                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الورقة</th>
+                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الصف</th>
+                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">العمود</th>
+                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الوصف</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="issuesTableBody">
+                                        <!-- Issues will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================================================== -->
+            <!-- SECTION 3: RELATIONSHIPS -->
+            <!-- ======================================================== -->
+            <section id="relationships" class="mb-24 section-content reveal">
+                <div class="flex items-start gap-4 mb-8">
+                    <div
+                        class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-2xl shadow-lg shadow-emerald-500/30"
+                        aria-hidden="true">
+                        🤝</div>
+                    <div>
+                        <div class="pill bg-emerald-50 text-emerald-700 mb-2">القسم التالت</div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">المورد والمركبة والسائق
+                        </h2>
+                        <p class="text-slate-500 font-medium mt-1">مين مربوط بمين؟</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info mb-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                        <div>
+                            <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                            <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                بص، المورد هو اللي بيجيبلك العربيات والسواقين. بتختار من تلات حاجات حسب الشغل:
+                                يا إما عربياتك وسواقينك شغالين معاك (موظف)، يا مورد بيجيبلك كل حاجة من بره (مقاول)، يا سواق حر معاه عربيته وبيشتغل بالقطعة (حرفي).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
+                    <h3 class="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="text-lg" aria-hidden="true">🗺️</span> الرسمة دي بتوضح العلاقة كلها
+                    </h3>
+                    <div class="mermaid flex justify-center" dir="ltr">
+                        flowchart LR
+                        S["🏢 المورد"]
+                        V["🚐 المركبة"]
+                        D["👨‍✈️ السائق"]
+                        A["📋 تعيين"]
+                        T["🚏 الرحلة"]
+                        S --> V
+                        S --> D
+                        D --> A
+                        V --> A
+                        S --> A
+                        A --> T
+                        style S fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+                        style T fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                    <div class="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-100 hover-lift">
+                        <div class="text-4xl mb-3" aria-hidden="true">👔</div>
+                        <h3 class="text-lg font-black text-blue-900 mb-1">نموذج الموظف</h3>
+                        <p class="text-xs text-blue-700 font-bold mb-4">الأسطول بتاعك</p>
+                        <ul class="space-y-2 text-xs text-slate-700">
+                            <li class="flex gap-2 items-start"><span class="text-blue-500" aria-hidden="true">●</span> السواق موظف عندك</li>
+                            <li class="flex gap-2 items-start"><span class="text-blue-500" aria-hidden="true">●</span> العربية ملكك</li>
+                            <li class="flex gap-2 items-start"><span class="text-blue-500" aria-hidden="true">●</span> خانة المورد فاضية</li>
+                            <li class="flex gap-2 items-start"><span class="text-blue-500" aria-hidden="true">●</span> السواق بياخد راتب شهري
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-gradient-to-br from-amber-50 to-white p-6 rounded-2xl border border-amber-100 hover-lift">
+                        <div class="text-4xl mb-3" aria-hidden="true">🏢</div>
+                        <h3 class="text-lg font-black text-amber-900 mb-1">نموذج المقاول</h3>
+                        <p class="text-xs text-amber-700 font-bold mb-4">مورد خارجي</p>
+                        <ul class="space-y-2 text-xs text-slate-700">
+                            <li class="flex gap-2 items-start"><span class="text-amber-500" aria-hidden="true">●</span> السواق مقاول</li>
+                            <li class="flex gap-2 items-start"><span class="text-amber-500" aria-hidden="true">●</span> العربية بتاعة المورد
+                            </li>
+                            <li class="flex gap-2 items-start"><span class="text-amber-500" aria-hidden="true">●</span> خانة المورد مطلوبة</li>
+                            <li class="flex gap-2 items-start"><span class="text-amber-500" aria-hidden="true">●</span> الدفع بمعدلات الرحلة
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-teal-50 to-white p-6 rounded-2xl border border-teal-100 hover-lift">
+                        <div class="text-4xl mb-3" aria-hidden="true">🧑‍🔧</div>
+                        <h3 class="text-lg font-black text-teal-900 mb-1">نموذج الحرفي</h3>
+                        <p class="text-xs text-teal-700 font-bold mb-4">سواق مستقل</p>
+                        <ul class="space-y-2 text-xs text-slate-700">
+                            <li class="flex gap-2 items-start"><span class="text-teal-500" aria-hidden="true">●</span> السواق حرفي</li>
+                            <li class="flex gap-2 items-start"><span class="text-teal-500" aria-hidden="true">●</span> العربية بتاعته هو</li>
+                            <li class="flex gap-2 items-start"><span class="text-teal-500" aria-hidden="true">●</span> خانة المورد فاضية</li>
+                            <li class="flex gap-2 items-start"><span class="text-teal-500" aria-hidden="true">●</span> الدفع لكل رحلة</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                            <span class="text-lg" aria-hidden="true">🔗</span>
+                            <span class="font-bold text-slate-800 text-sm">شكل العلاقة</span>
+                        </div>
+                        <img src="../Statics/Presentation/1.png" alt="العلاقة"
+                            class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
+                            مخطط بيوضح مين مربوط بمين في النظام.
+                        </figcaption>
+                    </figure>
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                            <span class="text-lg" aria-hidden="true">👥</span>
+                            <span class="font-bold text-slate-800 text-sm">نماذج التوظيف</span>
+                        </div>
+                        <img src="../Statics/Presentation/2.png" alt="نماذج التوظيف"
+                            class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
+                            التلات نماذج للتوظيف وملكية المركبات.
+                        </figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <!-- ======================================================== -->
+            <!-- SECTION 4: ASSIGNMENTS -->
+            <!-- ======================================================== -->
+            <section id="assignments" class="mb-24 section-content reveal">
+                <div class="flex items-start gap-4 mb-8">
+                    <div
+                        class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white text-2xl shadow-lg shadow-amber-500/30"
+                        aria-hidden="true">
+                        📋</div>
+                    <div>
+                        <div class="pill bg-amber-50 text-amber-700 mb-2">القسم الرابع</div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">توزيع الشغل (تعيين الجداول)</h2>
+                        <p class="text-slate-500 font-medium mt-1">مين هيعمل إيه وبأنهي عربية</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info mb-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                        <div>
+                            <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                            <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                التعيين ده معناه إنك بتقول للنظام "المشوار ده هيطلعه فلان، بالعربية الفلانية".
+                                كأنك بتوزع الشغل على الرجالة — كل واحد عارف رايح فين ومعاه إيه.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-6 shadow-sm">
+                    <h3 class="text-lg font-black text-slate-900 mb-5 flex items-center gap-2">
+                        <span class="text-xl" aria-hidden="true">🧩</span> عناصر التعيين
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-100">
+                            <div class="text-xs font-bold text-amber-600 mb-1">مشروع النقل</div>
+                            <div class="text-sm font-bold text-slate-800">العقد أو خدمة العميل</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-100">
+                            <div class="text-xs font-bold text-amber-600 mb-1">الـ Route</div>
+                            <div class="text-sm font-bold text-slate-800">مسار الخدمة</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-100">
+                            <div class="text-xs font-bold text-amber-600 mb-1">الجدول</div>
+                            <div class="text-sm font-bold text-slate-800">نمط الوقت المتكرر</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-100">
+                            <div class="text-xs font-bold text-amber-600 mb-1">المورد</div>
+                            <div class="text-sm font-bold text-slate-800">مزوّد النقل</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-100">
+                            <div class="text-xs font-bold text-amber-600 mb-1">المركبة</div>
+                            <div class="text-sm font-bold text-slate-800">العربية نفسها</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-100">
+                            <div class="text-xs font-bold text-amber-600 mb-1">السائق</div>
+                            <div class="text-sm font-bold text-slate-800">اللي هيسوق</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout callout-example mb-8">
+                    <div class="flex items-start gap-3 mb-4">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🛡️</span>
+                        <div>
+                            <div class="font-black text-green-900">الترتيب الآمن — أمشي كده وريّح دماغك</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                        <div class="flex items-center gap-2 bg-white/70 rounded-lg p-2"><span
+                                class="num-dot bg-green-600 text-white">1</span><span class="text-slate-700">اعمل كيان
+                                المورد</span></div>
+                        <div class="flex items-center gap-2 bg-white/70 rounded-lg p-2"><span
+                                class="num-dot bg-green-600 text-white">2</span><span class="text-slate-700">سجّل
+                                المركبات</span></div>
+                        <div class="flex items-center gap-2 bg-white/70 rounded-lg p-2"><span
+                                class="num-dot bg-green-600 text-white">3</span><span class="text-slate-700">سجّل
+                                السواقين</span></div>
+                        <div class="flex items-center gap-2 bg-white/70 rounded-lg p-2"><span
+                                class="num-dot bg-green-600 text-white">4</span><span class="text-slate-700">تأكد من
+                                الامتثال</span></div>
+                        <div class="flex items-center gap-2 bg-white/70 rounded-lg p-2"><span
+                                class="num-dot bg-green-600 text-white">5</span><span class="text-slate-700">حدّد المسار
+                                والجدول</span></div>
+                        <div class="flex items-center gap-2 bg-white/70 rounded-lg p-2"><span
+                                class="num-dot bg-green-600 text-white">6</span><span class="text-slate-700">نفّذ
+                                التعيين</span></div>
+                        <div class="flex items-center gap-2 bg-white/70 rounded-lg p-2 sm:col-span-2"><span
+                                class="num-dot bg-green-600 text-white">7</span><span class="text-slate-700">راقب
+                                المهام</span></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                            <span class="text-lg" aria-hidden="true">🖼️</span>
+                            <span class="font-bold text-slate-800 text-sm">واجهة التعيين</span>
+                        </div>
+                        <img src="../Statics/Presentation/10.png" alt="واجهة التعيين"
+                            class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
+                            هنا بتربط المورد والمركبة والسائق بالجدول.
+                        </figcaption>
+                    </figure>
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                            <span class="text-lg" aria-hidden="true">🔍</span>
+                            <span class="font-bold text-slate-800 text-sm">تفاصيل التعيين</span>
+                        </div>
+                        <img src="../Statics/Presentation/10r.png" alt="تفاصيل التعيين"
+                            class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
+                            تفاصيل إزاي الموارد بتربط بالجداول.
+                        </figcaption>
+                    </figure>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                            <span class="text-lg" aria-hidden="true">✏️</span>
+                            <span class="font-bold text-slate-800 text-sm">تعديل التعيينات — الجزء 1</span>
+                        </div>
+                        <img src="../Statics/Presentation/10rrl.png" alt="تعديل جزء 1"
+                            class="lightbox-trigger w-full h-auto max-h-[300px] object-contain" loading="lazy">
+                    </figure>
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                            <span class="text-lg" aria-hidden="true">✏️</span>
+                            <span class="font-bold text-slate-800 text-sm">تعديل التعيينات — الجزء 2</span>
+                        </div>
+                        <img src="../Statics/Presentation/10r2rl.png" alt="تعديل جزء 2"
+                            class="lightbox-trigger w-full h-auto max-h-[300px] object-contain" loading="lazy">
+                    </figure>
+                </div>
+            </section>
+
+            <!-- ======================================================== -->
+            <!-- SECTION 5: PRICING -->
+            <!-- ======================================================== -->
+            <section id="pricing" class="mb-24 section-content reveal">
+                <div class="flex items-start gap-4 mb-8">
+                    <div
+                        class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white text-2xl shadow-lg shadow-violet-500/30"
+                        aria-hidden="true">
+                        💰</div>
+                    <div>
+                        <div class="pill bg-violet-50 text-violet-700 mb-2">القسم الخامس</div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">التسعير</h2>
+                        <p class="text-slate-500 font-medium mt-1">عشان تعرف تكسب كام</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info mb-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                        <div>
+                            <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                            <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                التسعير ده معناه: بتدفع كام للمورد (تكلفة الإمداد)، وبتاخد كام من العميل (المبيعات).
+                                الفرق بينهم هو ده مكسبك اللي بيتحط في جيبك. حسبة دكان بسيطة جداً.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                    <div
+                        class="bg-gradient-to-br from-violet-50 to-white p-6 rounded-2xl border border-violet-100 hover-lift">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" aria-hidden="true">🛒</span>
+                            <div>
+                                <h3 class="text-lg font-black text-violet-900">تسعير الإمداد</h3>
+                                <p class="text-xs text-violet-700 font-bold">اللي بتدفعه للمورد</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-700">
+                            <li class="flex gap-2 items-start"><span class="text-violet-500" aria-hidden="true">●</span> المورد / مزوّد النقل
+                            </li>
+                            <li class="flex gap-2 items-start"><span class="text-violet-500" aria-hidden="true">●</span> نوع المركبة: أتوبيس،
+                                فان، شاحنة</li>
+                            <li class="flex gap-2 items-start"><span class="text-violet-500" aria-hidden="true">●</span> الخط: منين لفين</li>
+                            <li class="flex gap-2 items-start"><span class="text-violet-500" aria-hidden="true">●</span> الوردية: صبح، مسا،
+                                شهري</li>
+                            <li class="flex gap-2 items-start"><span class="text-violet-500" aria-hidden="true">●</span> الأساس: لكل رحلة، في
+                                اليوم، في الشهر</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-rose-50 to-white p-6 rounded-2xl border border-rose-100 hover-lift">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl" aria-hidden="true">💵</span>
+                            <div>
+                                <h3 class="text-lg font-black text-rose-900">تسعير المبيعات</h3>
+                                <p class="text-xs text-rose-700 font-bold">اللي بتقبضه من العميل</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-700">
+                            <li class="flex gap-2 items-start"><span class="text-rose-500" aria-hidden="true">●</span> العميل / مشروع النقل
+                            </li>
+                            <li class="flex gap-2 items-start"><span class="text-rose-500" aria-hidden="true">●</span> مستوى الخدمة: فئة
+                                المركبة، السعة</li>
+                            <li class="flex gap-2 items-start"><span class="text-rose-500" aria-hidden="true">●</span> التكرار: يومي، أسبوعي،
+                                شهري</li>
+                            <li class="flex gap-2 items-start"><span class="text-rose-500" aria-hidden="true">●</span> أساس الفوترة: لكل رحلة،
+                                لكل راكب</li>
+                            <li class="flex gap-2 items-start"><span class="text-rose-500" aria-hidden="true">●</span> قواعد الإيراد: الغرامات，
+                                الضريبة</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                    <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                        <span class="text-xl" aria-hidden="true">🧮</span> مثل بسيط للأرقام
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div
+                            class="text-center p-5 bg-gradient-to-br from-rose-50 to-white rounded-2xl border border-rose-100">
+                            <div class="text-[11px] font-black text-rose-600 mb-2">سعر البيع للعميل</div>
+                            <div class="text-3xl font-black text-rose-700">700 <span class="text-sm">ج.م</span></div>
+                            <div class="text-[11px] text-slate-500 mt-1">/ رحلة</div>
+                        </div>
+                        <div
+                            class="text-center p-5 bg-gradient-to-br from-slate-50 to-white rounded-2xl border border-slate-200 flex flex-col justify-center">
+                            <div class="text-2xl font-black text-slate-400" aria-hidden="true">−</div>
+                            <div class="text-[11px] text-slate-500 mt-1">ناقص</div>
+                        </div>
+                        <div
+                            class="text-center p-5 bg-gradient-to-br from-violet-50 to-white rounded-2xl border border-violet-100">
+                            <div class="text-[11px] font-black text-violet-600 mb-2">تكلفة الإمداد</div>
+                            <div class="text-3xl font-black text-violet-700">500 <span class="text-sm">ج.م</span></div>
+                            <div class="text-[11px] text-slate-500 mt-1">/ رحلة</div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="text-center p-6 bg-gradient-to-br from-emerald-50 to-white rounded-2xl border-2 border-emerald-200">
+                            <div class="text-[11px] font-black text-emerald-600 mb-2">يساوي مكسبك في الرحلة</div>
+                            <div class="text-5xl font-black text-emerald-600">200 <span class="text-xl">ج.م</span></div>
+                            <div class="text-xs text-slate-500 mt-2 font-bold">الهامش = 700 − 500</div>
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <div class="inline-block px-4 py-2 bg-slate-100 rounded-full text-xs font-bold text-slate-700">
+                                💡 نسبة الهامش = 200 ÷ 700 = <span class="text-emerald-600">28.6%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                                <span class="text-lg" aria-hidden="true">🛒</span>
+                                <span class="font-bold text-slate-800 text-sm">واجهة الإمداد</span>
+                            </div>
+                            <img src="../Statics/Presentation/3.png" alt="واجهة الإمداد"
+                                class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        </figure>
+                        <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                                <span class="text-lg" aria-hidden="true">💵</span>
+                                <span class="font-bold text-slate-800 text-sm">واجهة المبيعات</span>
+                            </div>
+                            <img src="../Statics/Presentation/4.png" alt="واجهة المبيعات"
+                                class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        </figure>
+                    </div>
+                </section>
+
+                <!-- ======================================================== -->
+                <!-- SECTION 6: READINESS -->
+                <!-- ======================================================== -->
+                <section id="readiness" class="mb-24 section-content reveal">
+                    <div class="flex items-start gap-4 mb-8">
+                        <div
+                            class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 text-white text-2xl shadow-lg shadow-rose-500/30"
+                            aria-hidden="true">
+                            ✅</div>
+                        <div>
+                            <div class="pill bg-rose-50 text-rose-700 mb-2">القسم السادس</div>
+                            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">مراجعة الجاهزية</h2>
+                            <p class="text-slate-500 font-medium mt-1">قبل ما تنطلق — تأكد إن كل حاجة تمام</p>
+                        </div>
+                    </div>
+
+                    <div class="callout callout-info mb-8">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                            <div>
+                                <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                                <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                    زي ما بتراجع على بنزينك وزيتك وكاوتشك قبل ما تطلع على الطريق — لازم تتأكد إن المشروع
+                                جاهز ومفيش حاجة ناقصة قبل ما تدوس بنزين وتشغل. شوية نقط بسيطة راجع عليها.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="text-xl" aria-hidden="true">📋</span> Checklist الجاهزية
+                        </h3>
+
+                        <div class="space-y-3">
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">حالة المشروع</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل المشروع نشط ومعتمد (Active/Approved)؟</p>
+                                </div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">تواريخ العقد</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل تاريخ الخدمة جوه فترة صلاحية العقد؟</p>
+                                </div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">الـ Routes</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل الخطوط اتعملت وهي نشطة؟</p>
+                                </div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">الجداول</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل الجداول اتكوّنت لأيام وأوقات التشغيل؟</p>
+                                </div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">التعيينات</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل الجداول معيّنة فعلًا لمورد أو مركبة أو سائق؟</p>
+                                </div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">التسعير</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل أسعار الإمداد والمبيعات متظبّطة؟</p>
+                                </div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">السعة</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل المركبات مناسبة لعدد الركاب ومتطلبات الخط؟</p>
+                                </div>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checklist-box"><span>✓</span></div>
+                                <div class="flex-1">
+                                    <div class="font-bold text-slate-900 text-sm">الاستثناءات</div>
+                                    <p class="text-xs text-slate-500 mt-1">هل اتعاملت مع الأعياد والإجازات والتواريخ المحظورة؟
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="callout callout-tip">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl flex-shrink-0" aria-hidden="true">💡</span>
+                                <div>
+                                    <div class="font-black text-amber-900 text-sm mb-1">نصيحة على السريع</div>
+                                    <p class="text-amber-800 text-xs leading-relaxed m-0">
+                                        اعمل مراجعة الجاهزية قبل التشغيل بيوم كامل — عشان لو في حاجة ناقصة، يبقى عندك وقت
+                                        تصلحها.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="callout callout-warn">
+                            <div class="flex items-start gap-3">
+                                <span class="text-xl flex-shrink-0" aria-hidden="true">⚠️</span>
+                                <div>
+                                    <div class="font-black text-red-900 text-sm mb-1">متستعجلش!</div>
+                                    <p class="text-red-800 text-xs leading-relaxed m-0">
+                                        مشروع شغّال مش معناه إنه جاهز. لازم كل البنود دي تتحقق قبل ما تعتبره جاهز للتشغيل.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                                <span class="text-lg" aria-hidden="true">🖼️</span>
+                                <span class="font-bold text-slate-800 text-sm">واجهة الجاهزية</span>
+                            </div>
+                            <img src="../Statics/Presentation/5.png" alt="واجهة الجاهزية"
+                                class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        </figure>
+                        <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                            <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                                <span class="text-lg" aria-hidden="true">🔗</span>
+                                <span class="font-bold text-slate-800 text-sm">العلاقة مع الـ Routes</span>
+                            </div>
+                            <img src="../Statics/Presentation/6.png" alt="العلاقة مع Routes"
+                                class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                        </figure>
+                    </div>
+                </section>
+
+                <!-- =================== Dynamic Stepper Footer for Active Section =================== -->
+                <div id="section-stepper-container"></div>
+
+                <!-- =================== FINAL CTA =================== -->
+                <div
+                    class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary-600 to-indigo-700 p-8 sm:p-12 text-white text-center shadow-2xl shadow-primary-600/30 reveal mt-16"
+                    id="final-cta">
+                    <div class="pointer-events-none absolute -top-10 -end-10 text-8xl opacity-10" aria-hidden="true">🎉</div>
+                    <div class="pointer-events-none absolute -bottom-10 -start-10 text-8xl opacity-10" aria-hidden="true">🚀</div>
+                    <div class="relative">
+                        <div class="text-5xl mb-4" aria-hidden="true">🎉</div>
+                        <h2 class="text-3xl sm:text-4xl font-black mb-3">عاش يا بطل! 🎊</h2>
+                        <p class="text-white/90 max-w-xl mx-auto mb-6 leading-relaxed">
+                            كده إنت لميت الليلة كلها وفهمت الدليل من الألف للياء. دلوقتي تقدر تخش وتستخدم نظام كوديفاي زي الباشا.
+                            ولو نسيت حاجة، القائمة اللي على الجنب معاك توديك لأي حتة.
+                        </p>
+                        <a href="#top"
+                            class="inline-flex items-center gap-2 bg-white text-primary-700 font-black px-6 py-3 rounded-xl hover:bg-primary-50 transition-colors shadow-lg">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="false" focusable="false">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                            </svg>
+                            ارجع لفوق
+                        </a>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- =================== Floating help button =================== -->
+        <button id="float-help" type="button" aria-label="مساعدة"
+            class="fixed bottom-6 start-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-xl shadow-primary-600/40 hover:scale-110 transition-transform">
+            <span class="text-xl" aria-hidden="true">💬</span>
+        </button>
+
+        <!-- ============ Back to top ============ -->
+        <button id="back-to-top" type="button" aria-label="العودة إلى الأعلى"
+            class="fixed bottom-6 end-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg shadow-primary-600/30 opacity-0 translate-y-3 pointer-events-none transition-all duration-300 hover:bg-primary-700 focus:outline-none">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+            </svg>
+        </button>
+
+        <!-- ============ Lightbox Modal ============ -->
+        <div id="lightbox" role="dialog" aria-modal="true" aria-label="عرض الصورة بالحجم الكامل"
+            class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/90 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+            <button id="lightbox-close" type="button" aria-label="إغلاق"
+                class="absolute top-6 end-6 text-white hover:text-slate-300 focus:outline-none p-2 bg-slate-800/50 hover:bg-slate-800/80 rounded-full transition-colors">
+                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="max-w-5xl max-h-screen p-4 w-full flex justify-center items-center">
+                <img id="lightbox-img" src="" alt="عرض مكبّر"
+                    class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+            </div>
+        </div>
+
+        <!-- Main Application Script -->
+        <script src="../Statics/JS/scripts.js"></script>
+        
+        <!-- Data Validation Script -->
+        <script>
+            // Data Validation Tool JavaScript
+            document.addEventListener('DOMContentLoaded', function() {
+                const dropZone = document.getElementById('dropZone');
+                const fileInput = document.getElementById('fileInput');
+                const fileInfo = document.getElementById('fileInfo');
+                const progressBar = document.getElementById('progressBar');
+                const progressFill = document.getElementById('progressFill');
+                const analysisResults = document.getElementById('analysisResults');
+                const summaryCard = document.getElementById('summaryCard');
+                const issuesTableBody = document.getElementById('issuesTableBody');
+                const downloadCleanBtn = document.getElementById('downloadCleanBtn');
+                const proceedImportBtn = document.getElementById('proceedImportBtn');
+                const resetBtn = document.getElementById('resetBtn');
+                
+                let currentAnalysis = null;
+                
+                // Drag and drop functionality
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = '#4f46e5';
+                    this.style.backgroundColor = '#ede9fe';
+                });
+                
+                dropZone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = '#ccc';
+                    this.style.backgroundColor = '';
+                });
+                
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = '#ccc';
+                    this.style.backgroundColor = '';
+                    
+                    if (e.dataTransfer.files.length) {
+                        handleFile(e.dataTransfer.files[0]);
+                    }
+                });
+                
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files.length) {
+                        handleFile(this.files[0]);
+                    }
+                });
+                
+                resetBtn.addEventListener('click', function() {
+                    fileInput.value = '';
+                    fileInfo.style.display = 'none';
+                    progressBar.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    analysisResults.style.display = 'none';
+                    summaryCard.innerHTML = '';
+                    issuesTableBody.innerHTML = '';
+                    downloadCleanBtn.disabled = true;
+                    proceedImportBtn.disabled = true;
+                });
+                
+                function handleFile(file) {
+                    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+                        alert('من فضلك اختر ملف إكسل صحيح (.xlsx أو .xls)');
+                        return;
+                    }
+                    
+                    // Show file info
+                    fileInfo.textContent = `تم اختيار: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} ميجابايت)`;
+                    fileInfo.style.display = 'block';
+                    
+                    // Start analysis
+                    startAnalysis(file);
+                }
+                
+                function startAnalysis(file) {
+                    progressBar.style.display = 'block';
+                    progressFill.style.width = '0%';
+                    
+                    // Simulate analysis progress
+                    let progress = 0;
+                    const interval = setInterval(() => {
+                        progress += Math.random() * 30;
+                        if (progress >= 100) {
+                            progress = 100;
+                            clearInterval(interval);
+                            completeAnalysis(file);
+                        }
+                        progressFill.style.width = `${progress}%`;
+                    }, 200);
+                }
+                
+                function completeAnalysis(file) {
+                    // In a real implementation, this would be replaced with actual API call to Python backend
+                    // For now, we'll simulate results
+                    
+                    // Mock analysis results
+                    currentAnalysis = {
+                        fileName: file.name,
+                        totalRows: Math.floor(Math.random() * 1000) + 500, // Random between 500-1500
+                        totalSheets: Math.floor(Math.random() * 5) + 1, // Random between 1-5
+                        score: Math.floor(Math.random() * 30) + 70, // Random between 70-100
+                        issues: [
+                            { severity: 'critical', category: 'Invalid Phone', sheet: 'Drivers', row: 45, column: 'Phone', issue: 'Invalid Egyptian phone number format' },
+                            { severity: 'warning', category: 'Date Format', sheet: 'Schedule', row: 12, column: 'Start_Date', issue: 'Date not in YYYY-MM-DD format' },
+                            { severity: 'info', category: 'Normalization', sheet: 'Routes', row: 67, column: 'Direction', issue: 'Direction inferred from schedule' },
+                            { severity: 'critical', category: 'Missing Data', sheet: 'Vehicles', row: 89, column: 'Driver_Name', issue: 'Required field missing' }
+                        ],
+                        summary: {
+                            critical: 2,
+                            warning: 3,
+                            info: 5
+                        }
+                    };
+                    
+                    displayResults(currentAnalysis);
+                }
+                
+                function displayResults(results) {
+                    // Update summary card
+                    summaryCard.innerHTML = `
+                        <div class="summary-item" style="background: #f8f9fa; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center;">
+                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold;">${results.totalRows}</div>
+                            <div class="summary-label">إجمالي الصفوف</div>
+                        </div>
+                        <div class="summary-item" style="background: #f8f9fa; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center;">
+                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold;">${results.totalSheets}</div>
+                            <div class="summary-label">إجمالي الأوراق</div>
+                        </div>
+                        <div class="summary-item critical" style="background: #ffeef0; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center; border-left: 4px solid #dc3545;">
+                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold; color: #dc3545;">${results.summary.critical}</div>
+                            <div class="summary-label">مشاكل حرجة</div>
+                        </div>
+                        <div class="summary-item warning" style="background: #fff3cd; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center; border-left: 4px solid #ffc107;">
+                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold; color: #856404;">${results.summary.warning}</div>
+                            <div class="summary-label">تحذيرات</div>
+                        </div>
+                        <div class="summary-item info" style="background: #d1ecf1; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center; border-left: 4px solid #17a2b8;">
+                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold; color: #0c5460;">${results.score}/100</div>
+                            <div class="summary-label">درجة الجودة</div>
+                        </div>
+                    `;
+                    
+                    // Update issues table
+                    issuesTableBody.innerHTML = '';
+                    results.issues.forEach(issue => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;" class="severity-${issue.severity}">
+                                <span style="font-weight: bold; ${
+                                    issue.severity === 'critical' ? 'color: #dc3545;' :
+                                    issue.severity === 'warning' ? 'color: #ffc107; color: #856404;' :
+                                    'color: #17a2b8;'
+                                }">${issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1)}</span>
+                            </td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.category}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.sheet}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.row}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.column}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.issue}</td>
+                        `;
+                        issuesTableBody.appendChild(row);
+                    });
+                    
+                    // Enable buttons based on results
+                    downloadCleanBtn.disabled = false;
+                    proceedImportBtn.disabled = results.summary.critical > 0; // Disable if critical issues exist
+                    
+                    analysisResults.style.display = 'block';
+                    progressBar.style.display = 'none';
+                }
+                
+                downloadCleanBtn.addEventListener('click', function() {
+                    alert('في التنفيذ الفعلي، هذا سيقوم بتحميل ملف الإكسل بعد التنظيف مع تطبيق الإصلاحات.');
+                    // In real implementation: trigger download of cleaned file from backend
+                });
+                
+                proceedImportBtn.addEventListener('click', function() {
+                    if (currentAnalysis.summary.critical > 0) {
+                        if (confirm('لا يزال هناك مشاكل حرجة في الملف. هل ترغب في المتابعة على أي حال؟')) {
+                            alert('في التنفيذ الفعلي، سيتم المتابعة بعملية الرفع.');
+                        }
+                    } else {
+                        alert('في التنفيذ الفعلي، سيتم المتابعة بعملية الرفع.');
+                    }
+                });
+            });
+        </script>
+        
+        <!-- Hidden styles for screen readers only -->
+        <style>
+            .sr-only {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+            
+            .focus\:not-sr-only:focus {
+                position: static;
+                width: auto;
+                height: auto;
+                padding: 0;
+                margin: 0;
+                overflow: visible;
+                clip: auto;
+                white-space: normal;
+            }
+            
+            .severity-critical {
+                color: #dc3545;
+                font-weight: bold;
+            }
+            
+            .severity-warning {
+                color: #ffc107;
+                color: #856404;
+            }
+            
+            .severity-info {
+                color: #17a2b8;
+            }
+            
+            .summary-item {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+                padding: 15px;
+                margin: 5px;
+                border-radius: 8px;
+            }
+            
+            .summary-item.critical {
+                background-color: #ffeef0;
+                border-left: 4px solid #dc3545;
+            }
+            
+            .summary-item.warning {
+                background-color: #fff3cd;
+                border-left: 4px solid #ffc107;
+            }
+            
+            .summary-item.info {
+                background-color: #d1ecf1;
+                border-left: 4px solid #17a2b8;
+            }
+            
+            .upload-btn {
+                background: #4f46e5;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                margin: 10px;
+            }
+            
+            .upload-btn:hover {
+                background: #4338ca;
+            }
+        </style>
+    </body>
+
+</html>

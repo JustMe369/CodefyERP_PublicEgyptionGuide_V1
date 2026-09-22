@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'Build completed'",
+    "build": "node -e \"require('fs').mkdirSync('dist', {recursive:true}); const fse = require('fs-extra'); fse.copySync('./Statics', './dist/Statics'); fse.copySync('./Temp', './dist/Temp'); fse.copySync('./api', './dist/api'); fse.copySync('./.vercel', './dist/.vercel'); fse.copySync('./README.md', './dist/README.md'); fse.copySync('./server.js', './dist/server.js'); fse.copySync('./vercel.json', './dist/vercel.json');\"",
     "start": "node server.js",
     "local-server": "node server.js",
     "api": "cd Statics/PY && python api_server.py"
@@ -13,7 +13,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "http-proxy-middleware": "^2.0.6"
+    "http-proxy-middleware": "^2.0.6",
+    "fs-extra": "^11.2.0"
   },
   "devDependencies": {
     "@vercel/node": "^2.10.3"

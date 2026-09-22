@@ -26,18 +26,17 @@
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/serverless-api.js"
-    },
-    {
       "source": "/(.*)",
       "destination": "/Temp/index.html"
     }
   ],
   "builds": [
     {
-      "src": "api/serverless-api.js",
-      "use": "@vercel/node"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ]
 }
