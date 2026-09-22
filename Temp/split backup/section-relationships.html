@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="دليل علاقات المورد والمركبة والسائق لنظام كوديفاي">
+    <meta name="theme-color" content="#2563eb">
+    <title>علاقات المورد والمركبة والسائق - دليل نظام كوديفاي</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        },
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#eff6ff',
+                primaryTextColor: '#1e3a8a',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#94a3b8',
+                fontFamily: 'Cairo, sans-serif'
+            }
+        });
+    </script>
+
+    <link rel="stylesheet" href="./../Statics/CSS/styles.css">
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
+
+    <!-- ============ Scroll Progress Bar ============ -->
+    <div id="scroll-progress"
+        class="fixed top-0 start-0 z-[60] h-1 w-0 bg-gradient-to-l from-primary-500 to-primary-700 transition-[width] duration-150 ease-out">
+    </div>
+
+    <!-- ============ Main Content ============ -->
+    <main id="top" class="mx-auto max-w-5xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
+
+        <!-- =================== HERO =================== -->
+        <header class="relative mb-8 rounded-xl overflow-hidden hero-gradient bg-grid border border-slate-200/60 p-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-lg sm:text-xl font-bold text-slate-900">
+                    <span class="block text-primary-600">دليل كوديفاي 🇪🇬</span>
+                </h1>
+                <div class="text-xs text-slate-600 hidden sm:block">نظام إدارة النقل الشامل</div>
+            </div>
+        </header>
+
+        <!-- ===== Section Header ===== -->
+        <div class="mb-16">
+            <div
+                class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 mb-4 ring-1 ring-inset ring-primary-700/10">
+                قسم علاقات المورد والمركبة والسائق
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-4">
+                علاقات المورد والمركبة والسائق
+            </h1>
+            <p class="text-lg text-slate-600 leading-relaxed max-w-3xl">
+                دليل شامل لفهم علاقات المورد والمركبة والسائق في نظام كوديفاي.
+            </p>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- SECTION 3: RELATIONSHIPS -->
+        <!-- ======================================================== -->
+        <section id="relationships" class="mb-24 section-content reveal">
+            <div class="flex items-start gap-4 mb-8">
+                <div
+                    class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white text-2xl shadow-lg shadow-emerald-500/30">
+                    🤝</div>
+                <div>
+                    <div class="pill bg-emerald-50 text-emerald-700 mb-2">القسم التالت</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">المورد والمركبة والسائق
+                    </h2>
+                    <p class="text-slate-500 font-medium mt-1">مين مربوط بمين؟</p>
+                </div>
+            </div>
+
+            <div class="callout callout-info mb-8">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl flex-shrink-0">🎯</span>
+                    <div>
+                        <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                        <p class="text-slate-700 text-sm leading-relaxed m-0">
+                            المورد هو اللي بيوفرلك العربيات والسواقين. إنت بتختار نموذج من تلاتة حسب شغلك:
+                            عربياتك وسواقينك (موظف)، ولا مورد خارجي بيوفر كل حاجة (مقاول)، ولا سواق مستقل بعربيته
+                            (حرفي).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
+                <h3 class="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="text-lg">🗺️</span> الرسمة دي بتوضح العلاقة كلها
+                </h3>
+                <div class="mermaid flex justify-center" dir="ltr">
+                    flowchart LR
+                    S["🏢 المورد"]
+                    V["🚐 المركبة"]
+                    D["👨‍✈️ السائق"]
+                    A["📋 تعيين"]
+                    T["🚏 الرحلة"]
+                    S --> V
+                    S --> D
+                    D --> A
+                    V --> A
+                    S --> A
+                    A --> T
+                    style S fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+                    style T fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                <div class="bg-gradient-to-br from-blue-50 to-white p-6 rounded-2xl border border-blue-100 hover-lift">
+                    <div class="text-4xl mb-3">👔</div>
+                    <h3 class="text-lg font-black text-blue-900 mb-1">نموذج الموظف</h3>
+                    <p class="text-xs text-blue-700 font-bold mb-4">الأسطول بتاعك</p>
+                    <ul class="space-y-2 text-xs text-slate-700">
+                        <li class="flex gap-2 items-start"><span class="text-blue-500">●</span> السواق موظف عندك</li>
+                        <li class="flex gap-2 items-start"><span class="text-blue-500">●</span> العربية ملكك</li>
+                        <li class="flex gap-2 items-start"><span class="text-blue-500">●</span> خانة المورد فاضية</li>
+                        <li class="flex gap-2 items-start"><span class="text-blue-500">●</span> السواق بياخد راتب شهري
+                        </li>
+                    </ul>
+                </div>
+
+                <div
+                    class="bg-gradient-to-br from-amber-50 to-white p-6 rounded-2xl border border-amber-100 hover-lift">
+                    <div class="text-4xl mb-3">🏢</div>
+                    <h3 class="text-lg font-black text-amber-900 mb-1">نموذج المقاول</h3>
+                    <p class="text-xs text-amber-700 font-bold mb-4">مورد خارجي</p>
+                    <ul class="space-y-2 text-xs text-slate-700">
+                        <li class="flex gap-2 items-start"><span class="text-amber-500">●</span> السواق مقاول</li>
+                        <li class="flex gap-2 items-start"><span class="text-amber-500">●</span> العربية بتاعة المورد
+                        </li>
+                        <li class="flex gap-2 items-start"><span class="text-amber-500">●</span> خانة المورد مطلوبة</li>
+                        <li class="flex gap-2 items-start"><span class="text-amber-500">●</span> الدفع بمعدلات الرحلة
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-gradient-to-br from-teal-50 to-white p-6 rounded-2xl border border-teal-100 hover-lift">
+                    <div class="text-4xl mb-3">🧑‍🔧</div>
+                    <h3 class="text-lg font-black text-teal-900 mb-1">نموذج الحرفي</h3>
+                    <p class="text-xs text-teal-700 font-bold mb-4">سواق مستقل</p>
+                    <ul class="space-y-2 text-xs text-slate-700">
+                        <li class="flex gap-2 items-start"><span class="text-teal-500">●</span> السواق حرفي</li>
+                        <li class="flex gap-2 items-start"><span class="text-teal-500">●</span> العربية بتاعته هو</li>
+                        <li class="flex gap-2 items-start"><span class="text-teal-500">●</span> خانة المورد فاضية</li>
+                        <li class="flex gap-2 items-start"><span class="text-teal-500">●</span> الدفع لكل رحلة</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                        <span class="text-lg">🔗</span>
+                        <span class="font-bold text-slate-800 text-sm">شكل العلاقة</span>
+                    </div>
+                    <img src="../Statics/img/1.png" alt="العلاقة"
+                        class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                    <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
+                        مخطط بيوضح مين مربوط بمين في النظام.
+                    </figcaption>
+                </figure>
+                <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                        <span class="text-lg">👥</span>
+                        <span class="font-bold text-slate-800 text-sm">نماذج التوظيف</span>
+                    </div>
+                    <img src="../Statics/img/2.png" alt="نماذج التوظيف"
+                        class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                    <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
+                        التلات نماذج للتوظيف وملكية المركبات.
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- =================== FINAL CTA =================== -->
+        <div
+            class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary-600 to-indigo-700 p-8 sm:p-12 text-white text-center shadow-2xl shadow-primary-600/30 reveal">
+            <div class="pointer-events-none absolute -top-10 -end-10 text-8xl opacity-10">🎉</div>
+            <div class="pointer-events-none absolute -bottom-10 -start-10 text-8xl opacity-10">🚀</div>
+            <div class="relative">
+                <div class="text-5xl mb-4">🎉</div>
+                <h2 class="text-3xl sm:text-4xl font-black mb-3">تمت العملية بنجاح! 🎊</h2>
+                <p class="text-white/90 max-w-xl mx-auto mb-6 leading-relaxed">
+                    لقد أكملت قسم علاقات المورد والمركبة والسائق. يمكنك الآن فهم العلاقات في نظام كوديفاي.
+                </p>
+                <a href="#top"
+                    class="inline-flex items-center gap-2 bg-white text-primary-700 font-black px-6 py-3 rounded-xl hover:bg-primary-50 transition-colors shadow-lg">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    ارجع لفوق
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =================== Floating help button =================== -->
+    <button id="float-help" type="button" aria-label="مساعدة"
+        class="fixed bottom-6 start-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-xl shadow-primary-600/40 hover:scale-110 transition-transform">
+        <span class="text-xl">💬</span>
+    </button>
+
+    <!-- ============ Back to top ============ -->
+    <button id="back-to-top" type="button" aria-label="العودة إلى الأعلى"
+        class="fixed bottom-6 end-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg shadow-primary-600/30 opacity-0 translate-y-3 pointer-events-none transition-all duration-300 hover:bg-primary-700 focus:outline-none">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <!-- ============ Lightbox Modal ============ -->
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="عرض الصورة بالحجم الكامل"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/90 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <button id="lightbox-close" type="button" aria-label="إغلاق"
+            class="absolute top-6 end-6 text-white hover:text-slate-300 focus:outline-none p-2 bg-slate-800/50 hover:bg-slate-800/80 rounded-full transition-colors">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="max-w-5xl max-h-screen p-4 w-full flex justify-center items-center">
+            <img id="lightbox-img" src="" alt="عرض م_kb_r"
+                class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+        </div>
+    </div>
+
+    <script src="./../Statics/JS/scripts.js"></script>
+</body>
+
+</html>

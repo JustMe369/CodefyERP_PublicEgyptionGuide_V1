@@ -1,0 +1,119 @@
+/* Navigation Styles */
+#mobile-header {
+  transition: all 0.3s ease;
+}
+
+#sidebar {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+#sidebar.shown {
+  transform: translateX(0);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  transform: translateX(-4px);
+}
+
+.nav-link.active {
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.03));
+  color: #2563eb !important;
+  font-weight: 700;
+  box-shadow: inset -3px 0 0 #2563eb;
+}
+
+/* Search input animations */
+.search-input:focus + .search-icon {
+  color: #2563eb;
+}
+
+/* Animation for navigation items */
+.nav-animation {
+  animation: navFadeIn 0.4s ease-out forwards;
+}
+
+@keyframes navFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments for navigation */
+@media (min-width: 1024px) {
+  #mobile-header {
+    display: none;
+  }
+  
+  #sidebar {
+    transform: translateX(0) !important;
+  }
+  
+  /* Ensure sidebar remains visible on large screens */
+  #sidebar.lg\:translate-x-0 {
+    transform: translateX(0) !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  #sidebar-overlay.is-visible {
+    display: block;
+  }
+  
+  /* Ensure proper positioning on mobile */
+  #sidebar.translate-x-full {
+    transform: translateX(100%) !important;
+  }
+}
+
+/* Custom scrollbar for sidebar */
+#sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+#sidebar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+#sidebar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Improved focus states for accessibility */
+.nav-link:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Better contrast for search suggestions */
+#search-suggestions li {
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #334155;
+  font-size: 14px;
+  transition: background-color var(--transition-fast);
+}
+
+#search-suggestions li:hover,
+#search-suggestions li:focus,
+#search-suggestions li.is-active {
+  background: #f1f5f9;
+  color: #1d4ed8;
+}

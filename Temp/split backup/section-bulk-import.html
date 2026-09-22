@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="دليل رفع المشاريع بالجملة لنظام كوديفاي">
+    <meta name="theme-color" content="#2563eb">
+    <title>رفع المشاريع بالجملة - دليل نظام كوديفاي</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        },
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#eff6ff',
+                primaryTextColor: '#1e3a8a',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#94a3b8',
+                fontFamily: 'Cairo, sans-serif'
+            }
+        });
+    </script>
+
+    <link rel="stylesheet" href="./../Statics/CSS/styles.css">
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
+
+    <!-- ============ Scroll Progress Bar ============ -->
+    <div id="scroll-progress"
+        class="fixed top-0 start-0 z-[60] h-1 w-0 bg-gradient-to-l from-primary-500 to-primary-700 transition-[width] duration-150 ease-out">
+    </div>
+
+    <!-- ============ Main Content ============ -->
+    <main id="top" class="mx-auto max-w-5xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
+
+        <!-- =================== HERO =================== -->
+        <header class="relative mb-8 rounded-xl overflow-hidden hero-gradient bg-grid border border-slate-200/60 p-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-lg sm:text-xl font-bold text-slate-900">
+                    <span class="block text-primary-600">دليل كوديفاي 🇪🇬</span>
+                </h1>
+                <div class="text-xs text-slate-600 hidden sm:block">نظام إدارة النقل الشامل</div>
+            </div>
+        </header>
+
+        <!-- ===== Section Header ===== -->
+        <div class="mb-16">
+            <div
+                class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 mb-4 ring-1 ring-inset ring-primary-700/10">
+                قسم رفع المشاريع بالجملة
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-4">
+                رفع المشاريع بالجملة
+            </h1>
+            <p class="text-lg text-slate-600 leading-relaxed max-w-3xl">
+                دليل شامل لرفع البيانات بالجملة في نظام كوديفاي.
+            </p>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- SECTION 2: BULK IMPORT -->
+        <!-- ======================================================== -->
+        <section id="bulk-import" class="mb-24 section-content reveal">
+            <div class="flex items-start gap-4 mb-8">
+                <div
+                    class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-2xl shadow-lg shadow-indigo-500/30">
+                    📦</div>
+                <div>
+                    <div class="pill bg-indigo-50 text-indigo-700 mb-2">القسم التاني</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">رفع المشاريع بالجملة
+                    </h2>
+                    <p class="text-slate-500 font-medium mt-1">وفّر وقتك — ارفع كله مرة واحدة</p>
+                </div>
+            </div>
+
+            <div class="callout callout-info mb-8">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl flex-shrink-0">🎯</span>
+                    <div>
+                        <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                        <p class="text-slate-700 text-sm leading-relaxed m-0">
+                            بدل ما تدخل كل سجل لوحده (وهتاخد منك ساعات)، بتعمل ملف إكسل واحد فيه كل البيانات
+                            وترفعه مرة واحدة. زي ما بترفع صورة على فيسبوك بالظبط.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-2 mb-6 shadow-sm">
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" class="tab-btn active rounded-xl py-3 px-3 text-sm font-bold transition-all"
+                        data-tab="routes">
+                        <span class="block text-lg mb-1">🛣️</span> Routes
+                    </button>
+                    <button type="button"
+                        class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
+                        data-tab="schedules">
+                        <span class="block text-lg mb-1">📅</span> الجداول
+                    </button>
+                    <button type="button"
+                        class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
+                        data-tab="trips">
+                        <span class="block text-lg mb-1">🚐</span> الرحلات
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab content -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                <div class="tab-content fade-in" data-content="routes">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">🛣️</span>
+                        <div>
+                            <h3 class="font-black text-slate-900 text-lg">رفع الـ Routes</h3>
+                            <p class="text-sm text-slate-500">خطوط السير — يعني العربية هتمشي منين لفين</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                class="text-slate-700"><strong>اربط الـ Route بالمشروع</strong> — يعني الخط ده تابع
+                                لمين</span></li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                class="text-slate-700"><strong>اسم الخط</strong> — زي "خط المعادي - وسط البلد"</span>
+                        </li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                class="text-slate-700"><strong>البداية والنهاية</strong> — منين وفي أي مكان</span></li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                class="text-slate-700"><strong>الحالة</strong> — نشط ولا متوقف</span></li>
+                    </ul>
+                </div>
+
+                <div class="tab-content hidden fade-in" data-content="schedules">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">📅</span>
+                        <div>
+                            <h3 class="font-black text-slate-900 text-lg">رفع الجداول</h3>
+                            <p class="text-sm text-slate-500">أوقات التشغيل — يعني العربية هتمشي إمتى</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                class="text-slate-700"><strong>اربط الجدول بالـ Route</strong> — الجدول ده بتاع أنهي
+                                خط</span></li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                class="text-slate-700"><strong>أيام التشغيل</strong> — السبت والأحد بس؟ ولا كل
+                                يوم؟</span></li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                class="text-slate-700"><strong>وقت البداية والنهاية</strong> — من الساعة كام لكام</span>
+                        </li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                class="text-slate-700"><strong>فترة الصلاحية</strong> — من تاريخ لتاريخ</span></li>
+                    </ul>
+                </div>
+
+                <div class="tab-content hidden fade-in" data-content="trips">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">🚐</span>
+                        <div>
+                            <h3 class="font-black text-slate-900 text-lg">رفع الرحلات</h3>
+                            <p class="text-sm text-slate-500">السجلات التنفيذية — الرحلة الفعلية اللي حصلت</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 text-sm">
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                class="text-slate-700"><strong>وقت الرحلة</strong> — بدأت الساعة كام</span></li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                class="text-slate-700"><strong>اربطها بالجدول</strong> — الرحلة دي تابعة لجدول
+                                إيه</span></li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                class="text-slate-700"><strong>السائق والمركبة</strong> — مين ساق وأنهي عربية</span>
+                        </li>
+                        <li class="flex gap-3 items-start"><span
+                                class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                class="text-slate-700"><strong>الحالة</strong> — اتمت؟ اتلغت؟ متأخرة؟</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Workflow Order -->
+            <div class="callout callout-example mb-8">
+                <div class="flex items-start gap-3 mb-4">
+                    <span class="text-2xl flex-shrink-0">🎯</span>
+                    <div>
+                        <div class="font-black text-green-900">الترتيب المهم! لازم تمشي بالترتيب ده</div>
+                        <p class="text-green-800 text-xs mt-1">لو مشيت بالعكس، هتتلخبط. زي ما بtbني بيت — الأساس الأول.
+                        </p>
+                    </div>
+                </div>
+                <ol class="space-y-2 text-sm text-slate-700">
+                    <li class="flex gap-3 items-start"><span class="num-dot bg-green-600 text-white">1</span><span>ارفع
+                            الـ <strong>Routes</strong> الأول — الخطوط</span></li>
+                    <li class="flex gap-3 items-start"><span class="num-dot bg-green-600 text-white">2</span><span>بعدها
+                            ارفع <strong>الجداول</strong> المرتبطة بالخطوط دي</span></li>
+                    <li class="flex gap-3 items-start"><span
+                            class="num-dot bg-green-600 text-white">3</span><span><strong>راجع الأخطاء</strong> لو ظهرت
+                            أي حاجة</span></li>
+                    <li class="flex gap-3 items-start"><span class="num-dot bg-green-600 text-white">4</span><span>اعمل
+                            <strong>الرحلات</strong> وعيّن السواقين والعربيات</span></li>
+                    <li class="flex gap-3 items-start"><span
+                            class="num-dot bg-green-600 text-white">5</span><span><strong>راجع الرحلات</strong> قبل ما
+                            تشغّلها فعليًا</span></li>
+                </ol>
+            </div>
+
+            <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
+                    <span class="text-lg">🖼️</span>
+                    <span class="font-bold text-slate-800 text-sm">شكل عملية الرفع</span>
+                </div>
+                <img src="../Statics/img/BulkAll.png" alt="عملية رفع المشاريع"
+                    class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
+                <figcaption class="p-4 bg-slate-50/50 text-sm text-slate-600 border-t border-slate-100">
+                    الصورة دي بتوضح إزاي بترفع ملف CSV فيه كل البيانات مرة واحدة.
+                </figcaption>
+            </figure>
+        </section>
+
+        <!-- =================== FINAL CTA =================== -->
+        <div
+            class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary-600 to-indigo-700 p-8 sm:p-12 text-white text-center shadow-2xl shadow-primary-600/30 reveal">
+            <div class="pointer-events-none absolute -top-10 -end-10 text-8xl opacity-10">🎉</div>
+            <div class="pointer-events-none absolute -bottom-10 -start-10 text-8xl opacity-10">🚀</div>
+            <div class="relative">
+                <div class="text-5xl mb-4">🎉</div>
+                <h2 class="text-3xl sm:text-4xl font-black mb-3">تمت العملية بنجاح! 🎊</h2>
+                <p class="text-white/90 max-w-xl mx-auto mb-6 leading-relaxed">
+                    لقد أكملت قسم رفع المشاريع بالجملة. يمكنك الآن رفع البيانات بالجملة في نظام كوديفاي.
+                </p>
+                <a href="#top"
+                    class="inline-flex items-center gap-2 bg-white text-primary-700 font-black px-6 py-3 rounded-xl hover:bg-primary-50 transition-colors shadow-lg">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    ارجع لفوق
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =================== Floating help button =================== -->
+    <button id="float-help" type="button" aria-label="مساعدة"
+        class="fixed bottom-6 start-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-xl shadow-primary-600/40 hover:scale-110 transition-transform">
+        <span class="text-xl">💬</span>
+    </button>
+
+    <!-- ============ Back to top ============ -->
+    <button id="back-to-top" type="button" aria-label="العودة إلى الأعلى"
+        class="fixed bottom-6 end-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg shadow-primary-600/30 opacity-0 translate-y-3 pointer-events-none transition-all duration-300 hover:bg-primary-700 focus:outline-none">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <!-- ============ Lightbox Modal ============ -->
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="عرض الصورة بالحجم الكامل"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/90 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <button id="lightbox-close" type="button" aria-label="إغلاق"
+            class="absolute top-6 end-6 text-white hover:text-slate-300 focus:outline-none p-2 bg-slate-800/50 hover:bg-slate-800/80 rounded-full transition-colors">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="max-w-5xl max-h-screen p-4 w-full flex justify-center items-center">
+            <img id="lightbox-img" src="" alt="عرض مكبّر"
+                class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+        </div>
+    </div>
+
+    <script src="./../Statics/JS/scripts.js"></script>
+</body>
+
+</html>

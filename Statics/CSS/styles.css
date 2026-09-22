@@ -1,0 +1,571 @@
+/* =========================================================
+   Custom Properties
+   ========================================================= */
+:root {
+    --header-height: 120px;
+    /* Unified vertical offset */
+    --transition-fast: 150ms;
+    --transition-base: 300ms;
+    --transition-slow: 700ms;
+}
+
+/* =========================================================
+   Base / Typography
+   ========================================================= */
+body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* =========================================================
+   Custom Scrollbar
+   ========================================================= */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+    transition: background var(--transition-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* =========================================================
+   Background pattern
+   ========================================================= */
+.bg-grid {
+    background-image:
+        linear-gradient(rgba(148, 163, 184, .07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, .07) 1px, transparent 1px);
+    background-size: 32px 32px;
+}
+
+/* =========================================================
+   Hero gradient
+   ========================================================= */
+.hero-gradient {
+    background:
+        radial-gradient(1200px 500px at 80% 0%, rgba(96, 165, 250, .25), transparent 60%),
+        radial-gradient(1000px 400px at 10% 20%, rgba(167, 139, 250, .22), transparent 60%),
+        radial-gradient(900px 500px at 50% 100%, rgba(52, 211, 153, .18), transparent 60%);
+}
+
+/* =========================================================
+   Glass
+   ========================================================= */
+.glass {
+    background: rgba(255, 255, 255, .75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+/* =========================================================
+   Image Hover & Lightbox Cursor
+   ========================================================= */
+.lightbox-trigger {
+    cursor: zoom-in;
+    transition: transform var(--transition-base) ease, box-shadow var(--transition-base) ease;
+}
+
+.lightbox-trigger:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .1);
+}
+
+/* =========================================================
+   Anchor offset for headings
+   ========================================================= */
+.prose h2,
+section[id] {
+    scroll-margin-top: 6rem;
+}
+
+/* =========================================================
+   Mermaid SVG
+   ========================================================= */
+.mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* =========================================================
+   Focus visibility (a11y)
+   ========================================================= */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+    border-radius: 8px;
+}
+
+/* =========================================================
+   Back-to-top reveal
+   ========================================================= */
+#back-to-top.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* =========================================================
+   Fade-in on scroll (reveal)
+   ========================================================= */
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity var(--transition-slow) ease, transform var(--transition-slow) ease;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* =========================================================
+   Hidden sections
+   ========================================================= */
+.hidden {
+    display: none !important;
+}
+
+/* =========================================================
+   Tabs
+   ========================================================= */
+.tab-btn.active {
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 10px 25px -10px rgba(37, 99, 235, .7);
+}
+
+.tab-content.fade-in {
+    animation: fadeInUp 0.4s ease both;
+}
+
+/* =========================================================
+   Active nav link — shimmer ring
+   ========================================================= */
+.nav-link.active {
+    background: linear-gradient(90deg, rgba(37, 99, 235, .10), rgba(37, 99, 235, .02));
+    color: #1d4ed8;
+    font-weight: 700;
+    position: relative;
+}
+
+.nav-link.active::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: #2563eb;
+    border-radius: 4px;
+}
+
+/* =========================================================
+   Pill badge
+   ========================================================= */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* =========================================================
+   Callouts
+   ========================================================= */
+.callout {
+    position: relative;
+    border-radius: 16px;
+    padding: 18px 20px;
+    border-inline-start: 5px solid transparent;
+}
+
+.callout-tip {
+    background: #fffbeb;
+    border-color: #f59e0b;
+}
+
+.callout-warn {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+.callout-info {
+    background: #eff6ff;
+    border-color: #3b82f6;
+}
+
+.callout-example {
+    background: #f0fdf4;
+    border-color: #22c55e;
+}
+
+.callout-note {
+    background: #f5f3ff;
+    border-color: #8b5cf6;
+}
+
+/* =========================================================
+   Card hover lift
+   ========================================================= */
+.hover-lift {
+    transition: transform var(--transition-base) ease, box-shadow var(--transition-base) ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 50px -20px rgba(15, 23, 42, .25);
+}
+
+/* =========================================================
+   Utility: numbered / check dots (used heavily in HTML)
+   ========================================================= */
+.num-dot,
+.check-dot {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.check-dot {
+    border-radius: 999px;
+}
+
+/* =========================================================
+   Checklist items
+   ========================================================= */
+.checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.checklist-item:hover {
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+
+.checklist-box {
+    flex-shrink: 0;
+    margin-top: 2px;
+    height: 24px;
+    width: 24px;
+    border-radius: 8px;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f43f5e;
+    font-size: 12px;
+    transition: border-color var(--transition-base), background-color var(--transition-base);
+}
+
+.checklist-item:hover .checklist-box {
+    border-color: #f43f5e;
+    background: #fff1f2;
+}
+
+/* =========================================================
+   Search suggestions
+   ========================================================= */
+#search-suggestions li {
+    padding: 8px 16px;
+    cursor: pointer;
+    color: #334155;
+    font-size: 14px;
+    transition: background-color var(--transition-fast);
+}
+
+#search-suggestions li:hover,
+#search-suggestions li:focus,
+#search-suggestions li.is-active {
+    background: #f1f5f9;
+    color: #1d4ed8;
+}
+
+/* =========================================================
+   Progress bar shimmer
+   ========================================================= */
+#scroll-progress {
+    background: linear-gradient(90deg, #60a5fa, #2563eb, #7c3aed);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+}
+
+/* =========================================================
+   Keyframes
+   ========================================================= */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes fadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* =========================================================
+   Reduced motion — respect user preference
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* =========================================================
+   Print
+   ========================================================= */
+@media print {
+
+    aside,
+    #mobile-header,
+    #lightbox,
+    #back-to-top,
+    #scroll-progress,
+    #float-help,
+    #sidebar-overlay {
+        display: none !important;
+    }
+
+    main {
+        margin: 0 !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+
+    .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .callout,
+    .bg-white {
+        box-shadow: none !important;
+    }
+
+    a {
+        color: #1e3a8a !important;
+        text-decoration: underline;
+    }
+}
+
+/* =========================================================
+   Performance improvements
+   ========================================================= */
+/* Optimize for faster rendering */
+* {
+    box-sizing: border-box;
+}
+
+/* Improve image loading */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Optimize for better performance */
+.will-change-transform {
+    will-change: transform;
+}
+
+/* Smooth scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
+/* =========================================================
+   Single Section Focused View Mode
+   ========================================================= */
+.single-section-mode .section-content:not(.active-section) {
+    display: none !important;
+}
+
+.section-content.active-section {
+    display: block !important;
+    animation: sectionEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes sectionEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Section completion indicators */
+.section-check-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 800;
+    transition: all 0.25s ease;
+}
+
+.section-check-badge.is-done {
+    background-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.section-check-badge:not(.is-done) {
+    background-color: #e2e8f0;
+    color: #94a3b8;
+}
+
+/* Mode Switcher Pill Button */
+.view-mode-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.view-mode-pill.active {
+    background-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.35);
+}
+
+.view-mode-pill:not(.active) {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.view-mode-pill:not(.active):hover {
+    background-color: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Bottom Section Stepper Footer */
+.section-stepper-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    text-decoration: none !important;
+}
+
+.section-stepper-card:hover {
+    transform: translateY(-3px);
+    border-color: #3b82f6;
+    box-shadow: 0 12px 24px -6px rgba(37, 99, 235, 0.12);
+}
+
+/* Modern Egyptian Toast Alert */
+#toast-notification {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+}
+
+#toast-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
