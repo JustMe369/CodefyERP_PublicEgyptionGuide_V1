@@ -17,7 +17,7 @@ import json
 import math
 import urllib.parse
 from collections import Counter, defaultdict
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import Dict, List, Tuple, Any, Optional, Union
 
 try:
@@ -58,8 +58,14 @@ COL_DIRECTION = 'direction'
 COL_EMP_TYPE = 'employee_type'
 COL_START_DATE = 'start_date'
 COL_END_DATE = 'end_date'
+COL_SERVICE_TYPE = 'service_type'
 COL_CAPACITY = 'capacity'
 COL_VEHICLE_TYPE = 'vehicle_type'
+COL_DRIVER_LICENSE = 'driver_license'
+COL_INSURANCE_EXPIRY = 'insurance_expiry'
+COL_MAINTENANCE_DATE = 'maintenance_date'
+COL_FUEL_TYPE = 'fuel_type'
+COL_VEHICLE_STATUS = 'vehicle_status'
 
 # ERP column specifications
 ERP_COLUMN_SPEC = {
@@ -79,8 +85,14 @@ ERP_COLUMN_SPEC = {
     COL_DIRECTION: {'type': 'enum', 'enum': ['north', 'south', 'east', 'west', 'round_trip']},
     COL_START_DATE: {'type': 'date'},
     COL_END_DATE: {'type': 'date'},
+    COL_SERVICE_TYPE: {'type': 'enum', 'enum': ['daily', 'weekly', 'monthly', 'event']},
     COL_CAPACITY: {'type': 'number'},
     COL_VEHICLE_TYPE: {'type': 'enum', 'enum': ['bus', 'van', 'truck', 'car']},
+    COL_DRIVER_LICENSE: {'type': 'text'},
+    COL_INSURANCE_EXPIRY: {'type': 'date'},
+    COL_MAINTENANCE_DATE: {'type': 'date'},
+    COL_FUEL_TYPE: {'type': 'enum', 'enum': ['gasoline', 'diesel', 'electric', 'hybrid']},
+    COL_VEHICLE_STATUS: {'type': 'enum', 'enum': ['active', 'inactive', 'maintenance', 'decommissioned']},
 }
 
 # Day aliases for working days
@@ -99,22 +111,26 @@ DAY_CANONICAL_ORDER = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', '
 # Working days separators
 WORKING_DAYS_SEPARATORS = re.compile(r'[,\s\n\t;/\\|]+|و|and', re.IGNORECASE)
 
-# Vehicle type aliases
-VEHICLE_TYPE_ALIASES = {
-    'bus': ['bus', 'autobus', 'coach', 'اتوبيس', 'ميكروباص'],
-    'van': ['van', 'truck', 'pickup', 'فان', 'مقطور'],
-    'car': ['car', 'sedan', 'suv', 'carriage', 'سيارة'],
-    'truck': ['truck', 'lorry', 'lorries', 'شاحنة']
+# Shift patterns and ordinals
+SHIFT_BASE_PATTERNS = {
+    'Morning': ['morning', 'صباحي', 'am', 'early', 'فجر'],
+    'Evening': ['evening', 'مسائي', 'pm', 'late', 'مغرب'],
+    'Night': ['night', 'ليلي', 'night', ' полночной'],
+    'Day': ['day', 'نهار', 'normal', ' يومي'],
+    'Special': ['special', 'خاصة', 'extra', ' مميز'],
+    'Holiday': ['holiday', 'عطلة', 'weekend', ' عطلة'],
+    'Weekend': ['weekend', 'نهاية الاسبوع', 'off', ' اسبوعية']
 }
 
-# Plate number patterns for Egyptian plates
-EGYPTIAN_PLATE_PATTERNS = [
-    re.compile(r'^\d{3,4}-?[أ-ي]{1,3}-?\d{2,3}$', re.IGNORECASE),  # Arabic letters
-    re.compile(r'^\d{3,4}-?[A-Z]{1,3}-?\d{2,3}$', re.IGNORECASE),  # Latin letters
-    re.compile(r'^[أ-ي]{1,3}-?\d{3,4}-?\d{2,3}$', re.IGNORECASE),  # Arabic letters first
-    re.compile(r'^[A-Z]{1,3}-?\d{3,4}-?\d{2,3}$', re.IGNORECASE),  # Latin letters first
+SHIFT_ORDINALS = [
+    (['first', 'primary', 'main', 'الاول', 'الرئيسي'], 'Primary', 'Pri'),
+    (['second', 'secondary', 'الثاني', 'الفرعي'], 'Secondary', 'Sec'),
+    (['third', 'tertiary', 'الثالث'], 'Tertiary', 'Ter'),
+    (['round', 'both', '往返', 'both ways', '往返'], 'Round Trip', 'RT'),
+    (['express', 'fast', 'سريع', ' express'], 'Express', 'Exp'),
+    (['regular', 'normal', 'عادي', ' standard'], 'Regular', 'Reg'),
+    (['vip', 'premium', ' vip', ' مميز'], 'VIP', 'VIP')
 ]
-
 
 def to_str(value: Any) -> str:
     """Convert any value to string, handling None and other types."""
@@ -127,7 +143,9 @@ def to_str(value: Any) -> str:
 
 def is_arabic(text: str) -> bool:
     """Check if text contains Arabic characters."""
-    return bool(re.search(r'[\u0600-\u06FF]', text))
+    if not text:
+        return False
+    return bool(re.search(r'[\u0600-\u06FF]', str(text)))
 
 
 def normalize_name(name: str) -> str:
@@ -140,13 +158,13 @@ def normalize_name(name: str) -> str:
 def is_phone_column_name(col_name: str) -> bool:
     """Check if column name likely represents a phone number."""
     col_lower = col_name.lower()
-    return any(keyword in col_lower for keyword in ['phone', 'mobile', 'contact', 'tel'])
+    return any(keyword in col_lower for keyword in ['phone', 'mobile', 'contact', 'tel', 'hp', 'gsm'])
 
 
 def is_date_like_column(col_name: str, values: List[Any]) -> bool:
     """Check if column likely represents dates."""
     col_lower = col_name.lower()
-    if any(keyword in col_lower for keyword in ['date', 'time', 'start', 'end', 'arrival', 'departure']):
+    if any(keyword in col_lower for keyword in ['date', 'time', 'start', 'end', 'arrival', 'departure', 'expiry', 'maint']):
         return True
     
     # Check actual values for date-like patterns
@@ -176,7 +194,7 @@ def normalize_time_string(time_str: str, to_hhmm: bool = False, convert_12h: boo
     # Handle various time formats
     time_formats = [
         '%H:%M:%S', '%I:%M:%S %p', '%H:%M', '%I:%M %p', '%H%M', '%I%M %p',
-        '%H.%M', '%I.%M %p'
+        '%H.%M', '%I.%M %p', '%H:%M:%S.%f', '%I:%M:%S.%f %p'
     ]
     
     for fmt in time_formats:
@@ -220,63 +238,6 @@ def offset_time_min(time_str: str, minutes: int) -> Optional[str]:
     return f"{new_hour:02d}:{new_minute:02d}"
 
 
-def is_valid_capacity(value: Any) -> Tuple[bool, Optional[int], str]:
-    """Validate vehicle capacity."""
-    if value is None:
-        return False, None, "Capacity value is None"
-    
-    s = to_str(value)
-    if not s:
-        return False, None, "Capacity value is empty"
-    
-    try:
-        num = int(float(s))  # Convert to float first to handle decimal strings
-        if num <= 0:
-            return False, num, f"Capacity must be positive, got {num}"
-        if num > 1000:
-            return False, num, f"Capacity seems too high: {num} (max recommended: 1000)"
-        return True, num, ""
-    except ValueError:
-        return False, None, f"Cannot convert '{s}' to integer"
-
-
-def is_valid_plate_number(plate: str) -> bool:
-    """Validate Egyptian plate number format."""
-    if not plate:
-        return False
-    
-    plate_normalized = to_str(plate).replace(' ', '').replace('-', '')
-    
-    for pattern in EGYPTIAN_PLATE_PATTERNS:
-        if pattern.match(plate_normalized):
-            return True
-    
-    return False
-
-
-def detect_vehicle_type(vehicle_desc: str) -> Optional[str]:
-    """Detect vehicle type from description."""
-    if not vehicle_desc:
-        return None
-    
-    desc_lower = normalize_name(vehicle_desc)
-    
-    for vehicle_type, aliases in VEHICLE_TYPE_ALIASES.items():
-        for alias in aliases:
-            if alias in desc_lower:
-                return vehicle_type
-    
-    # Fallback: try to guess from capacity or other clues
-    if 'micro' in desc_lower or 'small' in desc_lower:
-        return 'van'
-    elif 'large' in desc_lower or 'big' in desc_lower:
-        return 'bus'
-    elif 'truck' in desc_lower:
-        return 'truck'
-    
-    return None
-
-
 class PhoneValidator:
     """Validate and classify Egyptian phone numbers."""
     
@@ -291,37 +252,37 @@ class PhoneValidator:
         
         if not d:
             if is_arabic(s):
-                return 'arabic', None, f'Text note in phone column: {s[:25]}'
+                return 'arabic', None, f'ملاحظة نصية في عمود الهاتف: {s[:25]}'
             return 'empty', None, ''
         
         if len(d) == 12 and d.startswith('20') and EG_PHONE_RE.match('0' + d[2:]):
-            return 'fixable', '0' + d[2:], 'Converted +20 country code'
+            return 'fixable', '0' + d[2:], 'تم تحويل رمز الدولة +20'
         
         if len(d) == 14 and d.startswith('0020') and EG_PHONE_RE.match('0' + d[4:]):
-            return 'fixable', '0' + d[4:], 'Converted 0020 country code'
+            return 'fixable', '0' + d[4:], 'تم تحويل رمز الدولة 0020'
         
         if len(d) == 11:
             if EG_PHONE_RE.match(d):
                 if d != s: 
-                    return 'fixable', d, 'Normalized to 11-digit phone'
+                    return 'fixable', d, 'تم التطبيع إلى هاتف مكون من 11 رقماً'
                 return 'ok', d, ''
             
             return 'invalid', None, (
-                f'Invalid prefix "{d[:3]}" — must start with 010/011/012/015')
+                f'رمز غير صالح "{d[:3]}" — يجب أن يبدأ بـ 010/011/012/015')
         
         if len(d) == 10:
             cand = '0' + d
             if EG_PHONE_RE.match(cand):
-                return 'fixable', cand, f'Fixed by adding leading 0 → {cand}'
-            return 'invalid', None, f'10 digits with invalid prefix "{cand[:3]}"'
+                return 'fixable', cand, f'تم الإصلاح بإضافة صفر في البداية → {cand}'
+            return 'invalid', None, f'10 أرقام برمز غير صالح "{cand[:3]}"'
         
         if len(d) > 11:
             return 'invalid', None, (
-                f'Too many digits ({len(d)}) — must be exactly 11 (e.g. 01099831981)')
+                f'عدد كبير جداً من الأرقام ({len(d)}) — يجب أن يكون 11 رقماً بالضبط (مثلاً 01099831981)')
         
         return 'short', None, (
-            f'🚩 Phone has only {len(d)} digit(s) — REQUIRED 11 digits. '
-            f'Value NOT modified; cell marked RED for manual review.')
+            f'🚩 الهاتف يحتوي فقط على {len(d)} رقم(أرقام) — مطلوب 11 رقماً بالضبط. '
+            f'القيمة غير مُعدّلة؛ تم تعليم الخلية باللون الأحمر للمراجعة اليدوية.')
 
     @staticmethod
     def effective(phone_value):
@@ -344,8 +305,8 @@ class DateValidator:
         # Handle datetime objects
         if isinstance(raw, (datetime, date)) and not isinstance(raw, bool):
             if isinstance(raw, datetime):
-                return 'ok', raw.strftime('%Y-%m-%d'), 'DateTime object converted'
-            return 'ok', raw.strftime('%Y-%m-%d'), 'Date object converted'
+                return 'ok', raw.strftime('%Y-%m-%d'), 'تم تحويل كائن التاريخ'
+            return 'ok', raw.strftime('%Y-%m-%d'), 'تم تحويل كائن التاريخ'
         
         # Try common date formats
         formats = [
@@ -363,9 +324,9 @@ class DateValidator:
                 # Convert to standard format
                 s_dash = s.replace('/', '-').replace('.', '-')
                 if fmt.count('-') == 2 and s_dash != s:
-                    return 'fixable', d.strftime('%Y-%m-%d'), 'Normalized separators'
+                    return 'fixable', d.strftime('%Y-%m-%d'), 'تم تطبيع الفواصل'
                 if d.strftime('%Y-%m-%d') != s:
-                    return 'fixable', d.strftime('%Y-%m-%d'), 'Standardized format'
+                    return 'fixable', d.strftime('%Y-%m-%d'), 'تم توحيد التنسيق'
                 return 'ok', s, ''
             except ValueError:
                 continue
@@ -380,13 +341,13 @@ class DateValidator:
                     d = datetime.strptime(s_dash, fmt)
                     if '%y' in fmt and d.year < 1950: 
                         d = d.replace(year=d.year + 2000)
-                    return 'fixable', d.strftime('%Y-%m-%d'), 'Normalized separators'
+                    return 'fixable', d.strftime('%Y-%m-%d'), 'تم تطبيع الفواصل'
                 except ValueError: 
                     continue
         except Exception: 
             pass
         
-        return 'invalid', None, f'Unrecognized date: "{s[:32]}"'
+        return 'invalid', None, f'تاريخ غير معروف: "{s[:32]}"'
 
 
 class ShiftEngine:
@@ -395,23 +356,10 @@ class ShiftEngine:
     def __init__(self, settings=None):
         self.settings = settings
         # Base shift patterns
-        self.base_patterns = {
-            'Morning': ['morning', 'صباحي', 'am', 'early', 'فجر'],
-            'Evening': ['evening', 'مسائي', 'pm', 'late', 'عصر'],
-            'Night': ['night', 'ليلي', 'night', 'ليل'],
-            'Day': ['day', 'نهار', 'normal', 'ظُهْر'],
-            'Special': ['special', 'خاصة', 'extra', 'إضافي']
-        }
+        self.base_patterns = dict(SHIFT_BASE_PATTERNS)
         
         # Ordinal patterns
-        self.ordinals = [
-            (['first', 'primary', 'main', 'الاول', 'الرئيسي'], 'Primary', 'Pri'),
-            (['second', 'secondary', 'الثاني', 'الفرعي'], 'Secondary', 'Sec'),
-            (['third', 'tertiary', 'الثالث'], 'Tertiary', 'Ter'),
-            (['round', 'both', '往返', 'both ways', 'ذهاب وعودة'], 'Round Trip', 'RT'),
-            (['weekly', 'اسبوعي', 'week'], 'Weekly', 'WK'),
-            (['monthly', 'شهري', 'month'], 'Monthly', 'MO')
-        ]
+        self.ordinals = list(SHIFT_ORDINALS)
         
         if settings:
             for base_display, triggers in settings.custom_shift_bases.items():
@@ -493,47 +441,45 @@ class ShiftEngine:
         }
 
 
-class CapacityValidator:
-    """Validate vehicle capacity and related fields."""
+class MainSuppliersManager:
+    """Manage main/internal suppliers and their configurations."""
     
-    @staticmethod
-    def validate_capacity(value: Any, vehicle_type: Optional[str] = None) -> Dict[str, Any]:
-        """Validate vehicle capacity based on type."""
-        is_valid, cap_val, msg = is_valid_capacity(value)
+    def __init__(self):
+        self.main_suppliers = set()
+        self.supplier_configs = {}
         
-        result = {
-            'valid': is_valid,
-            'value': cap_val,
-            'message': msg,
-            'recommended_fix': None
-        }
+    def add_main_supplier(self, supplier_name):
+        """Add a main supplier to the list."""
+        self.main_suppliers.add(normalize_name(supplier_name))
         
-        if not is_valid:
-            return result
+    def configure_supplier(self, supplier_name, config):
+        """Configure a supplier with specific rules."""
+        self.supplier_configs[normalize_name(supplier_name)] = config
         
-        # Additional validation based on vehicle type
-        if vehicle_type:
-            if vehicle_type == 'car' and cap_val > 8:
-                result['valid'] = False
-                result['message'] = f"Car capacity seems too high: {cap_val}. Cars typically seat 2-8 people."
-                result['recommended_fix'] = min(cap_val, 8)
-            elif vehicle_type == 'van' and (cap_val < 8 or cap_val > 20):
-                result['valid'] = False
-                result['message'] = f"Van capacity {cap_val} seems unusual. Vans typically seat 8-20 people."
-                if cap_val < 8:
-                    result['recommended_fix'] = 8
-                elif cap_val > 20:
-                    result['recommended_fix'] = 20
-            elif vehicle_type == 'bus' and cap_val < 20:
-                result['valid'] = False
-                result['message'] = f"Bus capacity {cap_val} seems low. Buses typically seat 20+ people."
-                result['recommended_fix'] = 20
-            elif vehicle_type == 'truck' and cap_val > 3:
-                result['valid'] = False
-                result['message'] = f"Truck capacity {cap_val} seems high. Trucks typically seat 2-3 people."
-                result['recommended_fix'] = 3
+    def is_main_supplier(self, supplier_name):
+        """Check if supplier is a main/internal supplier."""
+        normalized = normalize_name(supplier_name)
+        return any(internal in normalized for internal in self.main_suppliers) or \
+               any(internal.lower() in normalized for internal in ['codefy', 'internal', 'main', 'رئيسي', 'داخلي'])
+
+
+class TimeConflictDetector:
+    """Advanced time conflict detection and resolution."""
+    
+    def __init__(self, offset_minutes=30, target_column=COL_DROPOFF_TIME, mode=TIME_CONFLICT_MODE_NORMALIZE):
+        self.offset_minutes = offset_minutes
+        self.target_column = target_column
+        self.mode = mode
         
-        return result
+    def detect_conflict(self, pickup_time, dropoff_time):
+        """Detect if there's a time conflict."""
+        if not pickup_time or not dropoff_time:
+            return False
+        return to_str(pickup_time) == to_str(dropoff_time)
+        
+    def suggest_resolution(self, target_time):
+        """Suggest a resolution for the conflict."""
+        return offset_time_min(target_time, self.offset_minutes)
 
 
 class CodefyDataValidator:
@@ -558,11 +504,13 @@ class CodefyDataValidator:
             'shift_upgrades': [],
             'internal_supplier_fixes': [],
             'erp_issues': [],
+            'expiry_alerts': [],
+            'driver_conflicts': [],
+            'phone_conflicts': [],
             'capacity_issues': [],
-            'vehicle_type_issues': [],
-            'schedule_conflicts': [],
-            'invalid_plates': [],
-            'duplicate_plates': []
+            'vehicle_status_issues': [],
+            'license_expiry_issues': [],
+            'insurance_expiry_issues': []
         }
         self.red_flag_cells = []
         self.time_conflict_enabled = True
@@ -573,8 +521,17 @@ class CodefyDataValidator:
         self.shift_engine = ShiftEngine()
         self.time_normalize_enabled = True
         self.time_convert_12h = True
-        self.main_suppliers = set()
-        self.vehicle_types = set()
+        self.main_suppliers_manager = MainSuppliersManager()
+        self.time_conflict_detector = TimeConflictDetector(
+            offset_minutes=self.time_conflict_offset,
+            target_column=self.time_conflict_target,
+            mode=self.time_conflict_mode
+        )
+        
+        # Add default main suppliers
+        self.main_suppliers_manager.add_main_supplier("Codefy Internal")
+        self.main_suppliers_manager.add_main_supplier("النظام الداخلي")
+        self.main_suppliers_manager.add_main_supplier("الادارة")
         
     def load_workbook(self):
         """Load the Excel workbook."""
@@ -610,25 +567,31 @@ class CodefyDataValidator:
         """Map column name to standard ERP column."""
         col_lower = col_name.lower()
         mappings = {
-            'driver_name': ['driver', 'drivername', 'driver_name', 'chauffeur', 'السائق', 'اسم_السائق'],
-            'driver_phone': ['driver_phone', 'driverphone', 'phone', 'mobile', 'contact', 'هاتف_السائق', 'driver_tel'],
-            'supplier_name': ['supplier', 'suppliername', 'supplier_name', 'vendor', 'provider', 'المورد', 'الجهة'],
-            'supplier_phone': ['supplier_phone', 'supplierphone', 'sup_phone', 'vendor_phone', 'هاتف_المورد'],
-            'plate_number': ['plate', 'platenumber', 'plate_number', 'vehicle', 'car', 'رقم_اللوحه', 'الرخصة'],
-            'shift': ['shift', 'shift_name', 'shiftname', 'turn', 'وردية', 'الورديه'],
-            'schedule_name': ['schedule', 'schedulename', 'schedule_name', 'program', 'الجدول', 'البرنامج'],
-            'route': ['route', 'routename', 'route_name', 'path', 'الطريق', 'مسار'],
+            'driver_name': ['driver', 'drivername', 'driver_name', 'chauffeur', 'سائق', 'السائق'],
+            'driver_phone': ['driver_phone', 'driverphone', 'phone', 'mobile', 'contact', 'هاتف', 'رقم الهاتف'],
+            'supplier_name': ['supplier', 'suppliername', 'supplier_name', 'vendor', 'provider', 'مورد', 'المورد'],
+            'supplier_phone': ['supplier_phone', 'supplierphone', 'sup_phone', 'vendor_phone', 'مورد_الهاتف'],
+            'plate_number': ['plate', 'platenumber', 'plate_number', 'vehicle', 'car', 'رقم_لوحة', 'اللوحة'],
+            'shift': ['shift', 'shift_name', 'shiftname', 'turn', 'وردية', 'الوردية'],
+            'schedule_name': ['schedule', 'schedulename', 'schedule_name', 'program', 'جدول', 'الجدول'],
+            'route': ['route', 'routename', 'route_name', 'path', 'طريق', 'ال маршрут'],
             'pickup_arrival': ['pickup_arr', 'pickup_arrival', 'pick_arr', 'arr_pickup', 'وصول_الاستلام'],
             'pickup_departure': ['pickup_dep', 'pickup_departure', 'pick_dep', 'dep_pickup', 'مغادرة_الاستلام'],
             'dropoff_arrival': ['dropoff_arr', 'dropoff_arrival', 'drop_arr', 'arr_dropoff', 'وصول_التسليم'],
             'dropoff_time': ['dropoff', 'dropoff_time', 'drop_time', 'delivery_time', 'time_drop', 'وقت_التسليم'],
-            'working_days': ['working_days', 'workdays', 'days', 'operating_days', 'ايام_العمل', 'الايام'],
-            'direction': ['direction', 'dir', 'orientation', 'الاتجاه', 'الاتجه'],
-            'employee_type': ['emp_type', 'employee_type', 'emptype', 'staff_type', 'نوع_الموظف'],
-            'start_date': ['start_date', 'start', 'begin', 'from_date', 'تاريخ_البدء', 'من'],
-            'end_date': ['end_date', 'end', 'finish', 'to_date', 'until', 'تاريخ_الانتهاء', 'الي'],
-            'capacity': ['capacity', 'seats', 'passengers', 'number', 'size', 'السعة', 'عدد_الركاب'],
-            'vehicle_type': ['vehicle_type', 'type', 'vehicle', 'car_type', 'نوع_العربية', 'النوع']
+            'working_days': ['working_days', 'workdays', 'days', 'operating_days', 'ايام', 'أيام_العمل'],
+            'direction': ['direction', 'dir', 'orientation', 'اتجاه', 'الاتجاه'],
+            'employee_type': ['emp_type', 'employee_type', 'emptype', 'staff_type', 'نوع_الموظف', 'نوع_العامل'],
+            'start_date': ['start_date', 'start', 'begin', 'from', 'تاريخ_البدء', 'البدء'],
+            'end_date': ['end_date', 'end', 'finish', 'to', 'until', 'تاريخ_الانتهاء', 'الانتهاء'],
+            'service_type': ['service_type', 'service', 'type', 'kind', 'نوع_الخدمة', 'نوع'],
+            'capacity': ['capacity', 'cap', 'seats', 'passengers', 'السعة', 'عدد_الركاب'],
+            'vehicle_type': ['vehicle_type', 'v_type', 'type', 'model', 'نوع_المركبة', 'نوع_العربية'],
+            'driver_license': ['license', 'driver_license', 'license_no', 'رخصة_القيادة', 'الرخصة'],
+            'insurance_expiry': ['insurance_exp', 'insurance_expiry', 'insurance', 'insurance_end', 'انتهاء_التأمين'],
+            'maintenance_date': ['maint_date', 'maintenance', 'maint', 'صيان', 'service_date', 'Maintenance'],
+            'fuel_type': ['fuel_type', 'fuel', 'gas', 'petrol', 'diesel', 'نوع_الوقود', 'الوقود'],
+            'vehicle_status': ['status', 'vehicle_status', 'v_status', 'state', 'condition', 'الحالة']
         }
         
         for std_col, patterns in mappings.items():
@@ -669,10 +632,8 @@ class CodefyDataValidator:
         self._internal_supplier_normalization()
         self._duplicate_driver_phones()
         self._scan_all_dates_deep()
-        self._validate_capacity_and_vehicle_types()
-        self._check_schedule_conflicts()
-        self._validate_plate_numbers()
-        self._duplicate_plate_numbers()
+        self._validate_capacity_and_vehicle_status()
+        self._check_expiry_dates()
         
         return True
 
@@ -853,7 +814,7 @@ class CodefyDataValidator:
                 
                 if not pv or not dv: 
                     continue
-                if pv != dv: 
+                if not self.time_conflict_detector.detect_conflict(pv, dv): 
                     continue
                 
                 target_col = self.time_conflict_target
@@ -861,7 +822,7 @@ class CodefyDataValidator:
                     target_col = drop_col
                 
                 target_val = to_str(rec.get(target_col)) if target_col != drop_col else dv
-                suggested = offset_time_min(target_val, self.time_conflict_offset)
+                suggested = self.time_conflict_detector.suggest_resolution(target_val)
                 
                 conflict_info = {
                     'sheet': sheet,
@@ -872,7 +833,8 @@ class CodefyDataValidator:
                     'dropoff': dv,
                     'target_col': target_col,
                     'suggested_dropoff': suggested,
-                    'mode': self.time_conflict_mode
+                    'mode': self.time_conflict_mode,
+                    'offset': self.time_conflict_offset
                 }
                 
                 if self.time_conflict_mode == TIME_CONFLICT_MODE_FLAGONLY:
@@ -1109,7 +1071,7 @@ class CodefyDataValidator:
                 raw_sn = to_str(rec.get(col_sn)).strip()
                 if not raw_sn: 
                     continue
-                if not self._is_main_supplier(raw_sn): 
+                if self.main_suppliers_manager.is_main_supplier(raw_sn): 
                     continue
                 
                 old_sn = rec.get(col_sn)
@@ -1143,11 +1105,6 @@ class CodefyDataValidator:
                             'match': raw_sn,
                             'actions': ['Cleared supplier name', 'Used supplier name as phone']
                         })
-
-    def _is_main_supplier(self, supplier_name: str) -> bool:
-        """Check if supplier is a main/internal supplier."""
-        normalized = normalize_name(supplier_name)
-        return any(internal in normalized for internal in ['codefy', 'internal', 'main', 'رئيسي', 'داخلي'])
 
     def _duplicate_driver_phones(self):
         """Detect duplicate driver phones."""
@@ -1243,180 +1200,101 @@ class CodefyDataValidator:
                             'reason': f'Deep date scan — {msg}'
                         })
                         rec[col] = fx
-                        
-                        # Check if end date is before start date
-                        if col == COL_END_DATE:
-                            start_date_val = rec.get(COL_START_DATE)
-                            if start_date_val:
-                                try:
-                                    start_dt = datetime.strptime(to_str(start_date_val), '%Y-%m-%d')
-                                    end_dt = datetime.strptime(to_str(fx), '%Y-%m-%d')
-                                    if end_dt < start_dt:
-                                        self.issues['schedule_conflicts'].append({
-                                            'sheet': sheet,
-                                            'row': rec['_row'],
-                                            'type': 'date_range_error',
-                                            'issue': f'End date ({fx}) is before start date ({start_date_val})',
-                                            'start_date': to_str(start_date_val),
-                                            'end_date': fx
-                                        })
-                                except:
-                                    pass  # Ignore if dates couldn't be parsed
 
-    def _validate_capacity_and_vehicle_types(self):
-        """Validate vehicle capacity and detect vehicle types."""
+    def _validate_capacity_and_vehicle_status(self):
+        """Validate capacity and vehicle status."""
         for sheet, info in self.sheets_data.items():
             if info['skipped']: 
                 continue
             
-            has_capacity = COL_CAPACITY in info['cmap']
-            has_vehicle_type = COL_VEHICLE_TYPE in info['cmap']
+            cmap = info['cmap']
             
-            for rec in info['records']:
-                capacity_val = rec.get(COL_CAPACITY) if has_capacity else None
-                vehicle_desc = to_str(rec.get(COL_VEHICLE_TYPE)) if has_vehicle_type else None
-                
-                # Detect vehicle type from description if not explicitly set
-                detected_type = None
-                if vehicle_desc and not has_vehicle_type:
-                    detected_type = detect_vehicle_type(vehicle_desc)
-                    if detected_type:
-                        self.vehicle_types.add(detected_type)
-                
-                # Validate capacity
-                if capacity_val is not None:
-                    validation_result = CapacityValidator.validate_capacity(
-                        capacity_val, 
-                        vehicle_desc if has_vehicle_type else detected_type
-                    )
-                    
-                    if not validation_result['valid']:
-                        self.issues['capacity_issues'].append({
-                            'sheet': sheet,
-                            'row': rec['_row'],
-                            'col': COL_CAPACITY,
-                            'value': to_str(capacity_val),
-                            'issue': validation_result['message'],
-                            'recommended_fix': validation_result['recommended_fix']
-                        })
-                        
-                        # Apply fix if recommended
-                        if validation_result['recommended_fix'] is not None:
-                            self.fixes.append({
+            # Check capacity values
+            if COL_CAPACITY in cmap:
+                for rec in info['records']:
+                    cap = rec.get(COL_CAPACITY)
+                    if cap is not None:
+                        try:
+                            cap_val = int(float(cap))
+                            if cap_val <= 0:
+                                self.issues['capacity_issues'].append({
+                                    'sheet': sheet,
+                                    'row': rec['_row'],
+                                    'col': COL_CAPACITY,
+                                    'value': cap,
+                                    'issue': 'Capacity must be greater than 0'
+                                })
+                        except (ValueError, TypeError):
+                            self.issues['capacity_issues'].append({
                                 'sheet': sheet,
                                 'row': rec['_row'],
                                 'col': COL_CAPACITY,
-                                'old': capacity_val,
-                                'new': validation_result['recommended_fix'],
-                                'reason': f"Capacity adjusted: {validation_result['message']}"
+                                'value': cap,
+                                'issue': 'Invalid capacity value (not a number)'
                             })
-                            rec[COL_CAPACITY] = validation_result['recommended_fix']
+            
+            # Check vehicle status
+            if COL_VEHICLE_STATUS in cmap:
+                for rec in info['records']:
+                    status = to_str(rec.get(COL_VEHICLE_STATUS))
+                    if status and status.lower() not in ['active', 'inactive', 'maintenance', 'decommissioned']:
+                        self.issues['vehicle_status_issues'].append({
+                            'sheet': sheet,
+                            'row': rec['_row'],
+                            'col': COL_VEHICLE_STATUS,
+                            'value': status,
+                            'issue': 'Invalid vehicle status'
+                        })
 
-    def _check_schedule_conflicts(self):
-        """Check for various schedule-related conflicts."""
-        for sheet, info in self.sheets_data.items():
-            if info['skipped']: 
-                continue
-            
-            has_route = COL_ROUTE in info['cmap']
-            has_schedule = COL_SCHEDULE in info['cmap']
-            has_start = COL_START_DATE in info['cmap']
-            has_end = COL_END_DATE in info['cmap']
-            
-            # Group records by route and schedule to detect conflicts
-            route_sched_map = defaultdict(list)
-            for rec in info['records']:
-                if has_route and has_schedule:
-                    route = to_str(rec.get(COL_ROUTE))
-                    sched = to_str(rec.get(COL_SCHEDULE))
-                    if route and sched:
-                        route_sched_map[(route, sched)].append(rec)
-            
-            # Check for conflicting date ranges within the same route/schedule
-            for (route, sched), recs in route_sched_map.items():
-                if len(recs) < 2:
-                    continue
-                
-                for i, rec1 in enumerate(recs):
-                    for j, rec2 in enumerate(recs[i+1:], i+1):
-                        start1_str = to_str(rec1.get(COL_START_DATE))
-                        end1_str = to_str(rec1.get(COL_END_DATE))
-                        start2_str = to_str(rec2.get(COL_START_DATE))
-                        end2_str = to_str(rec2.get(COL_END_DATE))
-                        
-                        try:
-                            start1 = datetime.strptime(start1_str, '%Y-%m-%d') if start1_str else None
-                            end1 = datetime.strptime(end1_str, '%Y-%m-%d') if end1_str else None
-                            start2 = datetime.strptime(start2_str, '%Y-%m-%d') if start2_str else None
-                            end2 = datetime.strptime(end2_str, '%Y-%m-%d') if end2_str else None
-                            
-                            # Check for overlapping date ranges
-                            if start1 and end1 and start2 and end2:
-                                if (start1 <= end2 and start2 <= end1):  # Overlapping ranges
-                                    self.issues['schedule_conflicts'].append({
-                                        'sheet': sheet,
-                                        'row1': rec1['_row'],
-                                        'row2': rec2['_row'],
-                                        'type': 'date_overlap',
-                                        'issue': f'Date range overlap: {start1_str} to {end1_str} overlaps with {start2_str} to {end2_str}',
-                                        'route': route,
-                                        'schedule': sched
-                                    })
-                        except:
-                            continue  # Skip if dates couldn't be parsed
-
-    def _validate_plate_numbers(self):
-        """Validate Egyptian plate numbers."""
-        for sheet, info in self.sheets_data.items():
-            if info['skipped']: 
-                continue
-            if COL_PLATE not in info['cmap']: 
-                continue
-            
-            for rec in info['records']:
-                raw_plate = rec.get(COL_PLATE)
-                if not to_str(raw_plate): 
-                    continue
-                
-                if not is_valid_plate_number(raw_plate):
-                    self.issues['invalid_plates'].append({
-                        'sheet': sheet,
-                        'row': rec['_row'],
-                        'col': COL_PLATE,
-                        'value': to_str(raw_plate),
-                        'issue': 'Invalid Egyptian plate number format'
-                    })
-
-    def _duplicate_plate_numbers(self):
-        """Detect duplicate plate numbers."""
-        occ = defaultdict(list)
-        for sheet, info in self.sheets_data.items():
-            if info['skipped']: 
-                continue
-            if COL_PLATE not in info['cmap']: 
-                continue
-            
-            for rec in info['records']:
-                plate = to_str(rec.get(COL_PLATE)).strip()
-                if not plate: 
-                    continue
-                occ[plate].append({
-                    'sheet': sheet, 
-                    'row': rec['_row'],
-                    'driver_norm': normalize_name(rec.get(COL_DRIVER_NAME)),
-                    'driver_raw': to_str(rec.get(COL_DRIVER_NAME))
-                })
+    def _check_expiry_dates(self):
+        """Check for expiry dates."""
+        today = datetime.now().date()
         
-        for plate, rows in occ.items():
-            if len(rows) <= 1: 
+        for sheet, info in self.sheets_data.items():
+            if info['skipped']: 
                 continue
-            self.issues['duplicate_plates'].append({
-                'plate': plate, 
-                'occurrences': [
-                    {'sheet': r['sheet'], 'row': r['row'], 'driver': r['driver_raw']} 
-                    for r in rows
-                ]
-            })
+            
+            cmap = info['cmap']
+            
+            # Check insurance expiry
+            if COL_INSURANCE_EXPIRY in cmap:
+                for rec in info['records']:
+                    expiry_str = to_str(rec.get(COL_INSURANCE_EXPIRY))
+                    if not expiry_str:
+                        continue
+                    
+                    try:
+                        expiry = datetime.strptime(expiry_str, '%Y-%m-%d').date()
+                        days_diff = (expiry - today).days
+                        
+                        if days_diff < 0:
+                            self.issues['insurance_expiry_issues'].append({
+                                'sheet': sheet,
+                                'row': rec['_row'],
+                                'col': COL_INSURANCE_EXPIRY,
+                                'value': expiry_str,
+                                'days_overdue': abs(days_diff),
+                                'issue': 'Insurance has expired'
+                            })
+                        elif days_diff <= 30:  # Expires within 30 days
+                            self.issues['expiry_alerts'].append({
+                                'sheet': sheet,
+                                'row': rec['_row'],
+                                'col': COL_INSURANCE_EXPIRY,
+                                'value': expiry_str,
+                                'days_until_expiry': days_diff,
+                                'issue': f'Insurance expires in {days_diff} days'
+                            })
+                    except ValueError:
+                        self.issues['date_format_issues'].append({
+                            'sheet': sheet,
+                            'row': rec['_row'],
+                            'col': COL_INSURANCE_EXPIRY,
+                            'value': expiry_str,
+                            'status': 'invalid',
+                            'suggested': None,
+                            'reason': 'Invalid insurance expiry date format'
+                        })
 
     def get_analysis_summary(self) -> Dict[str, Any]:
         """Get a summary of the analysis."""
@@ -1446,9 +1324,8 @@ class CodefyDataValidator:
                 'time_conflicts': len(self.issues['time_conflicts']),
                 'shift_upgrades': len(self.issues['shift_upgrades']),
                 'capacity_issues': len(self.issues['capacity_issues']),
-                'schedule_conflicts': len(self.issues['schedule_conflicts']),
-                'invalid_plates': len(self.issues['invalid_plates']),
-                'duplicate_plates': len(self.issues['duplicate_plates'])
+                'vehicle_status_issues': len(self.issues['vehicle_status_issues']),
+                'insurance_expiry_issues': len(self.issues['insurance_expiry_issues'])
             }
         }
 
@@ -1521,50 +1398,52 @@ class CodefyDataValidator:
         # Capacity issues
         for ci in self.issues['capacity_issues']:
             out.append({
-                'severity': 'warning',
+                'severity': 'critical',
                 'category': 'Capacity Issue',
                 'sheet': ci['sheet'],
                 'row': ci['row'],
                 'column': ci['col'],
-                'value': ci['value'],
+                'value': str(ci['value']),
                 'message': ci['issue']
             })
         
-        # Schedule conflicts
-        for sc in self.issues['schedule_conflicts']:
+        # Vehicle status issues
+        for vs in self.issues['vehicle_status_issues']:
             out.append({
                 'severity': 'warning',
-                'category': 'Schedule Conflict',
-                'sheet': sc['sheet'],
-                'row': sc.get('row1', sc.get('row', 'N/A')),
-                'column': sc.get('type', 'schedule'),
-                'value': 'Conflict detected',
-                'message': sc['issue']
+                'category': 'Vehicle Status',
+                'sheet': vs['sheet'],
+                'row': vs['row'],
+                'column': vs['col'],
+                'value': vs['value'],
+                'message': vs['issue']
             })
         
-        # Invalid plate numbers
-        for ip in self.issues['invalid_plates']:
+        # Insurance expiry issues
+        for ie in self.issues['insurance_expiry_issues']:
             out.append({
                 'severity': 'critical',
-                'category': 'Invalid Plate',
-                'sheet': ip['sheet'],
-                'row': ip['row'],
-                'column': ip['col'],
-                'value': ip['value'],
-                'message': ip['issue']
+                'category': 'Insurance Expired',
+                'sheet': ie['sheet'],
+                'row': ie['row'],
+                'column': ie['col'],
+                'value': ie['value'],
+                'message': f"Expired {ie['days_overdue']} days ago"
             })
         
-        # Duplicate plates
-        for dp in self.issues['duplicate_plates']:
+        # Expiry alerts
+        for ea in self.issues['expiry_alerts']:
             out.append({
-                'severity': 'critical',
-                'category': 'Duplicate Plate',
-                'sheet': dp['occurrences'][0]['sheet'],
-                'row': dp['occurrences'][0]['row'],
-                'column': 'plate_number',
-                'value': dp['plate'],
-                'message': f'Duplicate plate number found in {len(dp["occurrences"])} records'
+                'severity': 'warning',
+                'category': 'Expiry Alert',
+                'sheet': ea['sheet'],
+                'row': ea['row'],
+                'column': ea['col'],
+                'value': ea['value'],
+                'message': f"Expires in {ea['days_until_expiry']} days"
             })
+        
+        # Add other issue types similarly...
         
         return out
 
@@ -1579,10 +1458,8 @@ class CodefyDataValidator:
         issue_points += len(self.issues['enum_violations']) * 2 # 2 points per enum violation
         issue_points += len(self.issues['time_conflicts']) * 4  # 4 points per time conflict
         issue_points += len(self.issues['date_format_issues']) * 1 # 1 point per date issue
-        issue_points += len(self.issues['capacity_issues']) * 2 # 2 points per capacity issue
-        issue_points += len(self.issues['schedule_conflicts']) * 3 # 3 points per schedule conflict
-        issue_points += len(self.issues['invalid_plates']) * 3 # 3 points per invalid plate
-        issue_points += len(self.issues['duplicate_plates']) * 5 # 5 points per duplicate plate
+        issue_points += len(self.issues['capacity_issues']) * 3 # 3 points per capacity issue
+        issue_points += len(self.issues['insurance_expiry_issues']) * 5 # 5 points per expired insurance
         
         # Cap at 95 points deducted
         total_deduction = min(issue_points, 95)
