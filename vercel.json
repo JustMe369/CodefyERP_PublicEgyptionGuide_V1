@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "public": false,
+  "public": true,
   "github": {
     "enabled": true,
     "autoJobCancelation": true
@@ -25,6 +25,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/",
+      "destination": "/Temp/index.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/Temp/index.html"
