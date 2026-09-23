@@ -123,15 +123,22 @@ input:focus-visible {
 }
 
 /* =========================================================
-   Fade-in on scroll (reveal)
-   ========================================================= */
+    Fade-in on scroll (reveal)
+    Content is VISIBLE by default. JS enhances with scroll animation.
+    ========================================================= */
 .reveal {
-    opacity: 0;
-    transform: translateY(24px);
+    opacity: 1;
+    transform: translateY(0);
     transition: opacity var(--transition-slow) ease, transform var(--transition-slow) ease;
 }
 
-.reveal.is-visible {
+/* JS will add .js-ready to <html> before observing, then hide reveals */
+.js-ready .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+.js-ready .reveal.is-visible {
     opacity: 1;
     transform: translateY(0);
 }
@@ -568,4 +575,44 @@ html {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
     pointer-events: auto;
+}
+
+/* =========================================================
+    RTL Fallback & Visibility Guarantees
+    Ensures content is visible even if Tailwind classes fail
+    ========================================================= */
+
+/* Sidebar: visible by default on desktop (lg breakpoint = 1024px) */
+@media (min-width: 1024px) {
+    #sidebar {
+        transform: translateX(0) !important;
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    #main-content {
+        margin-right: 18rem !important;
+        margin-left: 0 !important;
+    }
+}
+
+/* Sidebar visible by default (fallback for translate-x-full) */
+#sidebar {
+    transform: none !important;
+}
+
+@media (max-width: 1023px) {
+    #sidebar {
+        transform: translateX(100%) !important;
+    }
+}
+
+/* Ensure main content is never pushed off-screen */
+#main-content {
+    max-width: 72rem;
+}
+
+/* Ensure body always has a visible background */
+body {
+    background-color: #f8fafc;
 }

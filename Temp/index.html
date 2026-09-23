@@ -9,6 +9,19 @@
     <meta name="theme-color" content="#2563eb">
     <title>دليل نظام كوديفاي - دليل المستخدم الشامل</title>
 
+    <!-- Enable JS-reveal animation early to prevent flash of hidden content -->
+    <script>document.documentElement.classList.add('js-ready');</script>
+
+    <!-- No-JS fallback: show all content even without JavaScript -->
+    <noscript>
+        <style>
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        </style>
+    </noscript>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
@@ -715,64 +728,6 @@
                     </figcaption>
                 </figure>
                 
-                <!-- Codefy Data Validation Tool Integration -->
-                <div class="mt-12 p-6 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="text-3xl" aria-hidden="true">🔍</div>
-                        <div>
-                            <h3 class="font-black text-slate-900 text-xl">التحقق من جودة البيانات</h3>
-                            <p class="text-sm text-slate-500">افحص ملف الإكسل قبل الرفع للتأكد من جاهزيته</p>
-                        </div>
-                    </div>
-                    
-                    <div id="validation-container">
-                        <div class="upload-section" id="dropZone" style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 8px; margin-bottom: 20px; transition: border-color 0.3s;">
-                            <h4 style="margin-bottom: 15px;">📁 رفع ملف الإكسل للتحليل</h4>
-                            <p style="margin-bottom: 20px;">اسحب الملف هنا أو انقر لاختياره</p>
-                            <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
-                            <button class="upload-btn" onclick="document.getElementById('fileInput').click()" style="background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px;">اختر ملف</button>
-                        </div>
-                        
-                        <div id="fileInfo" class="file-info" style="display: none; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;"></div>
-                        
-                        <div class="progress-bar" id="progressBar" style="display: none; width: 100%; height: 20px; background-color: #e9ecef; border-radius: 10px; overflow: hidden; margin: 20px 0;">
-                            <div class="progress-fill" id="progressFill" style="height: 100%; background-color: #28a745; width: 0%; transition: width 0.3s;"></div>
-                        </div>
-                        
-                        <div class="analysis-results" id="analysisResults" style="display: none; margin-top: 20px;">
-                            <h4 style="margin-bottom: 15px;">📈 نتائج التحليل</h4>
-                            
-                            <div class="summary-card" id="summaryCard" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
-                                <!-- Summary cards will be populated here -->
-                            </div>
-                            
-                            <div class="action-buttons" style="text-align: center; margin: 20px 0;">
-                                <button class="btn btn-primary" id="downloadCleanBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #007bff; color: white;">📥 تحميل الملف بعد التنظيف</button>
-                                <button class="btn btn-success" id="proceedImportBtn" disabled style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #28a745; color: white;">✅ الاستمرار في الرفع</button>
-                                <button class="btn btn-secondary" id="resetBtn" style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #6c757d; color: white;">🔄 إعادة</button>
-                            </div>
-                            
-                            <h5 style="margin: 20px 0 10px;">⚠️ المشاكل المكتشفة</h5>
-                            <div style="overflow-x: auto;">
-                                <table class="issues-table" id="issuesTable" style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                                    <thead>
-                                        <tr style="background-color: #f8f9fa;">
-                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الشدة</th>
-                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">النوع</th>
-                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الورقة</th>
-                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الصف</th>
-                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">العمود</th>
-                                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">الوصف</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="issuesTableBody">
-                                        <!-- Issues will be populated here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </section>
 
             <!-- ======================================================== -->
@@ -1367,195 +1322,9 @@
         </div>
 
         <!-- Main Application Script -->
-        <script src="../Statics/JS/scripts.js"></script>
+        <script src="../Statics/JS/scripts.js?v=20260923-1"></script>
         
-        <!-- Data Validation Script -->
-        <script>
-            // Data Validation Tool JavaScript
-            document.addEventListener('DOMContentLoaded', function() {
-                const dropZone = document.getElementById('dropZone');
-                const fileInput = document.getElementById('fileInput');
-                const fileInfo = document.getElementById('fileInfo');
-                const progressBar = document.getElementById('progressBar');
-                const progressFill = document.getElementById('progressFill');
-                const analysisResults = document.getElementById('analysisResults');
-                const summaryCard = document.getElementById('summaryCard');
-                const issuesTableBody = document.getElementById('issuesTableBody');
-                const downloadCleanBtn = document.getElementById('downloadCleanBtn');
-                const proceedImportBtn = document.getElementById('proceedImportBtn');
-                const resetBtn = document.getElementById('resetBtn');
-                
-                let currentAnalysis = null;
-                
-                // Drag and drop functionality
-                dropZone.addEventListener('dragover', function(e) {
-                    e.preventDefault();
-                    this.style.borderColor = '#4f46e5';
-                    this.style.backgroundColor = '#ede9fe';
-                });
-                
-                dropZone.addEventListener('dragleave', function(e) {
-                    e.preventDefault();
-                    this.style.borderColor = '#ccc';
-                    this.style.backgroundColor = '';
-                });
-                
-                dropZone.addEventListener('drop', function(e) {
-                    e.preventDefault();
-                    this.style.borderColor = '#ccc';
-                    this.style.backgroundColor = '';
-                    
-                    if (e.dataTransfer.files.length) {
-                        handleFile(e.dataTransfer.files[0]);
-                    }
-                });
-                
-                fileInput.addEventListener('change', function(e) {
-                    if (this.files.length) {
-                        handleFile(this.files[0]);
-                    }
-                });
-                
-                resetBtn.addEventListener('click', function() {
-                    fileInput.value = '';
-                    fileInfo.style.display = 'none';
-                    progressBar.style.display = 'none';
-                    progressFill.style.width = '0%';
-                    analysisResults.style.display = 'none';
-                    summaryCard.innerHTML = '';
-                    issuesTableBody.innerHTML = '';
-                    downloadCleanBtn.disabled = true;
-                    proceedImportBtn.disabled = true;
-                });
-                
-                function handleFile(file) {
-                    if (!file.name.match(/\.(xlsx|xls)$/i)) {
-                        alert('من فضلك اختر ملف إكسل صحيح (.xlsx أو .xls)');
-                        return;
-                    }
-                    
-                    // Show file info
-                    fileInfo.textContent = `تم اختيار: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} ميجابايت)`;
-                    fileInfo.style.display = 'block';
-                    
-                    // Start analysis
-                    startAnalysis(file);
-                }
-                
-                function startAnalysis(file) {
-                    progressBar.style.display = 'block';
-                    progressFill.style.width = '0%';
-                    
-                    // Simulate analysis progress
-                    let progress = 0;
-                    const interval = setInterval(() => {
-                        progress += Math.random() * 30;
-                        if (progress >= 100) {
-                            progress = 100;
-                            clearInterval(interval);
-                            completeAnalysis(file);
-                        }
-                        progressFill.style.width = `${progress}%`;
-                    }, 200);
-                }
-                
-                function completeAnalysis(file) {
-                    // In a real implementation, this would be replaced with actual API call to Python backend
-                    // For now, we'll simulate results
-                    
-                    // Mock analysis results
-                    currentAnalysis = {
-                        fileName: file.name,
-                        totalRows: Math.floor(Math.random() * 1000) + 500, // Random between 500-1500
-                        totalSheets: Math.floor(Math.random() * 5) + 1, // Random between 1-5
-                        score: Math.floor(Math.random() * 30) + 70, // Random between 70-100
-                        issues: [
-                            { severity: 'critical', category: 'Invalid Phone', sheet: 'Drivers', row: 45, column: 'Phone', issue: 'Invalid Egyptian phone number format' },
-                            { severity: 'warning', category: 'Date Format', sheet: 'Schedule', row: 12, column: 'Start_Date', issue: 'Date not in YYYY-MM-DD format' },
-                            { severity: 'info', category: 'Normalization', sheet: 'Routes', row: 67, column: 'Direction', issue: 'Direction inferred from schedule' },
-                            { severity: 'critical', category: 'Missing Data', sheet: 'Vehicles', row: 89, column: 'Driver_Name', issue: 'Required field missing' }
-                        ],
-                        summary: {
-                            critical: 2,
-                            warning: 3,
-                            info: 5
-                        }
-                    };
-                    
-                    displayResults(currentAnalysis);
-                }
-                
-                function displayResults(results) {
-                    // Update summary card
-                    summaryCard.innerHTML = `
-                        <div class="summary-item" style="background: #f8f9fa; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center;">
-                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold;">${results.totalRows}</div>
-                            <div class="summary-label">إجمالي الصفوف</div>
-                        </div>
-                        <div class="summary-item" style="background: #f8f9fa; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center;">
-                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold;">${results.totalSheets}</div>
-                            <div class="summary-label">إجمالي الأوراق</div>
-                        </div>
-                        <div class="summary-item critical" style="background: #ffeef0; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center; border-left: 4px solid #dc3545;">
-                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold; color: #dc3545;">${results.summary.critical}</div>
-                            <div class="summary-label">مشاكل حرجة</div>
-                        </div>
-                        <div class="summary-item warning" style="background: #fff3cd; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center; border-left: 4px solid #ffc107;">
-                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold; color: #856404;">${results.summary.warning}</div>
-                            <div class="summary-label">تحذيرات</div>
-                        </div>
-                        <div class="summary-item info" style="background: #d1ecf1; padding: 15px; border-radius: 6px; min-width: 150px; text-align: center; border-left: 4px solid #17a2b8;">
-                            <div class="summary-value" style="font-size: 1.5em; font-weight: bold; color: #0c5460;">${results.score}/100</div>
-                            <div class="summary-label">درجة الجودة</div>
-                        </div>
-                    `;
-                    
-                    // Update issues table
-                    issuesTableBody.innerHTML = '';
-                    results.issues.forEach(issue => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;" class="severity-${issue.severity}">
-                                <span style="font-weight: bold; ${
-                                    issue.severity === 'critical' ? 'color: #dc3545;' :
-                                    issue.severity === 'warning' ? 'color: #ffc107; color: #856404;' :
-                                    'color: #17a2b8;'
-                                }">${issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1)}</span>
-                            </td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.category}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.sheet}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.row}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.column}</td>
-                            <td style="border: 1px solid #ddd; padding: 12px; text-align: left;">${issue.issue}</td>
-                        `;
-                        issuesTableBody.appendChild(row);
-                    });
-                    
-                    // Enable buttons based on results
-                    downloadCleanBtn.disabled = false;
-                    proceedImportBtn.disabled = results.summary.critical > 0; // Disable if critical issues exist
-                    
-                    analysisResults.style.display = 'block';
-                    progressBar.style.display = 'none';
-                }
-                
-                downloadCleanBtn.addEventListener('click', function() {
-                    alert('في التنفيذ الفعلي، هذا سيقوم بتحميل ملف الإكسل بعد التنظيف مع تطبيق الإصلاحات.');
-                    // In real implementation: trigger download of cleaned file from backend
-                });
-                
-                proceedImportBtn.addEventListener('click', function() {
-                    if (currentAnalysis.summary.critical > 0) {
-                        if (confirm('لا يزال هناك مشاكل حرجة في الملف. هل ترغب في المتابعة على أي حال؟')) {
-                            alert('في التنفيذ الفعلي، سيتم المتابعة بعملية الرفع.');
-                        }
-                    } else {
-                        alert('في التنفيذ الفعلي، سيتم المتابعة بعملية الرفع.');
-                    }
-                });
-            });
-        </script>
-        
+
         <!-- Hidden styles for screen readers only -->
         <style>
             .sr-only {

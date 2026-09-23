@@ -4,8 +4,9 @@
  */
 document.addEventListener('DOMContentLoaded', function() {
     // If scripts.js is already running and handling the app, avoid redundant double initialization
-    if (window.codefyAppLoaded) return;
+    if (window.codefyAppLoaded || window.codefyNavbarLoaded) return;
     window.codefyAppLoaded = true;
+    window.codefyNavbarLoaded = true;
 
     const sidebar = document.getElementById('sidebar');
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');

@@ -21,6 +21,9 @@ let completedSections = new Set();
 let currentFile = null;
 let currentValidationResult = null;
 
+// Prevent companion scripts from initializing the application twice.
+window.codefyAppLoaded = true;
+
 document.addEventListener('DOMContentLoaded', function() {
     initApp();
     initializeValidationTool();
@@ -114,14 +117,12 @@ function saveProgress() {
 function toggleSectionCompletion(sectionId) {
     if (completedSections.has(sectionId)) {
         completedSections.delete(sectionId);
-        showToast('تم إلغاء تحديد إنجاز القسم 👍', 'info');
     } else {
         completedSections.add(sectionId);
-        showToast('عاش يا بطل! تم تسجيل إنجاز القسم بنجاح 🎊', 'success');
     }
     saveProgress();
     updateProgressUI();
-    updateStepperCompletionButton(sectionId);
+    updateSectionStepper(sectionId);
 }
 
 function updateProgressUI() {
@@ -153,170 +154,6 @@ function updateProgressUI() {
             }
         }
     });
-}
-
-/**
- * Section Switching & Single Section Focused Mode
- */
-function initSectionMode() {
-    // Read URL hash on load
-    const hash = window.location.hash.replace('#', '');
-    const foundIndex = SECTIONS.findIndex(s => s.id === hash);
-    if (foundIndex !== -1) {
-        currentSectionIndex = foundIndex;
-    } else {
-        currentSectionIndex = 0; // default to first section (login)
-    }
-
-    // Bind mode toggle buttons
-    const modeSingleBtns = document.querySelectorAll('.btn-mode-single');
-    const modeAllBtns = document.querySelectorAll('.btn-mode-all');
-
-    modeSingleBtns.forEach(btn => {
-        btn.addEventListener('click', () => setViewMode('single'));
-    });
-
-    modeAllBtns.forEach(btn => {
-        btn.addEventListener('click', () => setViewMode('all'));
-    });
-
-    // Apply initial view mode
-    applyViewMode();
-    showCurrentSection(false);
-
-    // Attach click handlers to all navigation links
-    const navLinks = document.querySelectorAll('.nav-link[data-section]');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetSecId = this.getAttribute('data-section');
-            const targetIndex = SECTIONS.findIndex(s => s.id === targetSecId);
-            if (targetIndex !== -1) {
-                currentSectionIndex = targetIndex;
-                showCurrentSection(true);
-                if (window.innerWidth < 1024) {
-                    closeSidebar();
-                }
-            }
-        });
-    });
-
-    // Hash change event listener
-    window.addEventListener('hashchange', function() {
-        const newHash = window.location.hash.replace('#', '');
-        const targetIndex = SECTIONS.findIndex(s => s.id === newHash);
-        if (targetIndex !== -1 && targetIndex !== currentSectionIndex) {
-            currentSectionIndex = targetIndex;
-            showCurrentSection(false);
-        }
-    });
-}
-
-function setViewMode(mode) {
-    if (viewMode === mode) return;
-    viewMode = mode;
-    applyViewMode();
-    showCurrentSection(true);
-    
-    if (mode === 'single') {
-        showToast('تم تفعيل وضع التركيز (عرض قسم بقسم) 🎯', 'info');
-    } else {
-        showToast('تم تفعيل وضع التصفح الكامل (كل الأقسام) 📜', 'info');
-    }
-}
-
-function applyViewMode() {
-    const mainContent = document.getElementById('main-content');
-    const modeSingleBtns = document.querySelectorAll('.btn-mode-single');
-    const modeAllBtns = document.querySelectorAll('.btn-mode-all');
-
-    if (viewMode === 'single') {
-        document.body.classList.add('single-section-mode');
-        document.body.classList.remove('all-sections-mode');
-        modeSingleBtns.forEach(b => b.classList.add('active'));
-        modeAllBtns.forEach(b => b.classList.remove('active'));
-    } else {
-        document.body.classList.remove('single-section-mode');
-        document.body.classList.add('all-sections-mode');
-        modeSingleBtns.forEach(b => b.classList.remove('active'));
-        modeAllBtns.forEach(b => b.classList.add('active'));
-        
-        // Ensure all sections are visible
-        document.querySelectorAll('.section-content').forEach(sec => {
-            sec.classList.remove('hidden');
-        });
-    }
-}
-
-function showCurrentSection(shouldScroll = true) {
-    const currentSec = SECTIONS[currentSectionIndex];
-    if (!currentSec) return;
-
-    // Update active nav link
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        if (link.getAttribute('data-section') === currentSec.id) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
-
-    // Update Top Breadcrumb & Mobile Header Title
-    const breadcrumbElem = document.getElementById('active-section-breadcrumb');
-    if (breadcrumbElem) {
-        breadcrumbElem.textContent = `${currentSec.icon} ${currentSec.title}`;
-    }
-    const mobileHeaderPill = document.getElementById('mobile-current-section');
-    if (mobileHeaderPill) {
-        mobileHeaderPill.textContent = `${currentSec.icon} ${currentSec.title}`;
-    }
-    const sectionCounter = document.getElementById('section-counter');
-    if (sectionCounter) {
-        sectionCounter.textContent = `القسم ${currentSectionIndex + 1} من ${SECTIONS.length}`;
-    }
-
-    // Update URL hash safely without reload
-    if (history.replaceState) {
-        history.replaceState(null, null, `#${currentSec.id}`);
-    } else {
-        window.location.hash = `#${currentSec.id}`;
-    }
-
-    if (viewMode === 'single') {
-        // Hide all sections, display only target section
-        document.querySelectorAll('.section-content').forEach(sec => {
-            if (sec.id === currentSec.id) {
-                sec.classList.add('active-section');
-                sec.classList.remove('hidden');
-            } else {
-                sec.classList.remove('active-section');
-            }
-        });
-        
-        // Update Bottom Stepper Footer inside active section
-        updateSectionStepper(currentSec.id);
-        
-        if (shouldScroll) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    } else {
-        // In All Sections mode, scroll to target section
-        const targetElement = document.getElementById(currentSec.id);
-        if (targetElement && shouldScroll) {
-            const offset = 90;
-            const elementPosition = targetElement.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - offset;
-            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-        }
-    }
-
-    // Trigger Mermaid rerender if needed
-    if (window.mermaid) {
-        try {
-            mermaid.contentLoaded();
-        } catch (e) {}
-    }
 }
 
 function updateSectionStepper(sectionId) {
@@ -429,184 +266,400 @@ function updateStepperCompletionButton(sectionId) {
 }
 
 /**
+ * Section Switching & Single Section Focused Mode
+ */
+function initSectionMode() {
+    // Read URL hash on load
+    const hash = window.location.hash.replace('#', '');
+    const foundIndex = SECTIONS.findIndex(s => s.id === hash);
+    currentSectionIndex = foundIndex !== -1 ? foundIndex : 0;
+
+    // Bind mode toggle buttons
+    const modeSingleBtns = document.querySelectorAll('.btn-mode-single');
+    const modeAllBtns = document.querySelectorAll('.btn-mode-all');
+
+    modeSingleBtns.forEach(btn => {
+        btn.addEventListener('click', () => setViewMode('single'));
+    });
+
+    modeAllBtns.forEach(btn => {
+        btn.addEventListener('click', () => setViewMode('all'));
+    });
+
+    // Apply initial view mode
+    applyViewMode();
+    showCurrentSection(false);
+
+    // Attach click handlers to all navigation links
+    const navLinks = document.querySelectorAll('.nav-link[data-section]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetSecId = this.getAttribute('data-section');
+            const targetIndex = SECTIONS.findIndex(s => s.id === targetSecId);
+            if (targetIndex !== -1) {
+                currentSectionIndex = targetIndex;
+                showCurrentSection(true);
+                if (window.innerWidth < 1024) {
+                    closeSidebar();
+                }
+            }
+        });
+    });
+
+    // Hash change event listener
+    window.addEventListener('hashchange', function() {
+        const newHash = window.location.hash.replace('#', '');
+        const targetIndex = SECTIONS.findIndex(s => s.id === newHash);
+        if (targetIndex !== -1 && targetIndex !== currentSectionIndex) {
+            currentSectionIndex = targetIndex;
+            showCurrentSection(false);
+        }
+    });
+}
+
+function setViewMode(mode) {
+    if (viewMode === mode) return;
+    viewMode = mode;
+    applyViewMode();
+    showCurrentSection(true);
+    
+    if (mode === 'single') {
+        showToast('تم تفعيل وضع التركيز (عرض قسم بقسم) 🎯', 'info');
+    } else {
+        showToast('تم تفعيل وضع التصفح الكامل (كل الأقسام) 📜', 'info');
+    }
+}
+
+function applyViewMode() {
+    const modeSingleBtns = document.querySelectorAll('.btn-mode-single');
+    const modeAllBtns = document.querySelectorAll('.btn-mode-all');
+
+    if (viewMode === 'single') {
+        document.body.classList.add('single-section-mode');
+        document.body.classList.remove('all-sections-mode');
+        modeSingleBtns.forEach(b => b.classList.add('active'));
+        modeAllBtns.forEach(b => b.classList.remove('active'));
+    } else {
+        document.body.classList.remove('single-section-mode');
+        document.body.classList.add('all-sections-mode');
+        modeSingleBtns.forEach(b => b.classList.remove('active'));
+        modeAllBtns.forEach(b => b.classList.add('active'));
+        
+        // Ensure all sections are visible
+        document.querySelectorAll('.section-content').forEach(sec => {
+            sec.classList.remove('hidden');
+        });
+    }
+}
+
+function showCurrentSection(shouldScroll = true) {
+    const currentSec = SECTIONS[currentSectionIndex];
+    if (!currentSec) return;
+
+    // Update active nav link
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        if (link.getAttribute('data-section') === currentSec.id) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+
+    // Update Top Breadcrumb & Mobile Header Title
+    const breadcrumbElem = document.getElementById('active-section-breadcrumb');
+    if (breadcrumbElem) {
+        breadcrumbElem.textContent = `${currentSec.icon} ${currentSec.title}`;
+    }
+    const mobileHeaderPill = document.getElementById('mobile-current-section');
+    if (mobileHeaderPill) {
+        mobileHeaderPill.textContent = `${currentSec.icon} ${currentSec.title}`;
+    }
+    const sectionCounter = document.getElementById('section-counter');
+    if (sectionCounter) {
+        sectionCounter.textContent = `القسم ${currentSectionIndex + 1} من ${SECTIONS.length}`;
+    }
+
+    // Update URL hash safely without reload
+    if (history.replaceState) {
+        history.replaceState(null, null, `#${currentSec.id}`);
+    } else {
+        window.location.hash = `#${currentSec.id}`;
+    }
+
+    if (viewMode === 'single') {
+        // Hide all sections, display only target section
+        document.querySelectorAll('.section-content').forEach(sec => {
+            if (sec.id === currentSec.id) {
+                sec.classList.add('active-section');
+                sec.classList.remove('hidden');
+            } else {
+                sec.classList.remove('active-section');
+            }
+        });
+        
+        // Update Bottom Stepper Footer inside active section
+        updateSectionStepper(currentSec.id);
+        
+        if (shouldScroll) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    } else {
+        // In All Sections mode, scroll to target section
+        const targetElement = document.getElementById(currentSec.id);
+        if (targetElement && shouldScroll) {
+            const offset = 90;
+            const elementPosition = targetElement.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        }
+    }
+
+    // Trigger Mermaid rerender if needed
+    if (window.mermaid) {
+        try {
+            mermaid.contentLoaded();
+        } catch (e) {}
+    }
+}
+
+/**
  * Sidebar Navigation & Mobile Drawer
  */
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const iconMenu = document.getElementById('icon-menu');
-    const iconClose = document.getElementById('icon-close');
+    const mobileMenuBtn = document.getElementById('mobile-menu-button');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', function() {
-            if (sidebar.classList.contains('translate-x-full')) {
-                openSidebar();
-            } else {
-                closeSidebar();
-            }
-        });
-    }
-
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', closeSidebar);
-    }
+    
+    if (!sidebar || !mobileMenuBtn || !sidebarOverlay) return;
+    
+    // Toggle sidebar on mobile menu button click
+    mobileMenuBtn.addEventListener('click', function() {
+        openSidebar();
+    });
+    
+    // Close sidebar when clicking overlay
+    sidebarOverlay.addEventListener('click', function() {
+        closeSidebar();
+    });
+    
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(e) {
+        if (sidebar.classList.contains('translate-x-0') && 
+            !sidebar.contains(e.target) && 
+            e.target !== mobileMenuBtn &&
+            !mobileMenuBtn.contains(e.target)) {
+            closeSidebar();
+        }
+    });
+    
+    // Close sidebar on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('translate-x-0')) {
+            closeSidebar();
+        }
+    });
+    
+    // Initialize active section highlighting
+    updateActiveSection();
 }
 
 function openSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const iconMenu = document.getElementById('icon-menu');
-    const iconClose = document.getElementById('icon-close');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-
-    if (sidebar) {
-        sidebar.classList.remove('translate-x-full');
-        sidebar.classList.add('translate-x-0');
-    }
-    if (iconMenu) iconMenu.classList.add('hidden');
-    if (iconClose) iconClose.classList.remove('hidden');
-    if (sidebarOverlay) sidebarOverlay.classList.remove('hidden');
-    if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'true');
+    
+    if (!sidebar || !sidebarOverlay) return;
+    
+    sidebar.classList.remove('-translate-x-full');
+    sidebar.classList.add('translate-x-0');
+    sidebarOverlay.classList.remove('hidden');
+    
+    // Prevent body scroll
     document.body.style.overflow = 'hidden';
 }
 
 function closeSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const iconMenu = document.getElementById('icon-menu');
-    const iconClose = document.getElementById('icon-close');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-
-    if (sidebar) {
-        sidebar.classList.add('translate-x-full');
-        sidebar.classList.remove('translate-x-0');
-    }
-    if (iconMenu) iconMenu.classList.remove('hidden');
-    if (iconClose) iconClose.classList.add('hidden');
-    if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
-    if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    
+    if (!sidebar || !sidebarOverlay) return;
+    
+    sidebar.classList.remove('translate-x-0');
+    sidebar.classList.add('-translate-x-full');
+    sidebarOverlay.classList.add('hidden');
+    
+    // Restore body scroll
     document.body.style.overflow = '';
 }
 
+function updateActiveSection() {
+    const currentHash = window.location.hash.substring(1) || 'login';
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+        const sectionId = link.getAttribute('data-section');
+        if (sectionId === currentHash) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}
+
 /**
- * Search Functionality with live suggestion dropdown
+ * Search Functionality
  */
 function initSearch() {
     const searchInput = document.getElementById('search-input');
-    const searchSuggestions = document.getElementById('search-suggestions');
-    const suggestionsList = document.getElementById('suggestions-list');
-
-    if (!searchInput || !searchSuggestions || !suggestionsList) return;
-
+    const searchResults = document.getElementById('search-results');
+    const allContent = document.querySelector('main');
+    
+    if (!searchInput || !searchResults || !allContent) return;
+    
+    // Sample search suggestions
+    const suggestions = [
+        { text: 'تسجيل الدخول', section: 'login' },
+        { text: 'رفع المشاريع', section: 'bulk-import' },
+        { text: 'المورد والمركبة', section: 'relationships' },
+        { text: 'توزيع الشغل', section: 'assignments' },
+        { text: 'التسعير', section: 'pricing' },
+        { text: 'مراجعة الجاهزية', section: 'readiness' }
+    ];
+    
     searchInput.addEventListener('input', function() {
         const query = this.value.trim().toLowerCase();
-        if (!query) {
-            searchSuggestions.classList.add('hidden');
+        
+        if (query === '') {
+            searchResults.classList.add('hidden');
             return;
         }
-
-        // Search through sections
-        const matches = SECTIONS.filter(s => 
-            s.title.toLowerCase().includes(query) || 
-            s.subtitle.toLowerCase().includes(query) ||
-            s.id.toLowerCase().includes(query)
+        
+        // Filter suggestions based on query
+        const filtered = suggestions.filter(item => 
+            item.text.toLowerCase().includes(query) || 
+            item.section.toLowerCase().includes(query)
         );
-
-        if (matches.length > 0) {
-            suggestionsList.innerHTML = matches.map(m => `
-                <li class="px-4 py-2.5 hover:bg-primary-50 cursor-pointer flex items-center justify-between border-b border-slate-100 last:border-none" data-search-target="${m.id}">
-                    <div class="flex items-center gap-2.5">
-                        <span class="text-xl">${m.icon}</span>
-                        <div>
-                            <div class="font-bold text-slate-800 text-sm">${m.title}</div>
-                            <div class="text-xs text-slate-500">${m.subtitle}</div>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-primary-600">فتح ↵</span>
-                </li>
-            `).join('');
-
-            suggestionsList.querySelectorAll('li').forEach(li => {
+        
+        if (filtered.length > 0) {
+            searchResults.innerHTML = '';
+            filtered.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0';
+                li.innerHTML = `
+                    <div class="font-bold text-slate-900">${item.text}</div>
+                    <div class="text-xs text-slate-500 mt-1">القسم: ${SECTIONS.find(s => s.id === item.section)?.title || item.section}</div>
+                `;
                 li.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-search-target');
-                    const targetIndex = SECTIONS.findIndex(s => s.id === targetId);
-                    if (targetIndex !== -1) {
-                        currentSectionIndex = targetIndex;
-                        showCurrentSection(true);
-                        searchInput.value = '';
-                        searchSuggestions.classList.add('hidden');
-                        if (window.innerWidth < 1024) closeSidebar();
+                    // Navigate to section
+                    if (viewMode === 'single') {
+                        const sectionIndex = SECTIONS.findIndex(s => s.id === item.section);
+                        if (sectionIndex !== -1) {
+                            currentSectionIndex = sectionIndex;
+                            showCurrentSection();
+                        }
+                    } else {
+                        window.location.hash = item.section;
                     }
+                    
+                    // Clear search and hide results
+                    searchInput.value = '';
+                    searchResults.classList.add('hidden');
+                    
+                    // Close mobile sidebar if open
+                    closeSidebar();
                 });
+                searchResults.appendChild(li);
             });
-
-            searchSuggestions.classList.remove('hidden');
+            searchResults.classList.remove('hidden');
         } else {
-            suggestionsList.innerHTML = `
-                <li class="px-4 py-3 text-center text-xs text-slate-500">
-                    ملقناش حاجة مطابقة لكلمة "${query}". جرب كلمة تانية زي "تسجيل" أو "تسعير".
-                </li>
-            `;
-            searchSuggestions.classList.remove('hidden');
+            searchResults.innerHTML = '<li class="px-4 py-3 text-center text-slate-500">لا توجد نتائج</li>';
+            searchResults.classList.remove('hidden');
         }
     });
-
-    // Close on click outside
+    
+    // Hide search results when clicking outside
     document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
-            searchSuggestions.classList.add('hidden');
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.add('hidden');
+        }
+    });
+    
+    // Keyboard shortcuts for search
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+        
+        // Escape to clear search
+        if (e.key === 'Escape' && searchInput === document.activeElement) {
+            searchInput.value = '';
+            searchResults.classList.add('hidden');
         }
     });
 }
 
 /**
- * Lightbox Modal for Large Images
+ * Lightbox Modal for Images
  */
 function initLightbox() {
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const lightboxClose = document.getElementById('lightbox-close');
+    // Initialize lightbox triggers
     const triggers = document.querySelectorAll('.lightbox-trigger');
-
-    if (!lightbox || !lightboxImg || !lightboxClose) return;
-
+    
     triggers.forEach(trigger => {
         trigger.addEventListener('click', function(e) {
             e.preventDefault();
-            const src = this.src || this.getAttribute('data-large-src');
-            if (src) {
-                lightboxImg.src = src;
+            
+            const imgSrc = this.src || this.getAttribute('href') || this.querySelector('img')?.src;
+            const caption = this.querySelector('figcaption')?.textContent || this.title || this.alt || '';
+            
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxCaption = document.getElementById('lightbox-caption');
+            
+            if (lightbox && lightboxImg) {
+                lightboxImg.src = imgSrc;
+                if (lightboxCaption) lightboxCaption.textContent = caption;
+                
+                // Show lightbox with fade-in effect
                 lightbox.classList.remove('hidden');
                 setTimeout(() => lightbox.classList.remove('opacity-0'), 10);
-                document.body.style.overflow = 'hidden';
             }
         });
     });
-
-    const closeHandler = () => {
-        lightbox.classList.add('opacity-0');
-        setTimeout(() => {
-            lightbox.classList.add('hidden');
-            document.body.style.overflow = '';
-        }, 300);
-    };
-
-    lightboxClose.addEventListener('click', closeHandler);
-    lightbox.addEventListener('click', function(e) {
-        if (e.target === lightbox) closeHandler();
-    });
+    
+    // Close lightbox
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightbox = document.getElementById('lightbox');
+    
+    if (lightboxClose && lightbox) {
+        lightboxClose.addEventListener('click', function() {
+            lightbox.classList.add('opacity-0');
+            setTimeout(() => lightbox.classList.add('hidden'), 300);
+        });
+        
+        // Close on clicking the backdrop
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) {
+                lightbox.classList.add('opacity-0');
+                setTimeout(() => lightbox.classList.add('hidden'), 300);
+            }
+        });
+    }
 }
 
 /**
- * Inner Tabs in Sections
+ * Tab Switching Functionality
  */
 function initTabs() {
+    // Initialize any generic tabs on the page
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-
-    if (!tabBtns.length || !tabContents.length) return;
-
+    
+    if (tabBtns.length === 0 || tabContents.length === 0) return;
+    
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             const tabName = this.getAttribute('data-tab');
@@ -853,8 +906,8 @@ function initializeValidationTool() {
         if (progressBar) progressBar.style.display = 'block';
         if (progressFill) progressFill.style.width = '0%';
 
-        const formData = new FormData();
-        formData.append('file', file);
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
 
         try {
             // If we're running via file:// protocol, skip API call and go straight to simulation
@@ -874,7 +927,7 @@ function initializeValidationTool() {
             
             const response = await fetch(endpoint, {
                 method: 'POST',
-                body: formData,
+                body: uploadFormData,
                 mode: 'cors',  // Enable CORS mode
                 credentials: 'omit', // Don't include credentials for CORS requests
                 headers: {
@@ -919,8 +972,8 @@ function initializeValidationTool() {
             return;
         }
         
-        const formData = new FormData();
-        formData.append('file', originalFile);
+        const downloadFormData = new FormData();
+        downloadFormData.append('file', originalFile);
 
         // Use the appropriate API endpoint based on environment
         const endpoint = `${apiBase}/download-cleaned`;
@@ -929,7 +982,7 @@ function initializeValidationTool() {
         try {
             const response = await fetch(endpoint, {
                 method: 'POST',
-                body: formData,
+                body: downloadFormData,
                 mode: 'cors',  // Enable CORS mode
                 credentials: 'omit' // Don't include credentials for CORS requests
             });
