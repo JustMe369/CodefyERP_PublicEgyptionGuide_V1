@@ -74,6 +74,67 @@ def validate_file():
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
+@app.route('/api/deep-analyze', methods=['POST', 'OPTIONS'])
+def deep_analyze_file():
+    """Perform deep analysis on uploaded Excel file using advanced analyzer."""
+    try:
+        if request.method == 'OPTIONS':
+            # Handle preflight request
+            response = jsonify()
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+            return response
+            
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Invalid file type. Please upload an Excel file.'}), 400
+        
+        # Save uploaded file temporarily
+        filename = secure_filename(file.filename)
+        temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(temp_path)
+        
+        # Import and use the advanced analyzer
+        from CodefyExcelAnalyzer_V11.3.1 import CodefyAnalyzer, AppSettings
+        settings = AppSettings()
+        analyzer = CodefyAnalyzer(temp_path, settings=settings)
+        
+        # Run the full analysis
+        report, fixes = analyzer.run()
+        
+        # Prepare detailed results
+        results = {
+            'success': True,
+            'summary': analyzer.get_analysis_summary(),
+            'detailed_issues': analyzer.build_issue_list(),
+            'fixes_available': len(analyzer.fixes),
+            'shift_upgrades': len(analyzer.issues['shift_upgrades']),
+            'time_conflicts': len(analyzer.issues['time_conflicts']),
+            'time_normalizations': len(analyzer.issues['time_normalizations']),
+            'red_flags': len(analyzer.red_flag_cells),
+            'ready_to_upload': analyzer.upload_ready
+        }
+        
+        # Clean up temporary file
+        os.remove(temp_path)
+        
+        response = jsonify(results)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+            
+    except Exception as e:
+        response = jsonify({'error': f'Server error during deep analysis: {str(e)}'}), 500
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
 @app.route('/api/download-cleaned', methods=['POST', 'OPTIONS'])
 def download_cleaned_file():
     """Generate and return a cleaned version of the validated file."""

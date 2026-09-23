@@ -1,0 +1,141 @@
+<section id="login" class="mb-24 section-content reveal">
+                <div class="flex items-start gap-4 mb-8">
+                    <div class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white text-2xl shadow-lg shadow-primary-500/30"
+                        aria-hidden="true">
+                        🔐
+                    </div>
+                    <div>
+                        <div class="pill bg-primary-50 text-primary-700 mb-2">أولاً</div>
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">تسجيل الدخول</h2>
+                        <p class="text-slate-500 font-medium mt-1">للبدء والاطلاع على مهامك</p>
+                    </div>
+                </div>
+
+                <div class="callout callout-info mb-8">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                        <div>
+                            <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                            <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                تفتح المتصفح، وتُدخل البريد الإلكتروني وكلمة المرور، ثم تضغط على زر تسجيل الدخول. وبذلك
+                                تكون قد دخلت إلى النظام. العملية بسيطة جداً — تماماً كتسجيل الدخول إلى أي تطبيق آخر.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                    <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                        <span class="text-xl" aria-hidden="true">🪜</span> الخطوات التفصيلية
+                    </h3>
+
+                    <ol class="space-y-6">
+                        <li class="flex gap-4 relative">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                                1</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">افتح المتصفح</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">استخدم أي متصفح متاح (كروم،
+                                    فايرفوكس، إيدج) وانتقل إلى رابط نظام كوديفاي.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                                2</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">أدخل البريد الإلكتروني أو رقم الهاتف</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">استخدم نفس البيانات التي سجلت بها.
+                                    يمكنك السماح للمتصفح بحفظها لتسهيل الدخول لاحقاً.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                                3</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">أدخل كلمة المرور</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">تأكد من عدم تفعيل مفتاح الأحرف
+                                    الكبيرة (Caps Lock) — فهو السبب الأكثر شيوعاً في أخطاء تسجيل الدخول.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4">
+                            <div
+                                class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-emerald-600 text-white font-black shadow-md shadow-emerald-600/30">
+                                ✓</div>
+                            <div class="pt-2">
+                                <div class="font-bold text-slate-900 mb-1">اضغط على زر "تسجيل الدخول"</div>
+                                <p class="text-sm text-slate-600 leading-relaxed m-0">وبذلك تنتقل مباشرة إلى لوحة
+                                    التحكم الرئيسية.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <!-- Diagram -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
+                    <h3 class="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="text-lg" aria-hidden="true">🗺️</span> مخطط توضيحي لخطوات تسجيل الدخول
+                    </h3>
+                    <div class="mermaid flex justify-center" dir="ltr">
+                        graph LR
+                        A["🌐 فتح المتصفح"] --> B["🔗 صفحة الدخول"]
+                        B --> C["✉️ بريد إلكتروني / هاتف"]
+                        C --> D["🔑 كلمة المرور"]
+                        D --> E["👆 اضغط دخول"]
+                        E --> F["🏠 لوحة التحكم"]
+                        style A fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+                        style F fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="aspect-video bg-slate-100 overflow-hidden">
+                            <img src="../Statics/img/login.png" alt="صفحة تسجيل الدخول"
+                                class="lightbox-trigger object-contain w-full h-full" loading="lazy">
+                        </div>
+                        <figcaption class="p-4 border-t border-slate-100 bg-slate-50/50">
+                            <div class="font-bold text-slate-900 text-sm">🔐 صفحة الدخول</div>
+                            <p class="text-xs text-slate-500 mt-1">واجهة الشاشة الأولى عند فتح الرابط</p>
+                        </figcaption>
+                    </figure>
+                    <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                        <div class="aspect-video bg-slate-100 overflow-hidden">
+                            <img src="../Statics/img/dashboard.png" alt="لوحة التحكم"
+                                class="lightbox-trigger object-contain w-full h-full" loading="lazy">
+                        </div>
+                        <figcaption class="p-4 border-t border-slate-100 bg-slate-50/50">
+                            <div class="font-bold text-slate-900 text-sm">🏠 لوحة التحكم</div>
+                            <p class="text-xs text-slate-500 mt-1">تجد هنا جميع مهامك بعد تسجيل الدخول</p>
+                        </figcaption>
+                    </figure>
+                </div>
+
+                <!-- Tips -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="callout callout-tip">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl flex-shrink-0" aria-hidden="true">💡</span>
+                            <div>
+                                <div class="font-black text-amber-900 text-sm mb-1">نصيحة سريعة</div>
+                                <p class="text-amber-800 text-xs leading-relaxed m-0">إذا كنت تستخدم النظام بشكل متكرر،
+                                    يمكنك السماح للمتصفح بحفظ كلمة المرور لتجنب إدخالها في كل مرة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="callout callout-warn">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl flex-shrink-0" aria-hidden="true">⚠️</span>
+                            <div>
+                                <div class="font-black text-red-900 text-sm mb-1">نسيت كلمة المرور؟</div>
+                                <p class="text-red-800 text-xs leading-relaxed m-0">لا تقلق، اضغط على "نسيت كلمة المرور"
+                                    وسيتم إرسال رابط إلى بريدك الإلكتروني لاستعادة حسابك في ثوانٍ.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
