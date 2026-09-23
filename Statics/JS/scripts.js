@@ -69,6 +69,7 @@ function initApp() {
     
     // Render initial progress
     updateProgressUI();
+    updateFinalCTAVisibility();
 }
 
 /**
@@ -128,6 +129,25 @@ function toggleSectionCompletion(sectionId) {
     saveProgress();
     updateProgressUI();
     updateSectionStepper(sectionId);
+    updateFinalCTAVisibility();
+}
+
+/**
+ * Final CTA Visibility — shows the celebration message only after all 6 sections are completed
+ */
+function updateFinalCTAVisibility() {
+    const finalCta = document.querySelector('[data-final-cta]');
+    if (!finalCta) return;
+
+    const allCompleted = completedSections.size === SECTIONS.length;
+    if (allCompleted) {
+        finalCta.classList.remove('hidden');
+        finalCta.classList.add('is-visible');
+        showToast('🎉 مبروك! خلصت كل الدليل بالكامل!', 'success');
+    } else {
+        finalCta.classList.add('hidden');
+        finalCta.classList.remove('is-visible');
+    }
 }
 
 function updateProgressUI() {
