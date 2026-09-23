@@ -860,6 +860,9 @@ function initializeEnhancedExcelAnalyzer() {
                 <button id="apply-fixes" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors" disabled>
                     🔧 تطبيق الإصلاحات
                 </button>
+                <button id="export-excel" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors" disabled>
+                    📥 تصدير Excel
+                </button>
             </div>
             <div id="analyzer-results" class="mt-4 hidden">
                 <h4 class="font-bold text-gray-800 mb-2">نتائج التحليل</h4>
@@ -874,6 +877,7 @@ function initializeEnhancedExcelAnalyzer() {
     document.getElementById('run-deep-analysis').addEventListener('click', runDeepAnalysis);
     document.getElementById('export-report').addEventListener('click', exportAnalysisReport);
     document.getElementById('apply-fixes').addEventListener('click', applyAutomaticFixes);
+    document.getElementById('export-excel').addEventListener('click', exportExcelReport);
 }
 
 async function runDeepAnalysis() {
@@ -1076,6 +1080,20 @@ function exportAnalysisReport() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+function exportExcelReport() {
+    if (!currentFile) {
+        alert('يرجى اختيار ملف إكسل أولاً');
+        return;
+    }
+
+    // In a real implementation, this would call the API to generate an Excel report
+    // For now, we'll simulate this functionality
+    alert('في الإصدار الكامل، سيؤدي هذا إلى توليد تقرير Excel مفصل مع كل النتائج والتصليحات.');
+    
+    // In the actual implementation, this would be:
+    // downloadCleanedFile(currentFile);
 }
 
 function applyAutomaticFixes() {
@@ -1477,3 +1495,260 @@ function showToast(message, type = 'info') {
         toast.classList.remove('show');
     }, 3500);
 }
+
+    // Initialize validation tool
+    function initValidationTool() {
+        const validationContainer = document.getElementById('validation-container');
+        if (!validationContainer) {
+            console.log('Validation container not found');
+            return;
+        }
+
+        // Create validation UI
+        validationContainer.innerHTML = `
+            <div class="validation-header">
+                <h3>🧰 أداة التحقق من صحة البيانات</h3>
+                <p>تحقق من صحة ملفات Excel قبل رفعها إلى النظام</p>
+            </div>
+            
+            <div class="validation-controls">
+                <div class="file-upload-section">
+                    <label for="excelFile" class="upload-label">
+                        <span class="upload-icon">📁</span>
+                        <span class="upload-text">اختر ملف Excel للتحقق</span>
+                    </label>
+                    <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" class="file-input">
+                    <button class="validate-btn" onclick="validateFile()">تحقق من الملف</button>
+                </div>
+                
+                <div class="validation-options">
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableShiftEngine" checked>
+                            <span class="checkmark"></span>
+                            <span class="label-text">تفعيل محرك الورديات المتقدم</span>
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableTimeControl" checked>
+                            <span class="checkmark"></span>
+                            <span class="label-text">تفعيل التحكم بالوقت</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="validation-results" class="validation-results hidden">
+                <div class="results-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">📋 عدد الصفوف:</span>
+                        <span id="totalRows" class="summary-value">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">🎯 درجة الجودة:</span>
+                        <span id="qualityScore" class="summary-value">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">⚠️ المشاكل:</span>
+                        <span id="issueCount" class="summary-value">0</span>
+                    </div>
+                </div>
+                
+                <div class="results-details">
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchTab('issues')">المشاكل</button>
+                        <button class="tab-btn" onclick="switchTab('summary')">الملخص</button>
+                        <button class="tab-btn" onclick="switchTab('fixes')">التصليحات</button>
+                    </div>
+                    
+                    <div id="issues-tab" class="tab-content active">
+                        <table class="issues-table">
+                            <thead>
+                                <tr>
+                                    <th>الخطورة</th>
+                                    <th>النوع</th>
+                                    <th>الورقة</th>
+                                    <th>الصف</th>
+                                    <th>العمود</th>
+                                    <th>القيمة</th>
+                                    <th>الرسالة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="issues-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="summary-tab" class="tab-content">
+                        <div id="summary-content"></div>
+                    </div>
+                    
+                    <div id="fixes-tab" class="tab-content">
+                        <div id="fixes-content"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Enhanced validation function
+    async function validateFile() {
+        const fileInput = document.getElementById('excelFile');
+        const resultsDiv = document.getElementById('validation-results');
+        const excelFile = fileInput.files[0];
+        
+        if (!excelFile) {
+            alert('الرجاء اختيار ملف Excel للتحقق');
+            return;
+        }
+
+        // Show loading state
+        resultsDiv.classList.remove('hidden');
+        document.getElementById('issues-body').innerHTML = '<tr><td colspan="7">جاري التحقق من الملف...</td></tr>';
+        
+        try {
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('file', excelFile);
+            
+            // Get options
+            const enableShiftEngine = document.getElementById('enableShiftEngine').checked;
+            const enableTimeControl = document.getElementById('enableTimeControl').checked;
+            
+            // Call the API with enhanced options
+            const response = await fetch('/deep_analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            // Display results
+            displayResults(result);
+        } catch (error) {
+            console.error('Error during validation:', error);
+            document.getElementById('issues-body').innerHTML = `<tr><td colspan="7">خطأ أثناء التحقق: ${error.message}</td></tr>`;
+        }
+    }
+
+    // Enhanced display results function
+    function displayResults(result) {
+        // Update summary
+        document.getElementById('totalRows').textContent = result.summary.total_rows || 0;
+        document.getElementById('qualityScore').textContent = result.summary.quality_score || 0;
+        
+        // Calculate total issues
+        const totalIssues = (result.summary.issues.critical || 0) + 
+                           (result.summary.issues.warning || 0) + 
+                           (result.summary.issues.info || 0);
+        document.getElementById('issueCount').textContent = totalIssues;
+        
+        // Populate issues table
+        const issuesBody = document.getElementById('issues-body');
+        issuesBody.innerHTML = '';
+        
+        if (result.issues && Array.isArray(result.issues)) {
+            result.issues.forEach(issue => {
+                const row = document.createElement('tr');
+                
+                // Determine row color based on severity
+                let rowClass = '';
+                if (issue.severity === 'critical') rowClass = 'critical-issue';
+                else if (issue.severity === 'warning') rowClass = 'warning-issue';
+                else if (issue.severity === 'info') rowClass = 'info-issue';
+                
+                row.className = rowClass;
+                
+                row.innerHTML = `
+                    <td>${getSeverityEmoji(issue.severity)} ${issue.severity}</td>
+                    <td>${issue.category || 'General'}</td>
+                    <td>${issue.sheet || 'N/A'}</td>
+                    <td>${issue.row || 'N/A'}</td>
+                    <td>${issue.column || 'N/A'}</td>
+                    <td>${issue.value || ''}</td>
+                    <td>${issue.message || ''}</td>
+                `;
+                issuesBody.appendChild(row);
+            });
+        }
+        
+        // Populate summary tab
+        const summaryContent = document.getElementById('summary-content');
+        summaryContent.innerHTML = `
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h4>📋 معلومات الملف</h4>
+                    <p><strong>عدد الأوراق:</strong> ${result.summary.total_sheets || 0}</p>
+                    <p><strong>عدد الصفوف:</strong> ${result.summary.total_rows || 0}</p>
+                    <p><strong>درجة الجودة:</strong> ${result.summary.quality_score || 0}/100</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>⚠️ توزيع المشاكل</h4>
+                    <p><strong class="critical">حرجة:</strong> ${result.summary.issues.critical || 0}</p>
+                    <p><strong class="warning">تحذير:</strong> ${result.summary.issues.warning || 0}</p>
+                    <p><strong class="info">معلومة:</strong> ${result.summary.issues.info || 0}</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>🔍 تفاصيل المشاكل</h4>
+                    <p><strong>هاتف غير صحيح:</strong> ${result.summary.breakdown.invalid_phones || 0}</p>
+                    <p><strong>صيغة تاريخ:</strong> ${result.summary.breakdown.date_format_issues || 0}</p>
+                    <p><strong>قيمة غير صحيحة:</strong> ${result.summary.breakdown.enum_violations || 0}</p>
+                    <p><strong>بيانات مفقودة:</strong> ${result.summary.breakdown.missing_data || 0}</p>
+                    <p><strong>وقت متعارض:</strong> ${result.summary.breakdown.time_conflicts || 0}</p>
+                    <p><strong>وردية متعارضة:</strong> ${result.summary.breakdown.shift_conflicts || 0}</p>
+                </div>
+            </div>
+        `;
+        
+        // Populate fixes tab if available
+        const fixesContent = document.getElementById('fixes-content');
+        if (result.fixes && result.fixes.length > 0) {
+            let fixesHTML = '<h4>🔧 التصليحات المقترحة</h4><ul>';
+            result.fixes.forEach(fix => {
+                fixesHTML += `<li><strong>ورقة ${fix.sheet}, صف ${fix.row}, عمود ${fix.col}:</strong> ${fix.reason} - <em>"${fix.old}" → "${fix.new}"</em></li>`;
+            });
+            fixesHTML += '</ul>';
+            fixesContent.innerHTML = fixesHTML;
+        } else {
+            fixesContent.innerHTML = '<h4>🔧 التصليحات المقترحة</h4><p>لا توجد تصليحات مقترحة</p>';
+        }
+    }
+
+    // Helper function to get severity emoji
+    function getSeverityEmoji(severity) {
+        switch(severity) {
+            case 'critical': return '🔴';
+            case 'warning': return '🟡';
+            case 'info': return '🔵';
+            default: return '⚪';
+        }
+    }
+
+    // Tab switching function
+    function switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Show selected tab and activate button
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // Initialize validation tool when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        initValidationTool();
+    });

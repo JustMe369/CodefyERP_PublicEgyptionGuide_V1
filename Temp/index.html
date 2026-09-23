@@ -359,12 +359,12 @@
                 </div>
             </header>
 
-            <section id="login" class="mb-24 section-content reveal" data-src="sections/login.html"></section>
-            <section id="bulk-import" class="mb-24 section-content reveal" data-src="sections/bulk-import.html"></section>
-            <section id="relationships" class="mb-24 section-content reveal" data-src="sections/relationships.html"></section>
-            <section id="assignments" class="mb-24 section-content reveal" data-src="sections/assignments.html"></section>
-            <section id="pricing" class="mb-24 section-content reveal" data-src="sections/pricing.html"></section>
-            <section id="readiness" class="mb-24 section-content reveal" data-src="sections/readiness.html"></section>
+            <section id="login" class="mb-24 section-content reveal"></section>
+            <section id="bulk-import" class="mb-24 section-content reveal"></section>
+            <section id="relationships" class="mb-24 section-content reveal"></section>
+            <section id="assignments" class="mb-24 section-content reveal"></section>
+            <section id="pricing" class="mb-24 section-content reveal"></section>
+            <section id="readiness" class="mb-24 section-content reveal"></section>
 
             <div id="section-stepper-container"></div>
 
@@ -428,27 +428,16 @@
         </div>
     </div>
 
+    <!-- Section content loaded via script src (works with file:// protocol) -->
+    <script src="sections-content.js"></script>
+
     <script>
     (function () {
         var sectionIds = ['login', 'bulk-import', 'relationships', 'assignments', 'pricing', 'readiness'];
         sectionIds.forEach(function (id) {
             var placeholder = document.getElementById(id);
-            if (!placeholder) return;
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', placeholder.getAttribute('data-src'), false);
-            try {
-                xhr.send();
-                if (xhr.status === 200 || xhr.status === 0) {
-                    var temp = document.createElement('div');
-                    temp.innerHTML = xhr.responseText;
-                    var section = temp.querySelector('section');
-                    if (section) {
-                        placeholder.outerHTML = section.outerHTML;
-                    }
-                }
-            } catch (e) {
-                console.warn('Failed to load section: ' + id, e);
-            }
+            if (!placeholder || !SECTION_CONTENT[id]) return;
+            placeholder.outerHTML = SECTION_CONTENT[id];
         });
         if (window.mermaid) {
             try { mermaid.contentLoaded(); } catch (e) {}
