@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="دليل تسجيل الدخول لنظام كوديفاي">
+    <meta name="theme-color" content="#2563eb">
+    <title>تسجيل الدخول - دليل نظام كوديفاي</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        },
+                        brand: {
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
+                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#eff6ff',
+                primaryTextColor: '#1e3a8a',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#94a3b8',
+                fontFamily: 'Cairo, sans-serif'
+            }
+        });
+    </script>
+
+    <link rel="stylesheet" href="./../Statics/CSS/styles.css">
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
+
+    <!-- ============ Scroll Progress Bar ============ -->
+    <div id="scroll-progress"
+        class="fixed top-0 start-0 z-[60] h-1 w-0 bg-gradient-to-l from-primary-500 to-primary-700 transition-[width] duration-150 ease-out">
+    </div>
+
+    <!-- ============ Main Content ============ -->
+    <main id="top" class="mx-auto max-w-5xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
+
+        <!-- =================== HERO =================== -->
+        <header class="relative mb-8 rounded-xl overflow-hidden hero-gradient bg-grid border border-slate-200/60 p-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-lg sm:text-xl font-bold text-slate-900">
+                    <span class="block text-primary-600">دليل كوديفاي 🇪🇬</span>
+                </h1>
+                <div class="text-xs text-slate-600 hidden sm:block">نظام إدارة النقل الشامل</div>
+            </div>
+        </header>
+
+        <!-- ===== Section Header ===== -->
+        <div class="mb-16">
+            <div
+                class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary-700 mb-4 ring-1 ring-inset ring-primary-700/10">
+                قسم تسجيل الدخول
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-4">
+                تسجيل الدخول
+            </h1>
+            <p class="text-lg text-slate-600 leading-relaxed max-w-3xl">
+                دليل شامل لخطوات تسجيل الدخول إلى نظام كوديفاي.
+            </p>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- SECTION 1: LOGIN -->
+        <!-- ======================================================== -->
+        <section id="login" class="mb-24 section-content reveal">
+            <div class="flex items-start gap-4 mb-8">
+                <div
+                    class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 text-white text-2xl shadow-lg shadow-primary-500/30">
+                    🔐
+                </div>
+                <div>
+                    <div class="pill bg-primary-50 text-primary-700 mb-2">القسم الأول</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">تسجيل الدخول</h2>
+                    <p class="text-slate-500 font-medium mt-1">أول خطوة عشان تدخل النظام</p>
+                </div>
+            </div>
+
+            <div class="callout callout-info mb-8">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl flex-shrink-0">🎯</span>
+                    <div>
+                        <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                        <p class="text-slate-700 text-sm leading-relaxed m-0">
+                            بتفتح المتصفح، بتكتب الإيميل والباسورد، وبتدوس زرار واحد. خلاص بقت جوه النظام.
+                            الموضوع أبسط ما يكون — زي ما بتفتح واتساب بالظبط.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Steps -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                    <span class="text-xl">🪜</span> الخطوات واحدة واحدة
+                </h3>
+
+                <ol class="space-y-6">
+                    <li class="flex gap-4 relative">
+                        <div
+                            class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                            1</div>
+                        <div class="pt-2">
+                            <div class="font-bold text-slate-900 mb-1">افتح المتصفح</div>
+                            <p class="text-sm text-slate-600 leading-relaxed m-0">أي متصفح عندك (كروم، فايرفوكس، إيدج) —
+                                كله تمام. وروح على رابط كوديفاي.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <div
+                            class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                            2</div>
+                        <div class="pt-2">
+                            <div class="font-bold text-slate-900 mb-1">اكتب الإيميل أو رقم الموبايل</div>
+                            <p class="text-sm text-slate-600 leading-relaxed m-0">نفس البيانات اللي سجلت بيها. مش لازم
+                                تحفظ — تقدر تخلي المتصفح يفتكرها.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <div
+                            class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white font-black shadow-md shadow-primary-600/30">
+                            3</div>
+                        <div class="pt-2">
+                            <div class="font-bold text-slate-900 mb-1">اكتب كلمة السر</div>
+                            <p class="text-sm text-slate-600 leading-relaxed m-0">خد بالك من الكابس لوك (Caps Lock) — دي
+                                أكتر حاجة بتغلط الناس.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <div
+                            class="flex-shrink-0 flex h-11 w-11 items-center justify-center rounded-full bg-emerald-600 text-white font-black shadow-md shadow-emerald-600/30">
+                            ✓</div>
+                        <div class="pt-2">
+                            <div class="font-bold text-slate-900 mb-1">دوس "تسجيل الدخول"</div>
+                            <p class="text-sm text-slate-600 leading-relaxed m-0">وخلاص! هتلاقي نفسك جوه النظام على لوحة
+                                التحكم.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Diagram -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
+                <h3 class="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="text-lg">🗺️</span> شكل الرحلة دي في رسمة
+                </h3>
+                <div class="mermaid flex justify-center" dir="ltr">
+                    graph LR
+                    A["🌐 فتح المتصفح"] --> B["🔗 صفحة الدخول"]
+                    B --> C["✉️ إيميل/موبايل"]
+                    C --> D["🔑 كلمة السر"]
+                    D --> E["👆 دوس دخول"]
+                    E --> F["🏠 لوحة التحكم"]
+                    style A fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+                    style F fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                    <div class="aspect-video bg-slate-100 overflow-hidden">
+                        <img src="../Statics/img/login.png" alt="صفحة تسجيل الدخول"
+                            class="lightbox-trigger object-contain w-full h-full" loading="lazy">
+                    </div>
+                    <figcaption class="p-4 border-t border-slate-100 bg-slate-50/50">
+                        <div class="font-bold text-slate-900 text-sm">🔐 صفحة الدخول</div>
+                        <p class="text-xs text-slate-500 mt-1">شكل الشاشة اللي هتشوفها أول ما تفتح اللينك</p>
+                    </figcaption>
+                </figure>
+                <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
+                    <div class="aspect-video bg-slate-100 overflow-hidden">
+                        <img src="../Statics/img/dashboard.png" alt="لوحة التحكم"
+                            class="lightbox-trigger object-contain w-full h-full" loading="lazy">
+                    </div>
+                    <figcaption class="p-4 border-t border-slate-100 bg-slate-50/50">
+                        <div class="font-bold text-slate-900 text-sm">🏠 لوحة التحكم</div>
+                        <p class="text-xs text-slate-500 mt-1">هنا هتلاقي كل الشغل بتاعك بعد ما تدخل</p>
+                    </figcaption>
+                </figure>
+            </div>
+
+            <!-- Tips -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="callout callout-tip">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl flex-shrink-0">💡</span>
+                        <div>
+                            <div class="font-black text-amber-900 text-sm mb-1">نصيحة على السريع</div>
+                            <p class="text-amber-800 text-xs leading-relaxed m-0">لو بتستخدم النظام كتير، خلي المتصفح
+                                يحفظ الباسورد. مش هتحتاج تكتبه كل مرة.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="callout callout-warn">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl flex-shrink-0">⚠️</span>
+                        <div>
+                            <div class="font-black text-red-900 text-sm mb-1">نسيت الباسورد؟</div>
+                            <p class="text-red-800 text-xs leading-relaxed m-0">مفيش مشكلة. دوس على "نسيت كلمة السر"
+                                وهيوصلك لينك على الإيميل تسترجع بيه حسابك.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== FINAL CTA =================== -->
+        <div
+            class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary-600 to-indigo-700 p-8 sm:p-12 text-white text-center shadow-2xl shadow-primary-600/30 reveal">
+            <div class="pointer-events-none absolute -top-10 -end-10 text-8xl opacity-10">🎉</div>
+            <div class="pointer-events-none absolute -bottom-10 -start-10 text-8xl opacity-10">🚀</div>
+            <div class="relative">
+                <div class="text-5xl mb-4">🎉</div>
+                <h2 class="text-3xl sm:text-4xl font-black mb-3">تمت العملية بنجاح! 🎊</h2>
+                <p class="text-white/90 max-w-xl mx-auto mb-6 leading-relaxed">
+                    لقد أكملت قسم تسجيل الدخول. يمكنك الآن استخدام نظام كوديفاي.
+                </p>
+                <a href="#top"
+                    class="inline-flex items-center gap-2 bg-white text-primary-700 font-black px-6 py-3 rounded-xl hover:bg-primary-50 transition-colors shadow-lg">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    ارجع لفوق
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =================== Floating help button =================== -->
+    <button id="float-help" type="button" aria-label="مساعدة"
+        class="fixed bottom-6 start-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-xl shadow-primary-600/40 hover:scale-110 transition-transform">
+        <span class="text-xl">💬</span>
+    </button>
+
+    <!-- ============ Back to top ============ -->
+    <button id="back-to-top" type="button" aria-label="العودة إلى الأعلى"
+        class="fixed bottom-6 end-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg shadow-primary-600/30 opacity-0 translate-y-3 pointer-events-none transition-all duration-300 hover:bg-primary-700 focus:outline-none">
+        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <!-- ============ Lightbox Modal ============ -->
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="عرض الصورة بالحجم الكامل"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/90 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <button id="lightbox-close" type="button" aria-label="إغلاق"
+            class="absolute top-6 end-6 text-white hover:text-slate-300 focus:outline-none p-2 bg-slate-800/50 hover:bg-slate-800/80 rounded-full transition-colors">
+            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="max-w-5xl max-h-screen p-4 w-full flex justify-center items-center">
+            <img id="lightbox-img" src="" alt="عرض مكبّر"
+                class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain transform scale-95 transition-transform duration-300">
+        </div>
+    </div>
+
+    <script src="./../Statics/JS/scripts.js"></script>
+</body>
+
+</html>
