@@ -24,6 +24,11 @@ let currentValidationResult = null;
 // Prevent companion scripts from initializing the application twice.
 window.codefyAppLoaded = true;
 
+// Clear the safety timeout from index.html so .reveal elements stay animated
+if (window.__jsReadyTimer) {
+    clearTimeout(window.__jsReadyTimer);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initApp();
     initializeValidationTool();
@@ -429,7 +434,7 @@ function showCurrentSection(shouldScroll = true) {
  */
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const mobileMenuBtn = document.getElementById('mobile-menu-button');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
     if (!sidebar || !mobileMenuBtn || !sidebarOverlay) return;
@@ -512,7 +517,7 @@ function updateActiveSection() {
  */
 function initSearch() {
     const searchInput = document.getElementById('search-input');
-    const searchResults = document.getElementById('search-results');
+    const searchResults = document.getElementById('search-suggestions');
     const allContent = document.querySelector('main');
     
     if (!searchInput || !searchResults || !allContent) return;

@@ -10,7 +10,21 @@
     <title>دليل نظام كوديفاي - دليل المستخدم الشامل</title>
 
     <!-- Enable JS-reveal animation early to prevent flash of hidden content -->
-    <script>document.documentElement.classList.add('js-ready');</script>
+    <script>
+        document.documentElement.classList.add('js-ready');
+        // Safety timeout: If scripts.js fails to load (e.g., SyntaxError like
+        // "redeclaration of const formData"), remove js-ready after 3s so
+        // .reveal content becomes visible instead of staying at opacity:0
+        window.__jsReadyTimer = setTimeout(function () {
+            if (!window.codefyAppLoaded) {
+                document.documentElement.classList.remove('js-ready');
+                var reveals = document.querySelectorAll('.reveal');
+                for (var i = 0; i < reveals.length; i++) {
+                    reveals[i].classList.add('is-visible');
+                }
+            }
+        }, 3000);
+    </script>
 
     <!-- No-JS fallback: show all content even without JavaScript -->
     <noscript>
@@ -1322,7 +1336,7 @@
         </div>
 
         <!-- Main Application Script -->
-        <script src="../Statics/JS/scripts.js?v=20260923-1"></script>
+        <script src="../Statics/JS/scripts.js?v=20260923-3"></script>
         
 
         <!-- Hidden styles for screen readers only -->
