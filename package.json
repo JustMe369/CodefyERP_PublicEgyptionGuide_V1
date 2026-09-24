@@ -2,33 +2,71 @@
   "name": "codefyerp-data-validation",
   "version": "1.0.0",
   "description": "CodefyERP Data Validation System for Egyptian Business Operations",
-  "main": "index.html",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": "24.x",
+    "npm": ">=10.0.0"
+  },
+  "packageManager": "npm@10.9.2",
   "scripts": {
     "dev": "vercel dev",
-    "build:css": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true tailwindcss -c tailwind.config.js -i ./Statics/CSS/tailwind.css -o ./Statics/CSS/tailwind.generated.css --minify",
-    "build": "npm run build:css && node -e \"require('fs').mkdirSync('dist', {recursive:true}); const fse = require('fs-extra'); fse.copySync('./Statics', './dist/Statics'); fse.copySync('./Temp', './dist/Temp'); fse.copySync('./README.md', './dist/README.md'); fse.copySync('./vercel.json', './dist/vercel.json'); const apiFiles = ['validate.js', 'download-cleaned.js', 'excel-analyzer.js', 'serverless-api.js', 'excel-analyzer-express.js']; apiFiles.forEach(f => fse.copySync('./api/' + f, './dist/api/' + f));\"",
     "start": "vercel dev",
-    "api": "cd Statics/PY && python api_server.py"
+    "api": "cd Statics/PY && python api_server.py",
+    "build:css": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true tailwindcss -c tailwind.config.js -i ./Statics/CSS/tailwind.css -o ./Statics/CSS/tailwind.generated.css --minify",
+    "build": "npm run build:css && node scripts/build.js",
+    "vercel-build": "npm run build",
+    "lint": "eslint . --ext .js,.ts --ignore-path .gitignore",
+    "lint:fix": "eslint . --ext .js,.ts --ignore-path .gitignore --fix",
+    "format": "prettier --write \"**/*.{js,ts,json,css,md,html}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{js,ts,json,css,md,html}\" --ignore-path .gitignore",
+    "test": "echo \"No tests configured yet\" && exit 0",
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\""
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "form-data": "^4.0.0",
-    "formidable": "^3.5.1",
-    "fs-extra": "^11.2.0",
-    "http-proxy-middleware": "^3.0.0",
-    "multer": "^1.4.5-lts.1"
+    "express": "^4.21.2",
+    "form-data": "^4.0.2",
+    "formidable": "^3.5.2",
+    "fs-extra": "^11.3.0"
   },
   "devDependencies": {
     "@vercel/node": "^4.2.0",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.21",
     "cross-env": "^7.0.3",
+    "eslint": "^9.17.0",
     "postcss": "^8.4.49",
+    "prettier": "^3.4.2",
     "tailwindcss": "^3.4.17"
   },
-  "engines": {
-    "node": "24.x"
+  "files": [
+    "api/",
+    "Statics/",
+    "Temp/",
+    "vercel.json",
+    "README.md"
+  ],
+  "directories": {
+    "lib": "api",
+    "test": "test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abahaas/CodefyERP-Help.git"
+  },
+  "bugs": {
+    "url": "https://github.com/abahaas/CodefyERP-Help/issues"
+  },
+  "homepage": "https://codefyag.vercel.app",
+  "keywords": [
+    "codefy",
+    "erp",
+    "data-validation",
+    "egypt",
+    "excel",
+    "transport",
+    "logistics"
+  ],
   "author": "CodefyERP Team",
   "license": "MIT"
 }
