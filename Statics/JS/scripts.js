@@ -52,9 +52,14 @@ function initializeCodefyThemeSystem() {
     const desktopSunPath = document.getElementById('desktop-sun-path');
     const desktopMoonPath = document.getElementById('desktop-moon-path');
     
-    // Check for saved theme preference or respect OS preference
-    const currentThemePref = localStorage.getItem('theme') || 
-                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-blue' : 'light');
+    // Check for saved theme preference - default to light if none is saved
+    let currentThemePref = localStorage.getItem('theme');
+    
+    // If no theme is saved in localStorage, set the default to light
+    if (!currentThemePref) {
+        currentThemePref = 'light';
+        localStorage.setItem('theme', 'light'); // Save default to browser cache
+    }
     
     // Apply the saved theme on page load
     if (currentThemePref === 'dark-blue') {
@@ -69,8 +74,8 @@ function initializeCodefyThemeSystem() {
             desktopSunPath.classList.add('hidden');
             desktopMoonPath.classList.remove('hidden');
         }
-    } else if (currentThemePref === 'sunny-light') {
-        document.documentElement.setAttribute('data-theme', 'sunny-light');
+    } else if (currentThemePref === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
         // Update mobile theme icon
         if (sunPathElement && moonPathElement) {
             sunPathElement.classList.remove('hidden');
@@ -120,9 +125,9 @@ function initializeCodefyThemeSystem() {
         }
     }
     
-    // Function to update theme display for sunny theme
-    function updateThemeDisplaySunny() {
-        // Light theme active (same as regular light)
+    // Function to update theme display for light theme
+    function updateThemeDisplayLight() {
+        // Light theme active
         if (sunPathElement && moonPathElement) {
             sunPathElement.classList.remove('hidden');
             moonPathElement.classList.add('hidden');
@@ -152,12 +157,13 @@ function initializeCodefyThemeSystem() {
         const currentThemeAttribute = document.documentElement.getAttribute('data-theme');
         
         if (currentThemeAttribute === 'dark-blue') {
-            // Switch to sunny light theme
-            document.documentElement.setAttribute('data-theme', 'sunny-light');
-            localStorage.setItem('theme', 'sunny-light');
-            updateThemeDisplaySunny();
-        } else if (currentThemeAttribute === 'sunny-light') {
-            // Switch to regular light theme
+            // Switch to light theme
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            updateThemeDisplayLight();
+        } else if (currentThemeAttribute === 'light') {
+            // Switch to regular light theme (do nothing, stays the same)
+            // Or potentially switch to default light theme if different
             document.documentElement.removeAttribute('data-theme');
             localStorage.setItem('theme', 'light');
             updateThemeDisplay(false);
@@ -174,11 +180,19 @@ function initializeCodefyThemeSystem() {
 }
 
 function initApp() {
+    // Initialize viewMode to single by default if not set
+    if (typeof viewMode === 'undefined' || !viewMode) {
+        viewMode = 'single';
+    }
+    
     // Load saved progress from localStorage
     loadProgress();
     
     // Initialize View Mode & Section Navigation
     initSectionMode();
+    
+    // Initialize View Mode Toggle Buttons
+    initViewModeToggle();
     
     // Initialize Search & Suggestions
     initSearch();
@@ -208,6 +222,45 @@ function initApp() {
     // Render initial progress
     updateProgressUI();
     updateFinalCTAVisibility();
+}
+
+/**
+ * Initialize View Mode Toggle Buttons
+ */
+function initViewModeToggle() {
+    const singleModeBtns = document.querySelectorAll('.btn-mode-single');
+    const allModeBtns = document.querySelectorAll('.btn-mode-all');
+    
+    // Set initial active state based on current viewMode
+    if (viewMode === 'single') {
+        singleModeBtns.forEach(btn => btn.classList.add('active'));
+        allModeBtns.forEach(btn => btn.classList.remove('active'));
+    } else {
+        singleModeBtns.forEach(btn => btn.classList.remove('active'));
+        allModeBtns.forEach(btn => btn.classList.add('active'));
+    }
+    
+    // Add event listeners to single mode buttons
+    singleModeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            setViewMode('single');
+            
+            // Update active states
+            singleModeBtns.forEach(b => b.classList.add('active'));
+            allModeBtns.forEach(b => b.classList.remove('active'));
+        });
+    });
+    
+    // Add event listeners to all mode buttons
+    allModeBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            setViewMode('all');
+            
+            // Update active states
+            singleModeBtns.forEach(b => b.classList.remove('active'));
+            allModeBtns.forEach(b => b.classList.add('active'));
+        });
+    });
 }
 
 /**
@@ -445,11 +498,14 @@ function initSectionMode() {
     const foundIndex = SECTIONS.findIndex(s => s.id === hash);
     currentSectionIndex = foundIndex !== -1 ? foundIndex : 0;
 
+    // Set default view mode to 'single' if not already set
+    if (!viewMode) {
+        viewMode = 'single';
+    }
 
     // Apply initial view mode
     applyViewMode();
     showCurrentSection(false);
-
 
     // Hash change event listener
     window.addEventListener('hashchange', function() {
@@ -493,15 +549,24 @@ function applyViewMode() {
         document.body.classList.remove('all-sections-mode');
         modeSingleBtns.forEach(b => b.classList.add('active'));
         modeAllBtns.forEach(b => b.classList.remove('active'));
+        
+        // Make sure only the current section is visible in single mode
+        if (typeof showCurrentSection === 'function') {
+            setTimeout(() => {
+                showCurrentSection(false);
+            }, 0);
+        }
     } else {
         document.body.classList.remove('single-section-mode');
         document.body.classList.add('all-sections-mode');
         modeSingleBtns.forEach(b => b.classList.remove('active'));
         modeAllBtns.forEach(b => b.classList.add('active'));
         
-        // Ensure all sections are visible
+        // Ensure all sections are visible in all mode
         document.querySelectorAll('.section-content').forEach(sec => {
             sec.classList.remove('hidden');
+            sec.classList.remove('active-section');
+            sec.style.display = 'block';
         });
     }
 }
@@ -542,24 +607,39 @@ function showCurrentSection(shouldScroll = true) {
     }
 
     if (viewMode === 'single') {
-        // Hide all sections, display only target section
+        // Hide all sections first
         document.querySelectorAll('.section-content').forEach(sec => {
-            if (sec.id === currentSec.id) {
-                sec.classList.add('active-section');
-                sec.classList.remove('hidden');
-            } else {
-                sec.classList.remove('active-section');
-            }
+            sec.classList.add('hidden');
+            sec.classList.remove('active-section');
         });
+        
+        // Then show only the current section
+        const targetSection = document.getElementById(currentSec.id);
+        if (targetSection) {
+            targetSection.classList.remove('hidden');
+            targetSection.classList.add('active-section');
+            
+            // Make sure it's visible by removing any potential conflicting classes
+            targetSection.style.display = 'block';
+        }
         
         // Update Bottom Stepper Footer inside active section
         updateSectionStepper(currentSec.id);
         
         if (shouldScroll) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Use a slight delay to ensure DOM updates are complete before scrolling
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 50);
         }
     } else {
-        // In All Sections mode, scroll to target section
+        // In All Sections mode, show all sections and scroll to target section
+        document.querySelectorAll('.section-content').forEach(sec => {
+            sec.classList.remove('hidden');
+            sec.classList.remove('active-section');
+            sec.style.display = 'block';
+        });
+        
         const targetElement = document.getElementById(currentSec.id);
         if (targetElement && shouldScroll) {
             const offset = 90;
@@ -725,49 +805,60 @@ function initSearch() {
  * Lightbox Modal for Images
  */
 function initLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    if (!lightbox || !lightboxImg) return;
+
+    function open(src, caption) {
+        lightboxImg.src = src;
+        if (lightboxCaption && caption) lightboxCaption.textContent = caption;
+        lightbox.classList.remove('hidden', 'opacity-0');
+        lightbox.classList.add('flex', 'opacity-100');
+        lightboxImg.classList.remove('scale-95');
+        lightboxImg.classList.add('scale-100');
+    }
+
+    function close() {
+        lightboxImg.classList.add('scale-95');
+        lightboxImg.classList.remove('scale-100');
+        lightbox.classList.add('opacity-0');
+        lightbox.classList.remove('opacity-100');
+        setTimeout(() => {
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex', 'opacity-0');
+        }, 300);
+    }
+
     // Initialize lightbox triggers
     const triggers = document.querySelectorAll('.lightbox-trigger');
-    
     triggers.forEach(trigger => {
         trigger.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            const imgSrc = this.src || this.getAttribute('href') || this.querySelector('img')?.src;
-            const caption = this.querySelector('figcaption')?.textContent || this.title || this.alt || '';
-            
-            const lightbox = document.getElementById('lightbox');
-            const lightboxImg = document.getElementById('lightbox-img');
-            const lightboxCaption = document.getElementById('lightbox-caption');
-            
-            if (lightbox && lightboxImg) {
-                lightboxImg.src = imgSrc;
-                if (lightboxCaption) lightboxCaption.textContent = caption;
-                
-                // Show lightbox with fade-in effect
-                lightbox.classList.remove('hidden');
-                setTimeout(() => lightbox.classList.remove('opacity-0'), 10);
-            }
+            const imgSrc = this.src || this.getAttribute('href') || (this.querySelector('img') && this.querySelector('img').src) || '';
+            const caption = (this.querySelector('figcaption') && this.querySelector('figcaption').textContent) || this.title || this.alt || '';
+            if (imgSrc) open(imgSrc, caption);
         });
     });
-    
+
     // Close lightbox
-    const lightboxClose = document.getElementById('lightbox-close');
-    const lightbox = document.getElementById('lightbox');
-    
-    if (lightboxClose && lightbox) {
-        lightboxClose.addEventListener('click', function() {
-            lightbox.classList.add('opacity-0');
-            setTimeout(() => lightbox.classList.add('hidden'), 300);
-        });
-        
-        // Close on clicking the backdrop
-        lightbox.addEventListener('click', function(e) {
-            if (e.target === lightbox) {
-                lightbox.classList.add('opacity-0');
-                setTimeout(() => lightbox.classList.add('hidden'), 300);
-            }
-        });
+    if (lightboxClose) {
+        lightboxClose.addEventListener('click', close);
     }
+
+    // Close on clicking the backdrop
+    lightbox.addEventListener('click', function(e) {
+        if (e.target === lightbox) close();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) {
+            close();
+        }
+    });
 }
 
 /**
@@ -834,17 +925,41 @@ function initScrollProgress() {
     const progress = document.getElementById('scroll-progress');
     if (!progress) return;
 
-    window.addEventListener('scroll', () => {
+    // Throttled scroll handler for better performance
+    let ticking = false;
+    
+    function updateScrollProgress() {
         if (viewMode === 'all') {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
+            const scrolled = height ? (winScroll / height) * 100 : 0;
+            
+            // Animate the width with smoother transitions
             progress.style.width = scrolled + '%';
+            
+            // Add opacity effect based on scroll amount for more visual interest
+            const opacity = Math.min(1, scrolled / 20); // Start fading in at 20% scroll
+            progress.style.opacity = opacity > 0.2 ? 1 : 0.2 + (opacity * 0.8);
         } else {
+            // In single section mode, calculate based on section index
             const pct = ((currentSectionIndex + 1) / SECTIONS.length) * 100;
             progress.style.width = pct + '%';
+            progress.style.opacity = 1;
         }
-    }, { passive: true });
+        ticking = false;
+    }
+
+    function requestScrollUpdate() {
+        if (!ticking) {
+            requestAnimationFrame(updateScrollProgress);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestScrollUpdate, { passive: true });
+    
+    // Also update when view mode changes
+    // Note: This assumes there's a mechanism to call updateScrollProgress when viewMode changes
 }
 
 function initBackToTop() {

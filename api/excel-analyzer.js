@@ -10,6 +10,7 @@ import { tmpdir } from 'os';
 import formidable from 'formidable';
 import FormData from 'form-data'; // Add form-data for Node.js compatibility
 import { createReadStream } from 'fs';
+import { Buffer } from 'buffer';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -29,6 +30,9 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Check if this is a download request
+  const isDownloadRequest = req.query.download === 'true';
+  
   // Create uploads directory if it doesn't exist
   const uploadDir = join(process.cwd(), 'uploads');
   try {
@@ -62,6 +66,17 @@ export default async function handler(req, res) {
     }
 
     const file = Array.isArray(files.file) ? files.file[0] : files.file;
+    
+    // Check if this is a download request
+    if (isDownloadRequest) {
+      // Directly serve the uploaded file for download
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${file.originalFilename}"`);
+      
+      const fileStream = createReadStream(file.filepath);
+      fileStream.pipe(res);
+      return;
+    }
     
     // Determine the Python API endpoint
     const pythonApiUrl = process.env.PYTHON_API_URL || 'http://localhost:5000';
@@ -98,13 +113,30 @@ export default async function handler(req, res) {
       throw new Error(`Python API responded with status ${response.status}`);
     }
     
-    const result = await response.json();
+    // Check if response is JSON or binary (for file download)
+    const contentType = response.headers.get('content-type');
     
-    // Clean up the temporary file
-    await fsPromises.unlink(tempFilePath);
-    
-    // Return the result to the client
-    res.status(200).json(result);
+    if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+      // This is a file download response - get the binary content
+      const buffer = Buffer.from(await response.buffer());
+      
+      // Set proper headers for Excel file download
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="fixed_${file.originalFilename || 'file.xlsx'}"`);
+      res.setHeader('Content-Length', buffer.length);
+      
+      // Send the binary Excel file
+      res.send(buffer);
+    } else {
+      // This is a JSON response
+      const result = await response.json();
+      
+      // Clean up the temporary file
+      await fsPromises.unlink(tempFilePath);
+      
+      // Return the result to the client
+      res.status(200).json(result);
+    }
   } catch (error) {
     console.error('Excel Analyzer API Error:', error);
     res.status(500).json({

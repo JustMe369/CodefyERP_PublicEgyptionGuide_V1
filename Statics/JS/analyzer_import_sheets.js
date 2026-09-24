@@ -134,7 +134,14 @@ function initializeValidationTool() {
             if (progressFill) progressFill.style.width = '20%';
             
             // Use the appropriate API endpoint based on environment
-            const endpoint = `${apiBase}/validate`;
+            let endpoint;
+            if (isLocalhost) {
+                // For localhost, use the Python API directly - note the correct endpoint
+                endpoint = 'http://localhost:5000/api/validate-excel';
+            } else {
+                // For deployed version, use the Vercel API endpoint
+                endpoint = `${apiBase}/excel-analyzer`;
+            }
             console.log(`Using API endpoint: ${endpoint}`);
             
             const response = await fetch(endpoint, {
@@ -184,14 +191,24 @@ function initializeValidationTool() {
             return;
         }
         
-        const downloadFormData = new FormData();
-        downloadFormData.append('file', originalFile);
-
         // Use the appropriate API endpoint based on environment
-        const endpoint = `${apiBase}/download-cleaned`;
+        let endpoint;
+        if (isLocalhost) {
+            // For localhost, use the Python API directly - note the correct endpoint for export
+            endpoint = 'http://localhost:5000/api/validate-and-fix';
+        } else {
+            // For deployed version, use the Vercel API endpoint
+            endpoint = `${apiBase}/excel-analyzer`;
+        }
+        
         console.log(`Using download endpoint: ${endpoint}`);
 
         try {
+            // Create form data with auto_fix parameter
+            const downloadFormData = new FormData();
+            downloadFormData.append('file', originalFile);
+            downloadFormData.append('auto_fix', 'true'); // Tell the API to auto-fix and return the file
+
             const response = await fetch(endpoint, {
                 method: 'POST',
                 body: downloadFormData,
@@ -203,17 +220,30 @@ function initializeValidationTool() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Create a blob from the response and trigger download
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `cleaned_${originalFile.name}`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            // Check if response is JSON or binary file
+            const contentType = response.headers.get('content-type');
+            
+            if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+                // This is a file download response
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `fixed_${originalFile.name}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } else {
+                // This is a JSON response, possibly an error
+                const result = await response.json();
+                if (result.success === false) {
+                    alert(`Error: ${result.error || result.message || 'Unknown error'}`);
+                } else {
+                    alert('File processed successfully but no downloadable file returned.');
+                }
+            }
         } catch (error) {
             console.error('Download error:', error);
             

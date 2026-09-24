@@ -149,9 +149,14 @@ function initializeSmartThemeToggle() {
     const smartSunPath = document.getElementById('smart-sun-path');
     const smartMoonPath = document.getElementById('smart-moon-path');
     
-    // Check for saved theme preference or respect OS preference
-    const currentTheme = localStorage.getItem('theme') || 
-                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-blue' : 'light');
+    // Check for saved theme preference - default to light if none is saved
+    let currentTheme = localStorage.getItem('theme');
+    
+    // If no theme is saved in localStorage, set the default to light
+    if (!currentTheme) {
+        currentTheme = 'light';
+        localStorage.setItem('theme', 'light'); // Save default to browser cache
+    }
     
     // Apply the saved theme on page load
     if (currentTheme === 'dark-blue') {
@@ -160,6 +165,13 @@ function initializeSmartThemeToggle() {
         if (smartSunPath && smartMoonPath) {
             smartSunPath.classList.add('hidden');
             smartMoonPath.classList.remove('hidden');
+        }
+    } else if (currentTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        // Update smart theme icon
+        if (smartSunPath && smartMoonPath) {
+            smartSunPath.classList.remove('hidden');
+            smartMoonPath.classList.add('hidden');
         }
     } else {
         document.documentElement.removeAttribute('data-theme');
@@ -187,9 +199,9 @@ function initializeSmartThemeToggle() {
         }
     }
     
-    // Function to update theme display for sunny theme
-    function updateThemeDisplaySunny() {
-        // Sunny light theme active (same as regular light)
+    // Function to update theme display for light theme
+    function updateThemeDisplayLight() {
+        // Light theme active
         if (smartSunPath && smartMoonPath) {
             smartSunPath.classList.remove('hidden');
             smartMoonPath.classList.add('hidden');
@@ -221,11 +233,11 @@ function initializeSmartThemeToggle() {
         const currentThemeAttribute = document.documentElement.getAttribute('data-theme');
         
         if (currentThemeAttribute === 'dark-blue') {
-            // Switch to sunny light theme
-            document.documentElement.setAttribute('data-theme', 'sunny-light');
-            localStorage.setItem('theme', 'sunny-light');
-            updateThemeDisplaySunny();
-        } else if (currentThemeAttribute === 'sunny-light') {
+            // Switch to light theme
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            updateThemeDisplayLight();
+        } else if (currentThemeAttribute === 'light') {
             // Switch to regular light theme
             document.documentElement.removeAttribute('data-theme');
             localStorage.setItem('theme', 'light');

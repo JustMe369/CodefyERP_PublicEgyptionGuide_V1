@@ -7,15 +7,7 @@
     --transition-fast: 150ms;
     --transition-base: 300ms;
     --transition-slow: 700ms;
-    
-    /* Light theme colors */
-    --bg-primary: #f8fafc;
-    --bg-secondary: #ffffff;
-    --bg-card: #ffffff;
-    --bg-sidebar: #ffffff;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-primary: #e2e8f0;
+
     --primary-50: #eff6ff;
     --primary-100: #dbeafe;
     --primary-200: #bfdbfe;
@@ -95,6 +87,45 @@ html {
     background: rgba(255, 255, 255, .75);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+}
+
+/* =========================================================
+   Lightbox Modal - Modern Full-Screen Image Popup
+   ========================================================= */
+#lightbox {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.95);
+}
+
+#lightbox #lightbox-img {
+    box-shadow:
+        0 25px 80px -20px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 0 60px -10px rgba(59, 130, 246, 0.3);
+    border-radius: 20px;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+}
+
+#lightbox #lightbox-img.scale-100 {
+    transform: scale(1);
+}
+
+#lightbox #lightbox-img.scale-95 {
+    transform: scale(0.95);
+}
+
+/* Close button hover effect */
+#lightbox #lightbox-close {
+    transition: all 0.25s ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+#lightbox #lightbox-close:hover {
+    background: rgba(239, 68, 68, 0.25) !important;
+    transform: rotate(90deg) scale(1.1);
 }
 
 /* =========================================================
@@ -350,9 +381,26 @@ input:focus-visible {
    Progress bar shimmer
    ========================================================= */
 #scroll-progress {
-    background: linear-gradient(90deg, #60a5fa, #2563eb, #7c3aed);
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-600), var(--primary-700));
     background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+    height: 3px !important;
+    z-index: 60 !important;
+    transition: width 0.15s ease-out, opacity 0.3s ease;
+}
+
+/* Enhanced glow effect for the scroll progress */
+#scroll-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: inherit;
+    filter: blur(6px);
+    opacity: 0.6;
+    z-index: -1;
 }
 
 /* =========================================================
@@ -694,57 +742,37 @@ html {
 /* =========================================================
    Single Section Focused View Mode
    ========================================================= */
-.single-section-mode .section-content:not(.active-section) {
-    display: none !important;
+/* Single Section Mode Specific Styles */
+body.single-section-mode .section-content {
+    display: none;
 }
 
-.section-content.active-section {
-    display: block !important;
-    animation: sectionEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+body.single-section-mode .section-content.active-section {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
 }
 
-@keyframes sectionEntrance {
-    0% {
+@keyframes fadeIn {
+    from {
         opacity: 0;
-        transform: translateY(14px);
+        transform: translateY(10px);
     }
-    100% {
+    to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Print styles */
-@media print {
-
-    aside,
-    #mobile-header,
-    #lightbox,
-    #back-to-top,
-    #scroll-progress,
-    #float-help,
-    #sidebar-overlay {
-        display: none !important;
-    }
-
-    main {
-        margin: 0 !important;
-        max-width: 100% !important;
-        padding: 0 !important;
-    }
-
-    .reveal {
-        opacity: 1 !important;
-        transform: none !important;
-    }
-
-    .callout,
-    .bg-white {
-        box-shadow: none !important;
-    }
-
-    a {
-        color: #1e3a8a !important;
-        text-decoration: underline;
-    }
+/* Ensure proper spacing in single section mode */
+body.single-section-mode main {
+    padding-bottom: 100px; /* Extra space for stepper footer */
 }
+
+/* All Sections Mode - Show all sections */
+body.all-sections-mode .section-content {
+    display: block;
+}
+
+/* =========================================================
+   Base / Typography
+   ========================================================= */

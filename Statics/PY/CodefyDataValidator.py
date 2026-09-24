@@ -1201,6 +1201,73 @@ class CodefyDataValidator:
             print(f"Error applying fixes: {e}")
             return False
 
+    def export_fixed(self, output_path: str):
+        """Export the fixed file with audit log."""
+        try:
+            # Apply fixes first
+            success = self.apply_fixes(output_path)
+            if not success:
+                raise Exception("Failed to apply fixes")
+            
+            # Reload the fixed workbook to add audit log
+            wb = load_workbook(output_path)
+            
+            # Create audit log sheet
+            audit_sheet_name = "Audit_Log | سجل التعديلات"
+            if audit_sheet_name in wb.sheetnames:
+                del wb[audit_sheet_name]
+            
+            audit_ws = wb.create_sheet(title=audit_sheet_name)
+            audit_ws.sheet_view.rightToLeft = True
+            
+            # Add headers
+            headers = ["Timestamp | الوقت", "Sheet | الورقة", "Row | الصف",
+                      "Column | العمود", "Original | القيمة السابقة",
+                      "Fixed | القيمة المصححة", "Reason | السبب"]
+            audit_ws.append(headers)
+            
+            # Style headers
+            header_font = Font(bold=True, color="FFFFFF", size=11)
+            header_fill = PatternFill(start_color="4da6ff", end_color="4da6ff", fill_type="solid")
+            for c in range(1, len(headers)+1):
+                cell = audit_ws.cell(1, c)
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+            
+            # Add fix records
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            for fix in self.fixes:
+                audit_ws.append([
+                    now,
+                    fix['sheet'],
+                    fix['row'],
+                    fix['col'],
+                    to_str(fix['old']),
+                    to_str(fix['new']),
+                    fix['reason']
+                ])
+            
+            # Set column widths
+            for c in range(1, len(headers)+1):
+                audit_ws.column_dimensions[get_column_letter(c)].width = 26
+            
+            # Freeze header row
+            audit_ws.freeze_panes = "A2"
+            
+            # Save the workbook with audit log
+            wb.save(output_path)
+            
+            # Return result
+            return {
+                'applied_fixes': len(self.fixes),
+                'output_path': output_path,
+                'success': True
+            }
+        except Exception as e:
+            print(f"Error exporting fixed file: {e}")
+            raise e
+
 
 def validate_excel_file(file_path: str) -> Dict[str, Any]:
     """

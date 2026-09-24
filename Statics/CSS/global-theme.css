@@ -394,17 +394,15 @@
     color: #e2f0ff;
 }
 
-/* =========================================================
-   Sunny Light Theme (Egyptian-inspired warm theme)
-   ========================================================= */
-[data-theme="sunny-light"] {
+/* Enhanced light theme with Egyptian-inspired warm colors */
+[data-theme="light"] {
     --bg-primary: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
     --bg-secondary: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 100%);
-    --bg-card: rgba(255, 255, 255, 0.9);
-    --bg-sidebar: rgba(255, 255, 255, 0.95);
+    --bg-card: rgba(255, 255, 255, 0.95);
+    --bg-sidebar: rgba(255, 255, 255, 0.98);
     --text-primary: #0f172a;
     --text-secondary: #64748b;
-    --border-primary: rgba(203, 213, 225, 0.6);
+    --border-primary: rgba(203, 213, 225, 0.7);
     --primary-50: #dbeafe;
     --primary-100: #bfdbfe;
     --primary-200: #93c5fd;
@@ -416,121 +414,244 @@
     --primary-800: #1e3a8a;
     --primary-900: #1e3a8a;
 
-    /* Sun-inspired accent colors */
+    /* Egyptian-inspired accent colors */
+    --egyptian-gold: #d4af37;
+    --egyptian-blue: #0f47af;
+    --egyptian-red: #cd5c5c;
+    --egyptian-green: #3cb371;
     --sunset-gold: #fbbf24;
     --sunset-orange: #f97316;
-    --sunset-pink: #f472b6;
     --sunset-yellow: #eab308;
 }
 
-/* Animated background for sunny theme */
-[data-theme="sunny-light"] body {
+/* Animated background for light theme */
+[data-theme="light"] body {
     background: var(--bg-primary);
     background-size: 400% 400%;
     animation: gradientAnimation 15s ease infinite;
     color: var(--text-primary);
 }
 
-/* Enhanced card styling for sunny theme */
-[data-theme="sunny-light"] .card,
-[data-theme="sunny-light"] .bg-white,
-[data-theme="sunny-light"] .section-content,
-[data-theme="sunny-light"] .callout {
+/* Enhanced card styling for light theme */
+[data-theme="light"] .card,
+[data-theme="light"] .bg-white,
+[data-theme="light"] .section-content,
+[data-theme="light"] .callout {
     background: var(--bg-card) !important;
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-primary) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-[data-theme="sunny-light"] .card:hover,
-[data-theme="sunny-light"] .section-content:hover {
+[data-theme="light"] .card:hover,
+[data-theme="light"] .section-content:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     border-color: var(--primary-500) !important;
 }
 
-/* Checklist for sunny theme */
-[data-theme="sunny-light"] .checklist-item {
-    background: #f8fafc;
-    border: 1px solid #f1f5f9;
+/* Enhanced sidebar for light theme */
+[data-theme="light"] #sidebar {
+    background: var(--bg-sidebar) !important;
+    backdrop-filter: blur(15px);
+    border-right: 1px solid var(--border-primary);
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="sunny-light"] .checklist-item:hover {
-    background: #fff1f2;
-    border-color: #fecdd3;
+/* Enhanced mobile header for light theme */
+[data-theme="light"] #mobile-header {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-primary) !important;
 }
 
-[data-theme="sunny-light"] .checklist-box {
-    border: 2px solid #cbd5e1;
+/* Enhanced text styling for light theme */
+[data-theme="light"] .text-slate-900 {
+    color: var(--text-primary) !important;
 }
 
-[data-theme="sunny-light"] .checklist-item:hover .checklist-box {
-    border-color: #f43f5e;
-    background: #fff1f2;
+[data-theme="light"] .text-slate-500,
+[data-theme="light"] .text-slate-600,
+[data-theme="light"] .text-slate-700 {
+    color: var(--text-secondary) !important;
 }
 
-/* Search suggestions for sunny theme */
-[data-theme="sunny-light"] #search-suggestions li {
-    color: #334155;
+/* Enhanced button styling for light theme */
+[data-theme="light"] .btn-primary {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+    transition: all 0.3s ease;
 }
 
-[data-theme="sunny-light"] #search-suggestions li:hover,
-[data-theme="sunny-light"] #search-suggestions li:focus,
-[data-theme="sunny-light"] #search-suggestions li.is-active {
-    background: #f1f5f9;
-    color: #1d4ed8;
+[data-theme="light"] .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-600) 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
 }
 
-/* Section badges for sunny theme */
-[data-theme="sunny-light"] .section-check-badge.is-done {
-    background-color: #10b981;
-    color: #ffffff;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+/* Enhanced input fields for light theme */
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="password"],
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-primary) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.3s ease;
 }
 
-[data-theme="sunny-light"] .section-check-badge:not(.is-done) {
-    background-color: #e2e8f0;
-    color: #94a3b8;
+[data-theme="light"] input[type="text"]:focus,
+[data-theme="light"] input[type="email"]:focus,
+[data-theme="light"] input[type="password"]:focus,
+[data-theme="light"] select:focus,
+[data-theme="light"] textarea:focus {
+    border-color: var(--primary-500) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+    background: var(--bg-secondary) !important;
 }
 
-/* View mode pills for sunny theme */
-[data-theme="sunny-light"] .view-mode-pill.active {
-    background-color: var(--primary-600);
-    color: #ffffff;
-    box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.35);
+/* Enhanced scrollbars for light theme */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--primary-400), var(--primary-300));
+    border-radius: 10px;
 }
 
-[data-theme="sunny-light"] .view-mode-pill:not(.active) {
-    background-color: #f1f5f9;
-    color: #475569;
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(var(--primary-500), var(--primary-400));
 }
 
-[data-theme="sunny-light"] .view-mode-pill:not(.active):hover {
-    background-color: #e2e8f0;
-    color: #1e293b;
+/* Enhanced theme toggle button for light theme */
+[data-theme="light"] .theme-toggle {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid var(--primary-300) !important;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
 }
 
-/* Stepper card for sunny theme */
-[data-theme="sunny-light"] .section-stepper-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+[data-theme="light"] .theme-toggle:hover {
+    background: rgba(59, 130, 246, 0.2) !important;
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
-[data-theme="sunny-light"] .section-stepper-card:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 12px 24px -6px rgba(37, 99, 235, 0.12);
+/* Light theme scrollbar for sidebar */
+[data-theme="light"] #sidebar::-webkit-scrollbar-thumb {
+    background: rgba(150, 170, 200, 0.4);
 }
 
-/* Active nav link for sunny theme */
-[data-theme="sunny-light"] .nav-link.active {
+[data-theme="light"] #sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 130, 180, 0.6);
+}
+
+/* Egyptian accent elements */
+[data-theme="light"] .egyptian-accent {
+    position: relative;
+}
+
+[data-theme="light"] .egyptian-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--egyptian-gold), var(--egyptian-blue), var(--egyptian-gold));
+    border-radius: 2px;
+}
+
+/* Animated hover effects for links */
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] a:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.15)) !important;
+    border-radius: 8px;
+    transform: translateX(5px);
+    transition: all 0.3s ease;
+}
+
+/* Enhanced callout boxes for light theme */
+[data-theme="light"] .callout {
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme="light"] .callout::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--primary-500), var(--primary-300));
+    transition: all 0.4s ease;
+}
+
+[data-theme="light"] .callout:hover::before {
+    width: 100%;
+    opacity: 0.15;
+    background: linear-gradient(to bottom, var(--egyptian-gold), var(--egyptian-blue));
+}
+
+/* Enhanced progress bar for light theme */
+[data-theme="light"] #progress-bar-fill {
+    background: linear-gradient(90deg, var(--primary-500), var(--egyptian-gold), var(--primary-400)) !important;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
+    transition: width 0.5s ease-in-out;
+}
+
+/* Floating particles effect for light theme */
+[data-theme="light"] body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.08) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.05) 0%, transparent 30%);
+    animation: floatParticles 20s linear infinite;
+}
+
+/* In light theme, adjust grid opacity */
+[data-theme="light"] .bg-grid {
+    background-image:
+        linear-gradient(rgba(150, 180, 220, .1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(150, 180, 220, .1) 1px, transparent 1px);
+}
+
+/* Light theme hero gradient adjustment */
+[data-theme="light"] .hero-gradient {
+    background:
+        radial-gradient(1200px 500px at 80% 0%, rgba(37, 99, 235, .25), transparent 60%),
+        radial-gradient(1000px 400px at 10% 20%, rgba(249, 115, 22, .22), transparent 60%),
+        radial-gradient(900px 500px at 50% 100%, rgba(234, 179, 8, .18), transparent 60%);
+}
+
+/* Light theme glass effect */
+[data-theme="light"] .glass {
+    background: rgba(255, 255, 255, .85);
+}
+
+/* Light theme lightbox trigger */
+[data-theme="light"] .lightbox-trigger:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .1);
+}
+
+/* Light theme active nav link */
+[data-theme="light"] .nav-link.active {
     background: linear-gradient(90deg, rgba(37, 99, 235, .10), rgba(37, 99, 235, .02));
     color: var(--primary-700);
     font-weight: 700;
     position: relative;
 }
 
-[data-theme="sunny-light"] .nav-link.active::before {
+[data-theme="light"] .nav-link.active::before {
     content: '';
     position: absolute;
     inset-inline-start: 0;
@@ -542,124 +663,75 @@
     border-radius: 4px;
 }
 
-/* Tab buttons for sunny theme */
-[data-theme="sunny-light"] .tab-btn.active {
-    background: var(--primary-600);
-    color: white;
-    box-shadow: 0 10px 25px -10px rgba(37, 99, 235, .7);
+/* Light theme callouts */
+[data-theme="light"] .callout-tip { background: #fffbeb; border-color: #f59e0b; }
+[data-theme="light"] .callout-warn { background: #fef2f2; border-color: #ef4444; }
+[data-theme="light"] .callout-info { background: #eff6ff; border-color: #3b82f6; }
+[data-theme="light"] .callout-example { background: #f0fdf4; border-color: #22c55e; }
+[data-theme="light"] .callout-note { background: #f5f3ff; border-color: #8b5cf6; }
+
+/* Light theme card hover */
+[data-theme="light"] .hover-lift:hover {
+    box-shadow: 0 25px 50px -20px rgba(0, 0, 0, .15);
 }
 
-/* Sunny light theme scrollbar for sidebar */
-[data-theme="sunny-light"] #sidebar::-webkit-scrollbar-thumb {
-    background: linear-gradient(var(--primary-600), var(--primary-400));
+/* Light theme checklist */
+[data-theme="light"] .checklist-item {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
 }
 
-[data-theme="sunny-light"] #sidebar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(var(--primary-700), var(--primary-500));
+[data-theme="light"] .checklist-item:hover {
+    background: #fff1f2;
+    border-color: #fecdd3;
 }
 
-/* Sunny light theme search suggestions */
-[data-theme="sunny-light"] #search-suggestions li {
-    color: var(--text-secondary);
+[data-theme="light"] .checklist-box {
+    border: 2px solid #cbd5e1;
 }
 
-[data-theme="sunny-light"] #search-suggestions li:hover,
-[data-theme="sunny-light"] #search-suggestions li:focus,
-[data-theme="sunny-light"] #search-suggestions li.is-active {
-    background: var(--primary-100);
-    color: var(--primary-700);
+[data-theme="light"] .checklist-item:hover .checklist-box {
+    border-color: #f43f5e;
+    background: #fff1f2;
 }
 
-/* Sunny light theme nav link hover */
-[data-theme="sunny-light"] .nav-link:hover {
-    transform: translateX(-4px);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.2)) !important;
-    border-radius: 8px;
+/* Light theme search suggestions */
+[data-theme="light"] #search-suggestions li {
+    color: #334155;
 }
 
-/* Sunny light theme active nav link */
-[data-theme="sunny-light"] .nav-link.active {
-    background: linear-gradient(90deg, rgba(37, 99, 235, .10), rgba(37, 99, 235, .02));
-    color: var(--primary-700);
-    font-weight: 700;
-    box-shadow: inset -3px 0 0 var(--primary-600);
+[data-theme="light"] #search-suggestions li:hover,
+[data-theme="light"] #search-suggestions li:focus,
+[data-theme="light"] #search-suggestions li.is-active {
+    background: #f1f5f9;
+    color: #1d4ed8;
 }
 
-/* Sunny light theme mobile header */
-[data-theme="sunny-light"] #mobile-header {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-primary) !important;
+/* Light theme section badges */
+[data-theme="light"] .section-check-badge.is-done {
+    background-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
 }
 
-/* Sunny light theme sidebar */
-[data-theme="sunny-light"] #sidebar {
-    background: var(--bg-sidebar) !important;
-    backdrop-filter: blur(15px);
-    border-inline-end: 1px solid var(--border-primary);
-    box-shadow: 5px 0 25px rgba(203, 213, 225, 0.3);
+[data-theme="light"] .section-check-badge:not(.is-done) {
+    background-color: #e2e8f0;
+    color: #94a3b8;
 }
 
-/* Sunny light theme sidebar overlay */
-[data-theme="sunny-light"] #sidebar-overlay {
-    background: rgba(15, 23, 42, 0.5) !important;
-    backdrop-filter: blur(4px);
-}
-
-/* Sunny light theme theme toggle button */
-[data-theme="sunny-light"] .codefy-theme-toggle {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid var(--primary-500) !important;
-    backdrop-filter: blur(5px);
-}
-
-[data-theme="sunny-light"] .codefy-theme-toggle:hover {
-    background: rgba(79, 70, 229, 0.2) !important;
-    transform: scale(1.05) rotate(15deg);
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-}
-
-/* Sunny light theme collapse toggle button */
-[data-theme="sunny-light"] #sidebar-collapse-toggle {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid var(--border-primary) !important;
-}
-
-[data-theme="sunny-light"] #sidebar-collapse-toggle:hover {
-    background: rgba(79, 70, 229, 0.2) !important;
-}
-
-/* Sunny light theme search input */
-[data-theme="sunny-light"] #search-input {
-    background: var(--bg-card) !important;
-    border: 1px solid var(--border-primary) !important;
-    color: var(--text-primary) !important;
-}
-
-[data-theme="sunny-light"] #search-input:focus {
-    border-color: var(--primary-500) !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
-    background: var(--bg-secondary) !important;
-}
-
-/* Sunny light theme progress container */
-[data-theme="sunny-light"] .progress-container > div {
-    background: linear-gradient(135deg, var(--primary-900) 0%, var(--primary-700) 100%) !important;
-}
-
-/* Sunny light theme view mode pills */
-[data-theme="sunny-light"] .view-mode-pill.active {
+/* Light theme mode switcher */
+[data-theme="light"] .view-mode-pill.active {
     background-color: var(--primary-600);
     color: #ffffff;
     box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.35);
 }
 
-[data-theme="sunny-light"] .view-mode-pill:not(.active) {
+[data-theme="light"] .view-mode-pill:not(.active) {
     background-color: #f1f5f9;
     color: #475569;
 }
 
-[data-theme="sunny-light"] .view-mode-pill:not(.active):hover {
+[data-theme="light"] .view-mode-pill:not(.active):hover {
     background-color: #e2e8f0;
     color: #1e293b;
 }
@@ -782,4 +854,18 @@
 #search-suggestions li.is-active {
   background: #f1f5f9;
   color: #1d4ed8;
+}
+
+/* Enhanced scroll progress for different themes */
+[data-theme="dark-blue"] #scroll-progress {
+  background: linear-gradient(90deg, var(--primary-700), var(--primary-500), var(--egyptian-gold));
+  box-shadow: 0 0 10px rgba(77, 165, 235, 0.6);
+  height: 3px !important;
+}
+
+/* Light theme scroll progress - using the same style but adapted */
+[data-theme="light"] #scroll-progress {
+  background: linear-gradient(90deg, var(--primary-500), var(--egyptian-gold), var(--primary-400));
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+  height: 3px !important;
 }

@@ -1,4 +1,4 @@
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Flask API server for CodefyERP Sheet Analyzer v11.3.1
@@ -8,22 +8,22 @@ Provides endpoints for Excel file analysis, export, validation, and cleaned down
 import os
 import sys
 import json
-import time
 import tempfile
-import traceback
-import threading
 from datetime import datetime
 
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-from codefy_web_service import (
-    CodefyWebService, TempFileManager, _is_allowed,
-    ALLOWED_EXTENSIONS, EXPORT_FORMATS,
+# Import the main analyzer class from CodefyDataValidator
+import importlib.util
+analyzer_spec = importlib.util.spec_from_file_location(
+    "CodefyDataValidator", 
+    os.path.join(os.path.dirname(__file__), "CodefyDataValidator.py")
 )
+analyzer_module = importlib.util.module_from_spec(analyzer_spec)
+analyzer_spec.loader.exec_module(analyzer_module)
+CodefyAnalyzer = analyzer_module.CodefyDataValidator
 
 app = Flask(__name__)
 CORS(app)
@@ -35,14 +35,22 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 service = CodefyWebService()
 
 
-
-
-
-
-
-
-
-
+@app.route('/', methods=['GET'])
+def index():
+    """Home route with API documentation"""
+    return jsonify({
+        'service': 'CodefyERP Excel Analyzer API',
+        'version': '11.3.1',
+        'endpoints': {
+            'POST /api/validate': 'Validate Excel file and return issues',
+            'POST /api/validate-excel': 'Validate Excel file and return issues',
+            'POST /api/validate-and-fix': 'Validate and return fixed file',
+            'POST /api/export': 'Export file in various formats',
+            'GET /api/health': 'Health check',
+            'GET /api/settings': 'Get current settings',
+            'POST /api/settings': 'Update settings'
+        }
+    })
 
 
 @app.route('/api/health', methods=['GET'])
@@ -84,13 +92,23 @@ def validate_excel():
         # In a real implementation, we would run the full analysis
         # For now, we'll simulate the analysis
         try:
-            # This would run the full analysis
-            result, fixes = analyzer.run()
+            # Run the full analysis
+            success = analyzer.analyze()
+            if not success:
+                return jsonify({
+                    'success': False,
+                    'error': 'Analysis failed',
+                    'message': 'Could not analyze the uploaded file'
+                }), 500
             
             # Return the API-ready dictionary
-            api_result = analyzer.to_api_dict()
-            api_result['success'] = True
-            api_result['message'] = f"File {file.filename} analyzed successfully"
+            api_result = {
+                'success': True,
+                'summary': analyzer.get_analysis_summary(),
+                'issues': analyzer._all_issues(),
+                'fixes_available': len(analyzer.fixes) > 0,
+                'message': f"File {file.filename} analyzed successfully"
+            }
             
             return jsonify(api_result)
             
@@ -115,7 +133,7 @@ def validate_excel():
 
 @app.route('/api/validate-and-fix', methods=['POST'])
 def validate_and_fix():
-    """Validate and fix Excel/CSV file"""
+    """Validate and fix Excel/CSV file, returning the fixed file"""
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file provided'}), 400
@@ -124,7 +142,7 @@ def validate_and_fix():
         if file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
         
-        # Get options
+        # Get options - check both form data and query parameters
         auto_fix = request.form.get('auto_fix', 'true').lower() == 'true'
         
         # Save uploaded file to temporary location
@@ -135,40 +153,149 @@ def validate_and_fix():
         try:
             # Create analyzer and run analysis
             analyzer = CodefyAnalyzer(file_path=temp_path)
-            result, fixes = analyzer.run()
             
-            # Get API-ready results
-            api_result = analyzer.to_api_dict()
-            api_result['success'] = True
-            api_result['auto_fix_applied'] = auto_fix
-            api_result['original_filename'] = file.filename
+            # Run the analysis
+            success = analyzer.analyze()
+            if not success:
+                return jsonify({
+                    'success': False,
+                    'error': 'Analysis failed',
+                    'message': 'Could not analyze the uploaded file'
+                }), 500
             
-            # If auto-fix is enabled, prepare fixed file
-            if auto_fix and api_result.get('fixes_applied'):
-                # In a real implementation, we would generate a fixed file
-                # For now, we just indicate that fixes are available
-                api_result['fixed_file_available'] = True
+            # Prepare response
+            api_result = {
+                'success': True,
+                'summary': analyzer.get_analysis_summary(),
+                'issues': analyzer._all_issues(),
+                'fixes_available': len(analyzer.fixes) > 0,
+                'message': f"File {file.filename} analyzed successfully",
+                'fixes_applied': len(analyzer.fixes)
+            }
+            
+            # If auto_fix is enabled, save the fixed file and return it
+            if auto_fix:
+                fixed_file_path = os.path.join(temp_dir, f"fixed_{file.filename}")
+                try:
+                    # Use the export_fixed method to save the corrected file
+                    export_result = analyzer.export_fixed(fixed_file_path)
+                    
+                    # Verify file exists
+                    if os.path.exists(fixed_file_path):
+                        # Return the fixed file for download with proper headers
+                        response = send_file(
+                            fixed_file_path,
+                            as_attachment=True,
+                            download_name=f"fixed_{file.filename}",
+                            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        )
+                        
+                        # Add additional headers for file downloads
+                        response.headers['Content-Length'] = os.path.getsize(fixed_file_path)
+                        response.headers['X-File-Name'] = f"fixed_{file.filename}"
+                        response.headers['X-File-Size'] = os.path.getsize(fixed_file_path)
+                        
+                        return response
+                    else:
+                        # If export failed somehow, return the analysis results
+                        return jsonify(api_result)
+                        
+                except Exception as e:
+                    print(f"Error exporting fixed file: {e}")
+                    # If export fails, return the analysis results without the file
+                    api_result['export_error'] = str(e)
+                    return jsonify(api_result)
             
             return jsonify(api_result)
             
-        except Exception as e:
-            return jsonify({
-                'success': False,
-                'error': str(e),
-                'message': 'Error during validation and fixing'
-            }), 500
         finally:
-            # Clean up temporary file
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
+            # Clean up temporary files
+            for temp_file in [temp_path, fixed_file_path]:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
     
     except Exception as e:
         return jsonify({
             'success': False,
             'error': str(e),
-            'message': 'Server error during validation and fixing'
+            'message': 'Server error during file validation'
         }), 500
 
 
+@app.route('/api/export-fixed', methods=['POST'])
+def export_fixed():
+    """Export fixed Excel file"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Save uploaded file to temporary location
+        temp_dir = tempfile.mkdtemp()
+        temp_path = os.path.join(temp_dir, file.filename)
+        file.save(temp_path)
+        
+        try:
+            # Create analyzer and run analysis
+            analyzer = CodefyAnalyzer(file_path=temp_path)
+            analyzer.run()  # Run analysis first
+            
+            # Create output path for the fixed file
+            output_path = os.path.join(temp_dir, f"fixed_{file.filename}")
+            
+            # Export the fixed file
+            export_result = analyzer.export_fixed(output_path)
+            
+            # Return the fixed file for download with proper headers
+            response = send_file(
+                output_path,
+                as_attachment=True,
+                download_name=f"fixed_{file.filename}",
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            
+            # Add additional headers for file downloads
+            response.headers['Content-Length'] = os.path.getsize(output_path)
+            response.headers['X-File-Name'] = f"fixed_{file.filename}"
+            response.headers['X-File-Size'] = os.path.getsize(output_path)
+            
+            return response
+            
+        finally:
+            # Clean up temporary files
+            for temp_file in [temp_path, output_path]:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Server error during file export'
+        }), 500
+
+
+@app.route('/api/settings', methods=['GET'])
+def get_settings():
+    """Get current analyzer settings"""
+    return jsonify({
+        'success': True,
+        'message': 'Settings endpoint not implemented in core version'
+    })
+
+
+@app.route('/api/settings', methods=['POST'])
+def update_settings():
+    """Update analyzer settings"""
+    return jsonify({
+        'success': True,
+        'message': 'Settings endpoint not implemented in core version'
+    })
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
