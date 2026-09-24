@@ -5,8 +5,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // If scripts.js is already running and handling the app, avoid redundant double initialization
     if (window.codefyAppLoaded || window.codefyNavbarLoaded) {
-        // Still initialize smart theme toggle even if scripts.js is loaded
-        initializeSmartThemeToggle();
         // Initialize sidebar functionality regardless
         initializeSidebarCollapseControls();
         initSidebar();
@@ -18,9 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize all navbar functionality
     initializeSidebarCollapseControls();
     initSidebar();
-    
-    // Smart theme toggle functionality
-    initializeSmartThemeToggle();
 });
 
 // Collapsible Sidebar Management System
@@ -37,19 +32,30 @@ function initializeSidebarCollapseControls() {
     });
     
     // Initialize sidebar collapsed state from localStorage
-    const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    const isSidebarCollapsed = window.innerWidth >= 1024 && localStorage.getItem('sidebarCollapsed') === 'true';
     if (isSidebarCollapsed) {
         sidebar.classList.add('sidebar-collapsed');
         document.body.classList.add('sidebar-is-collapsed');
-        collapseToggle?.setAttribute('aria-expanded', 'false');
+    }
+
+    function syncCollapseState(isCollapsed) {
+        if (!collapseToggle) return;
+        collapseToggle.setAttribute('aria-expanded', String(!isCollapsed));
+        collapseToggle.setAttribute('aria-label', isCollapsed ? 'توسيع الشريط الجانبي' : 'طي الشريط الجانبي');
+        collapseToggle.setAttribute('title', isCollapsed ? 'توسيع الشريط الجانبي' : 'طي الشريط الجانبي');
         if (collapseIcon) {
-            collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
+            collapseIcon.innerHTML = isCollapsed
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />'
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />';
         }
     }
+
+    syncCollapseState(sidebar.classList.contains('sidebar-collapsed'));
 
     // Handle sidebar collapse/expand functionality
     if (collapseToggle && sidebar) {
         collapseToggle.addEventListener('click', function() {
+            if (window.innerWidth < 1024) return;
             const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
             
             if (isCollapsed) {
@@ -57,20 +63,13 @@ function initializeSidebarCollapseControls() {
                 sidebar.classList.remove('sidebar-collapsed');
                 document.body.classList.remove('sidebar-is-collapsed');
                 localStorage.setItem('sidebarCollapsed', 'false');
-                collapseToggle.setAttribute('aria-expanded', 'true');
-                if (collapseIcon) {
-                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />';
-                }
             } else {
                 // Collapse sidebar
                 sidebar.classList.add('sidebar-collapsed');
                 document.body.classList.add('sidebar-is-collapsed');
                 localStorage.setItem('sidebarCollapsed', 'true');
-                collapseToggle.setAttribute('aria-expanded', 'false');
-                if (collapseIcon) {
-                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
-                }
             }
+            syncCollapseState(!isCollapsed);
         });
     }
 }

@@ -214,14 +214,16 @@
 }
 
 /* Enhanced theme toggle button for dark theme */
-[data-theme="dark-blue"] .theme-toggle {
+[data-theme="dark-blue"] .theme-control,
+[data-theme="dark-blue"] .codefy-theme-toggle {
     background: rgba(255, 255, 255, 0.1) !important;
     border: 1px solid var(--primary-500) !important;
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
 }
 
-[data-theme="dark-blue"] .theme-toggle:hover {
+[data-theme="dark-blue"] .theme-control:hover,
+[data-theme="dark-blue"] .codefy-theme-toggle:hover {
     background: rgba(79, 70, 229, 0.2) !important;
     transform: scale(1.1) rotate(15deg);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
@@ -609,14 +611,16 @@
 }
 
 /* Enhanced theme toggle button for light theme */
-[data-theme="light"] .theme-toggle {
+[data-theme="light"] .theme-control,
+[data-theme="light"] .codefy-theme-toggle {
     background: rgba(255, 255, 255, 0.8) !important;
     border: 1px solid var(--primary-300) !important;
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
 }
 
-[data-theme="light"] .theme-toggle:hover {
+[data-theme="light"] .theme-control:hover,
+[data-theme="light"] .codefy-theme-toggle:hover {
     background: rgba(59, 130, 246, 0.2) !important;
     transform: scale(1.1) rotate(15deg);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);

@@ -104,7 +104,7 @@
     </div>
 
     <div class="flex">
-        <aside id="sidebar"
+        <aside id="sidebar" aria-label="التنقل الرئيسي"
             class="sidebar-shell fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto pt-5 pb-6 transition-all duration-300 ease-in-out lg:translate-x-0 shadow-xl backdrop-blur-2xl border-e">
 
             <div class="relative z-10 px-4 mb-5">
@@ -126,22 +126,22 @@
                     </div>
 
                     <!-- Theme Toggle -->
-                    <button id="smart-theme-toggle" type="button" aria-label="تبديل الوضع"
-                        class="sidebar-icon-button flex-shrink-0" style="opacity: 1;">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button id="smart-theme-toggle" type="button" aria-label="تفعيل الوضع الداكن" aria-pressed="false"
+                        title="تفعيل الوضع الداكن" class="sidebar-icon-button theme-control flex-shrink-0" style="opacity: 1;">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
                                 id="smart-sun-path" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                                d="M20.354 15.354A9 9 0 018.646  3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
                                 class="hidden" id="smart-moon-path" />
                         </svg>
                     </button>
 
                     <!-- Collapse Toggle - Professional Floating Action Button -->
-                    <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي" aria-expanded="true"
-                        class="sidebar-collapse-button p-2.5 rounded-full bg-gradient-to-br from-primary-500 to-blue-600 hover:from-primary-400 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:scale-105 active:scale-95 border border-primary-400/30">
-                        <svg id="collapse-icon" class="h-3 w-3 text-white transition-transform duration-500" fill="none" viewBox="0 0 24 24"
+                    <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي" aria-controls="sidebar" aria-expanded="true"
+                        title="طي الشريط الجانبي" class="sidebar-collapse-button" data-collapse-toggle>
+                        <svg id="collapse-icon" class="h-4 w-4 transition-transform duration-500" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
                         </svg>
@@ -191,7 +191,7 @@
 
             <!-- Navigation Section - Unified Modern Design -->
             <div class="relative z-10 px-4 flex-1">
-                <div class="navigation-header text-[10px] font-black text-slate-600 uppercase tracking-[0.15em] mb-4 px-2 transition-opacity duration-300">خريطة النظام</div>
+                <div class="navigation-header text-[10px] font-black text-slate-600 uppercase tracking-[0.15em] mb-4 px-2 transition-opacity duration-300">دليلك</div>
                 <ul id="navigation-links" class="space-y-1.5">
                     <li>
                         <a href="#login" data-section="login"
@@ -1678,7 +1678,8 @@
                 </div>
             </div>
 
-           
+            <!-- ============ Footer Container (will be filled from footer.html) ============ -->
+            <div id="footer-container"></div>
 
         </main>
     </div>
@@ -1750,33 +1751,46 @@
     <script src="../Statics/JS/footer.js"></script>
     <script src="../Statics/JS/mobile.js"></script>
 
+    <!-- ============ Dynamic footer loader from footer.html ============ -->
     <script>
-        // Dynamic loader for extracted footer.html component
         (function () {
-            if (!window.location.protocol.startsWith('http')) { return; }
+            'use strict';
+
+            var container = document.getElementById('footer-container');
+            if (!container) { return; }
+
+            /* Only attempt fetch on http/https */
+            if (!window.location.protocol.startsWith('http')) {
+                return;
+            }
 
             fetch('footer.html')
                 .then(function (res) {
-                    if (!res.ok) throw new Error('Network error loading footer');
+                    if (!res.ok) throw new Error('Network error loading footer: ' + res.status);
                     return res.text();
                 })
                 .then(function (html) {
-                    var container = document.getElementById('footer-container');
-                    if (container && html.trim()) {
-                        container.innerHTML = html;
-                        if (typeof window.initFloatingFooter === 'function') {
-                            window.initFloatingFooter();
-                        }
-                        if (typeof updateSectionStepper === 'function'
-                            && typeof SECTIONS !== 'undefined'
-                            && typeof currentSectionIndex !== 'undefined'
-                            && SECTIONS[currentSectionIndex]) {
-                            updateSectionStepper(SECTIONS[currentSectionIndex].id);
-                        }
+                    if (!html.trim()) return;
+                    container.innerHTML = html;
+
+                    /* Re-init footer behaviours after injection */
+                    if (typeof window.initFloatingFooter === 'function') {
+                        window.initFloatingFooter();
                     }
+                    if (typeof updateSectionStepper === 'function'
+                        && typeof SECTIONS !== 'undefined'
+                        && typeof currentSectionIndex !== 'undefined'
+                        && SECTIONS[currentSectionIndex]) {
+                        updateSectionStepper(SECTIONS[currentSectionIndex].id);
+                    }
+
+                    /* Dispatch event so other modules can react to footer mount */
+                    document.dispatchEvent(new CustomEvent('footer:loaded'));
                 })
-                .catch(function () {
-                    // Silent fallback — inline template already mounted
+                .catch(function (err) {
+                    if (window.console && console.warn) {
+                        console.warn('[Codefy] Footer could not be loaded:', err.message);
+                    }
                 });
         })();
     </script>
@@ -1857,6 +1871,25 @@
             background: #4338ca;
         }
     </style>
+<!-- ============ Simple Codefy Footer ============ -->
+<footer id="simple-footer" class="bg-white border-t border-slate-200 py-8 mt-16" role="contentinfo" aria-label="فوتر الموقع">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-right">
+                <span class="text-lg font-bold text-slate-900">كوديفاي مصر</span>
+                <p class="text-sm text-slate-500 mt-1">© 2026 جميع الحقوق محفوظة — نظام إدارة الموارد المتكامل الذكي</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button type="button" id="footer-scroll-top" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors" title="العودة لأعلى الصفحة">
+                    <span>⬆️</span> للأعلى
+                </button>
+                <button type="button" id="footer-help-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors" title="طلب مساعدة سريعة">
+                    <span>💬</span> مساعدة
+                </button>
+            </div>
+        </div>
+    </div>
+</footer>
 </body>
 
 </html>

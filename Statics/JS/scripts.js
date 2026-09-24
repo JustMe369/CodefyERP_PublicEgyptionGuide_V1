@@ -42,141 +42,48 @@ document.addEventListener('DOMContentLoaded', function() {
 // Theme Management System with unique function names to avoid conflicts
 function initializeCodefyThemeSystem() {
     const themeToggleButton = document.getElementById('theme-toggle');
-    const themeIconElement = document.getElementById('theme-icon');
     const sunPathElement = document.getElementById('sun-path');
     const moonPathElement = document.getElementById('moon-path');
-    
-    // Desktop theme toggle elements
-    const desktopThemeButton = document.getElementById('desktop-theme-toggle');
-    const desktopThemeIcon = document.getElementById('desktop-theme-icon');
-    const desktopSunPath = document.getElementById('desktop-sun-path');
-    const desktopMoonPath = document.getElementById('desktop-moon-path');
-    
-    // Check for saved theme preference - default to light if none is saved
-    let currentThemePref = localStorage.getItem('theme');
-    
-    // If no theme is saved in localStorage, set the default to light
-    if (!currentThemePref) {
-        currentThemePref = 'light';
-        localStorage.setItem('theme', 'light'); // Save default to browser cache
-    }
-    
-    // Apply the saved theme on page load
-    if (currentThemePref === 'dark-blue') {
-        document.documentElement.setAttribute('data-theme', 'dark-blue');
-        // Update mobile theme icon
-        if (sunPathElement && moonPathElement) {
-            sunPathElement.classList.add('hidden');
-            moonPathElement.classList.remove('hidden');
-        }
-        // Update desktop theme icon
-        if (desktopSunPath && desktopMoonPath) {
-            desktopSunPath.classList.add('hidden');
-            desktopMoonPath.classList.remove('hidden');
-        }
-    } else if (currentThemePref === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        // Update mobile theme icon
-        if (sunPathElement && moonPathElement) {
-            sunPathElement.classList.remove('hidden');
-            moonPathElement.classList.add('hidden');
-        }
-        // Update desktop theme icon
-        if (desktopSunPath && desktopMoonPath) {
-            desktopSunPath.classList.remove('hidden');
-            desktopMoonPath.classList.add('hidden');
-        }
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        // Update mobile theme icon
-        if (sunPathElement && moonPathElement) {
-            sunPathElement.classList.remove('hidden');
-            moonPathElement.classList.add('hidden');
-        }
-        // Update desktop theme icon
-        if (desktopSunPath && desktopMoonPath) {
-            desktopSunPath.classList.remove('hidden');
-            desktopMoonPath.classList.add('hidden');
-        }
-    }
-    
-    // Function to update theme elements
-    function updateThemeDisplay(isDark) {
-        if (isDark) {
-            // Dark theme active
-            if (sunPathElement && moonPathElement) {
-                sunPathElement.classList.add('hidden');
-                moonPathElement.classList.remove('hidden');
-            }
-            if (desktopSunPath && desktopMoonPath) {
-                desktopSunPath.classList.add('hidden');
-                desktopMoonPath.classList.remove('hidden');
-            }
-        } else {
-            // Light theme active
-            if (sunPathElement && moonPathElement) {
-                sunPathElement.classList.remove('hidden');
-                moonPathElement.classList.add('hidden');
-            }
-            if (desktopSunPath && desktopMoonPath) {
-                desktopSunPath.classList.remove('hidden');
-                desktopMoonPath.classList.add('hidden');
-            }
-        }
-    }
-    
-    // Function to update theme display for light theme
-    function updateThemeDisplayLight() {
-        // Light theme active
-        if (sunPathElement && moonPathElement) {
-            sunPathElement.classList.remove('hidden');
-            moonPathElement.classList.add('hidden');
-        }
-        if (desktopSunPath && desktopMoonPath) {
-            desktopSunPath.classList.remove('hidden');
-            desktopMoonPath.classList.add('hidden');
-        }
-    }
-    
-    // Toggle theme when mobile button is clicked
-    if (themeToggleButton) {
-        themeToggleButton.addEventListener('click', function() {
-            toggleCodefyTheme();
+    const smartThemeButton = document.getElementById('smart-theme-toggle');
+    const smartSunPath = document.getElementById('smart-sun-path');
+    const smartMoonPath = document.getElementById('smart-moon-path');
+    const themeButtons = [themeToggleButton, smartThemeButton].filter(Boolean);
+    const iconPairs = [
+        [sunPathElement, moonPathElement],
+        [smartSunPath, smartMoonPath]
+    ];
+
+    function applyTheme(theme) {
+        const isDark = theme === 'dark-blue';
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark-blue' : 'light');
+        localStorage.setItem('theme', isDark ? 'dark-blue' : 'light');
+
+        iconPairs.forEach(function(pair) {
+            if (!pair[0] || !pair[1]) return;
+            pair[0].classList.toggle('hidden', isDark);
+            pair[1].classList.toggle('hidden', !isDark);
+        });
+
+        themeButtons.forEach(function(button) {
+            button.setAttribute('aria-pressed', String(isDark));
+            button.setAttribute('aria-label', isDark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن');
+            button.setAttribute('title', isDark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن');
         });
     }
-    
-    // Toggle theme when desktop button is clicked
-    if (desktopThemeButton) {
-        desktopThemeButton.addEventListener('click', function() {
-            toggleCodefyTheme();
-        });
+
+    function toggleTheme() {
+        const nextTheme = document.documentElement.getAttribute('data-theme') === 'dark-blue'
+            ? 'light'
+            : 'dark-blue';
+        applyTheme(nextTheme);
     }
-    
-    // Common toggle function with unique name
-    function toggleCodefyTheme() {
-        const currentThemeAttribute = document.documentElement.getAttribute('data-theme');
-        
-        if (currentThemeAttribute === 'dark-blue') {
-            // Switch to light theme
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-            updateThemeDisplayLight();
-        } else if (currentThemeAttribute === 'light') {
-            // Switch to regular light theme (do nothing, stays the same)
-            // Or potentially switch to default light theme if different
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('theme', 'light');
-            updateThemeDisplay(false);
-        } else {
-            // Switch to dark blue theme
-            document.documentElement.setAttribute('data-theme', 'dark-blue');
-            localStorage.setItem('theme', 'dark-blue');
-            updateThemeDisplay(true);
-        }
-        
-        // Optional: Add a subtle transition effect
-        document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
-    }
+
+    applyTheme(localStorage.getItem('theme') === 'dark-blue' ? 'dark-blue' : 'light');
+    themeButtons.forEach(function(button) {
+        button.addEventListener('click', toggleTheme);
+    });
+
+    window.codefyThemeController = { applyTheme: applyTheme, toggleTheme: toggleTheme };
 }
 
 function initApp() {
