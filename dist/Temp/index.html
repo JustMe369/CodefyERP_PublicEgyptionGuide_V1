@@ -1871,65 +1871,20 @@
             background: #4338ca;
         }
     </style>
-<!-- ============ Reusable Codefy Floating Water Footer & Stepper Component ============ -->
-<footer id="codefy-floating-footer" class="codefy-floating-footer" role="contentinfo" aria-label="شريط التنقل والفوتر السفلي">
-    <!-- Ambient Water Glow & Wave Line -->
-    <div class="water-ambient-bar" aria-hidden="true"></div>
-
-    <div class="footer-dock-inner">
-        <!-- =================== Extracted Dynamic Stepper Container =================== -->
-        <div id="section-stepper-container">
-            <!-- Dynamically populated and maintained by updateSectionStepper in scripts.js -->
-            <div class="stepper-dock-row">
-                <!-- Previous Button -->
-                <button type="button" id="btn-prev-section" class="stepper-nav-btn disabled" disabled aria-label="القسم السابق">
-                    <span aria-hidden="true">➔</span>
-                    <span class="btn-main-label">القسم السابق</span>
-                </button>
-
-                <!-- Center Progress & Completion Capsule -->
-                <div class="stepper-center-capsule">
-                    <div class="stepper-section-badge">
-                        <span class="water-droplet-dot" aria-hidden="true"></span>
-                        <span id="footer-active-section-name">تسجيل الدخول</span>
-                    </div>
-
-                    <button type="button" id="btn-toggle-done" class="btn-toggle-done-pill" aria-label="تعليم القسم كمنجز">
-                        <span id="footer-done-icon">○</span>
-                        <span id="footer-done-text">علّم كمنجز</span>
-                    </button>
-
-                    <div class="water-progress-track" title="نسبة الإنجاز في الدليل" aria-hidden="true">
-                        <div id="footer-progress-fill" class="water-progress-fill" style="width: 0%;"></div>
-                    </div>
-                </div>
-
-                <!-- Next Button -->
-                <button type="button" id="btn-next-section" class="stepper-nav-btn primary" aria-label="القسم التالي">
-                    <span class="btn-main-label">القسم التالي</span>
-                    <span aria-hidden="true">←</span>
-                </button>
+<!-- ============ Simple Codefy Footer ============ -->
+<footer id="simple-footer" class="bg-white border-t border-slate-200 py-8 mt-16" role="contentinfo" aria-label="فوتر الموقع">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-right">
+                <span class="text-lg font-bold text-slate-900">كوديفاي مصر</span>
+                <p class="text-sm text-slate-500 mt-1">© 2026 جميع الحقوق محفوظة — نظام إدارة الموارد المتكامل الذكي</p>
             </div>
-        </div>
-
-        <!-- =================== Footer Bottom Meta & Brand Row =================== -->
-        <div class="footer-meta-row">
-            <div class="footer-meta-brand">
-                <span class="footer-water-badge">🌊 نيل كوديفاي</span>
-                <span>كوديفاي مصر © 2026 — نظام إدارة الموارد المتكامل الذكي</span>
-            </div>
-
-            <div class="footer-quick-actions">
-                <button type="button" id="footer-help-btn" class="footer-quick-btn" title="طلب مساعدة سريعة">
-                    <span>💬</span> مساعدة
-                </button>
-                <button type="button" id="footer-scroll-top" class="footer-quick-btn" title="العودة لأعلى الصفحة">
+            <div class="flex items-center gap-4">
+                <button type="button" id="footer-scroll-top" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors" title="العودة لأعلى الصفحة">
                     <span>⬆️</span> للأعلى
                 </button>
-                <button type="button" id="footer-minimize-btn" class="footer-minimize-toggle" title="تصغير / توسيع الشريط" aria-expanded="true" aria-label="تصغير أو توسيع شريط التنقل السفلي">
-                    <svg class="w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-                    </svg>
+                <button type="button" id="footer-help-btn" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors" title="طلب مساعدة سريعة">
+                    <span>💬</span> مساعدة
                 </button>
             </div>
         </div>

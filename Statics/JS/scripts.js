@@ -604,6 +604,249 @@ function closeSidebar() {
 }
 
 /**
+ * Amazing Sidebar Collapse Button - Dynamic Animations & Interactions
+ */
+function initializeCollapseButton() {
+    console.log('[CollapseButton] Initializing...');
+    const collapseBtn = document.getElementById('sidebar-collapse-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const body = document.body;
+    
+    if (!collapseBtn || !sidebar) {
+        console.error('[CollapseButton] Missing elements:', { collapseBtn: !!collapseBtn, sidebar: !!sidebar });
+        return;
+    }
+    
+    console.log('[CollapseButton] Elements found, attaching listeners');
+    
+    const particlesContainer = collapseBtn.querySelector('.collapse-particles');
+    
+    // Particle burst on click
+    function createParticleBurst() {
+        if (!particlesContainer) return;
+        
+        const particleCount = 12;
+        const particles = [];
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'collapse-particle';
+            
+            // Random angle for particle spread
+            const angle = (i / particleCount) * Math.PI * 2;
+            const distance = 40 + Math.random() * 30;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            // Random color variation
+            const hue = 200 + Math.random() * 80; // Blue to purple range
+            particle.style.background = `hsl(${hue}, 80%, 60%)`;
+            
+            // Random size
+            const size = 4 + Math.random() * 6;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            particlesContainer.appendChild(particle);
+            particles.push(particle);
+        }
+        
+        // Clean up particles after animation
+        setTimeout(() => {
+            particles.forEach(p => p.remove());
+        }, 800);
+    }
+    
+    // Ripple effect on click
+    function createRipple(event) {
+        const ripple = document.createElement('div');
+        ripple.className = 'collapse-ripple';
+        
+        const rect = collapseBtn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        
+        ripple.style.width = `${size}px`;
+        ripple.style.height = `${size}px`;
+        ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
+        ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
+        
+        collapseBtn.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 500);
+    }
+    
+    // Apply collapsed state with smooth transitions
+    function applyCollapsedState(isCollapsed) {
+        // Enable hardware acceleration for smoother animations
+        sidebar.style.willChange = 'transform, width';
+        collapseBtn.style.willChange = 'transform';
+        
+        // Update ARIA attributes and core classes
+        collapseBtn.setAttribute('aria-expanded', String(!isCollapsed));
+        body.classList.toggle('sidebar-is-collapsed', isCollapsed);
+        sidebar.classList.toggle('sidebar-collapsed', isCollapsed);
+        
+        // Get icon elements
+        const expandedIcon = collapseBtn.querySelector('.collapse-icon-expanded');
+        const collapsedIcon = collapseBtn.querySelector('.collapse-icon-collapsed');
+        const glowRing = collapseBtn.querySelector('.collapse-glow-ring');
+        const pulseRing = collapseBtn.querySelector('.collapse-pulse-ring');
+        
+        // Update icons with extremely smooth transitions
+        if (expandedIcon && collapsedIcon) {
+            // Force GPU acceleration for icon animations
+            expandedIcon.style.willChange = 'opacity, transform';
+            collapsedIcon.style.willChange = 'opacity, transform';
+            
+            if (isCollapsed) {
+                // Sidebar is collapsed: show collapsed icon (chevron left), hide expanded icon
+                expandedIcon.style.opacity = '0';
+                expandedIcon.style.transform = 'translate(-50%, -50%) scale(0.5) rotate(-90deg)';
+                collapsedIcon.style.opacity = '1';
+                collapsedIcon.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+            } else {
+                // Sidebar is expanded: show expanded icon (chevron right), hide collapsed icon
+                expandedIcon.style.opacity = '1';
+                expandedIcon.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+                collapsedIcon.style.opacity = '0';
+                collapsedIcon.style.transform = 'translate(-50%, -50%) scale(0.5) rotate(90deg)';
+            }
+            
+            // Clean up willChange after animations complete
+            setTimeout(() => {
+                expandedIcon.style.willChange = 'auto';
+                collapsedIcon.style.willChange = 'auto';
+            }, 600);
+        }
+        
+        // Trigger enhanced glow and pulse effects
+        if (glowRing) {
+            glowRing.style.opacity = '1';
+            glowRing.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                glowRing.style.opacity = '0';
+                glowRing.style.transform = 'scale(1)';
+            }, 500);
+        }
+        if (pulseRing) {
+            pulseRing.style.opacity = '1';
+            pulseRing.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                pulseRing.style.opacity = '0';
+                pulseRing.style.transform = 'scale(1)';
+            }, 700);
+        }
+        
+        // Update tooltip text and position with smooth transition
+        const tooltip = collapseBtn.querySelector('.collapse-tooltip');
+        if (tooltip) {
+            // Fade out tooltip first
+            tooltip.style.opacity = '0';
+            setTimeout(() => {
+                tooltip.textContent = isCollapsed ? 'توسيع الشريط الجانبي' : 'طي الشريط الجانبي';
+                // Update tooltip position for RTL
+                if (isCollapsed) {
+                    tooltip.style.transform = 'translateY(-50%) translateX(0)';
+                } else {
+                    tooltip.style.transform = 'translateY(-50%) translateX(8px)';
+                }
+                // Fade tooltip back in
+                tooltip.style.opacity = '1';
+            }, 150);
+        }
+        
+        // Clean up willChange after all sidebar animations complete
+        setTimeout(() => {
+            sidebar.style.willChange = 'auto';
+            collapseBtn.style.willChange = 'auto';
+        }, 400);
+        
+        // Save to localStorage
+        localStorage.setItem('sidebar-collapsed', String(isCollapsed));
+        console.log('[CollapseButton] State changed smoothly:', isCollapsed);
+    }
+    
+    // Main click handler
+    collapseBtn.addEventListener('click', function(event) {
+        console.log('[CollapseButton] Clicked!');
+        const isCurrentlyCollapsed = body.classList.contains('sidebar-is-collapsed');
+        const newState = !isCurrentlyCollapsed;
+        
+        // Create particle burst
+        createParticleBurst();
+        
+        // Create ripple
+        createRipple(event);
+        
+        // Apply new state
+        applyCollapsedState(newState);
+        
+        // Add haptic feedback via vibration API if available
+        if (navigator.vibrate) {
+            navigator.vibrate(30);
+        }
+        
+        // Show toast notification
+        const message = newState ? 'تم طي الشريط الجانبي ←' : 'تم توسيع الشريط الجانبي →';
+        if (typeof showToast === 'function') {
+            showToast(message, 'info');
+        }
+    });
+    
+    // Keyboard accessibility
+    collapseBtn.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.click();
+        }
+    });
+    
+    // Initialize tooltip
+    collapseBtn.addEventListener('mouseenter', function() {
+        const tooltip = this.querySelector('.collapse-tooltip');
+        if (tooltip) {
+            tooltip.style.opacity = '1';
+            tooltip.style.visibility = 'visible';
+            tooltip.style.transform = 'translateY(-50%) translateX(0)';
+        }
+    });
+    
+    collapseBtn.addEventListener('mouseleave', function() {
+        const tooltip = this.querySelector('.collapse-tooltip');
+        if (tooltip) {
+            tooltip.style.opacity = '0';
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.transform = 'translateY(-50%) translateX(8px)';
+        }
+    });
+    
+    // Load saved state from localStorage
+    const savedState = localStorage.getItem('sidebar-collapsed');
+    if (savedState === 'true') {
+        console.log('[CollapseButton] Loading saved state: collapsed');
+        applyCollapsedState(true);
+    }
+    
+    console.log('[CollapseButton] Initialization complete');
+}
+
+// Initialize collapse button when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeCollapseButton);
+} else {
+    initializeCollapseButton();
+}
+
+// Also expose for debugging
+window.codefyCollapseButton = {
+    toggle: () => document.getElementById('sidebar-collapse-toggle')?.click(),
+    getState: () => document.body.classList.contains('sidebar-is-collapsed')
+};
+
+/**
  * Search Functionality
  */
 function initSearch() {
@@ -907,5 +1150,3 @@ function initKeyboardShortcuts() {
 
 // Note: Analysis Configuration functions have been moved to analyzer_import_sheets.js
 // Functions like loadAnalysisConfig, saveAnalysisConfig, applyConfigToUI, etc.
-
-

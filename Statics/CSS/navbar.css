@@ -6,9 +6,49 @@
 /* Sidebar RTL-safe base */
 #sidebar {
   transition:
-    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.3s ease;
-  will-change: transform;
+  will-change: transform, width;
+}
+
+/* Collapse button icon transitions for ultra-smooth animations */
+.collapse-icon-expanded,
+.collapse-icon-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+/* Ensure SVG icon itself is perfectly centered within its container, RTL-safe */
+.collapse-icon-expanded svg,
+.collapse-icon-collapsed svg {
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+/* Glow and pulse ring animations */
+.collapse-glow-ring,
+.collapse-pulse-ring {
+  transition:
+    opacity 0.4s ease-out,
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tooltip smooth transition */
+.collapse-tooltip {
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #sidebar.shown {

@@ -138,13 +138,35 @@
                         </svg>
                     </button>
 
-                    <!-- Collapse Toggle - Professional Floating Action Button -->
+                    <!-- Collapse Toggle - Amazing Dynamic Floating Action Button -->
                     <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي" aria-controls="sidebar" aria-expanded="true"
                         title="طي الشريط الجانبي" class="sidebar-collapse-button" data-collapse-toggle>
-                        <svg id="collapse-icon" class="h-4 w-4 transition-transform duration-500" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-                        </svg>
+                        <!-- Particle burst container -->
+                        <div class="collapse-particles absolute inset-0 pointer-events-none overflow-hidden rounded-full" aria-hidden="true"></div>
+                        
+                        <!-- Icon wrapper with morphing animation -->
+                        <div class="collapse-icon-wrapper relative flex h-full w-full items-center justify-center">
+                            <!-- Expanded state icon (sidebar OPEN - chevron RIGHT for RTL: point to right to collapse) -->
+                             <svg class="collapse-icon-expanded absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-white transition-all duration-500 ease-out" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                             </svg>
+                             
+                             <!-- Collapsed state icon (sidebar CLOSED - chevron LEFT for RTL: point to left to expand) -->
+                             <svg class="collapse-icon-collapsed absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-white opacity-0 scale-50 transition-all duration-500 ease-out" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                             </svg>
+                            
+                            <!-- Glowing ring -->
+                            <div class="collapse-glow-ring absolute inset-0 rounded-full border-2 border-primary-400/50 opacity-0 transition-all duration-500"></div>
+                            
+                            <!-- Pulse ring -->
+                            <div class="collapse-pulse-ring absolute -inset-1 rounded-full border-2 border-primary-500/30 opacity-0 transition-all duration-700"></div>
+                        </div>
+                        
+                        <!-- Tooltip -->
+                        <span class="collapse-tooltip absolute -right-10 top-1/2 -translate-y-1/2 px-3 py-1.5 text-[11px] font-medium text-white bg-slate-900 rounded-lg shadow-lg opacity-0 invisible translate-x-2 transition-all duration-300 whitespace-nowrap pointer-events-none">
+                            طي الشريط الجانبي
+                        </span>
                     </button>
                 </div>
             </div>
@@ -165,27 +187,6 @@
                 <div id="search-suggestions"
                     class="absolute z-30 mt-2 start-4 end-4 bg-slate-900/98 backdrop-blur-2xl border border-white/[0.05] rounded-xl shadow-2xl hidden overflow-hidden">
                     <ul id="suggestions-list" class="py-2 max-h-64 overflow-y-auto divide-y divide-white/[0.03]"></ul>
-                </div>
-            </div>
-
-            <!-- Progress Container - Stunning Gradient Card -->
-            <div class="progress-container relative z-10 px-4 mb-6 transition-opacity duration-300">
-                <div class="p-4 rounded-3xl bg-gradient-to-br from-primary-600/20 via-blue-600/15 to-emerald-600/10 text-white border border-white/10 shadow-xl backdrop-blur-md">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
-                            <span class="text-emerald-400">📊</span> تقدمك في الدليل
-                        </span>
-                        <span id="progress-percent" class="text-xs font-black text-emerald-400">0%</span>
-                    </div>
-                    <div class="h-2.5 w-full bg-black/30 rounded-full overflow-hidden mb-3">
-                        <div id="progress-bar-fill"
-                            class="h-full bg-gradient-to-r from-primary-500 via-blue-500 to-emerald-400 rounded-full transition-all duration-700 shadow-lg shadow-primary-500/40"
-                            style="width: 0%"></div>
-                    </div>
-                    <div class="flex items-center justify-between text-[10px] text-slate-500">
-                        <span id="progress-count">0 من 7 أقسام</span>
-                        <span class="text-slate-600">استمر في التقدم! ⭐</span>
-                    </div>
                 </div>
             </div>
 
@@ -296,11 +297,6 @@
 
             <!-- Enhanced Footer Content -->
             <div class="footer-content relative z-10 px-5 pt-5 mt-auto border-t border-white/10 text-center transition-opacity duration-300">
-                <div class="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 mb-4">
-                    <p class="text-[11px] font-medium text-slate-400 leading-normal m-0">
-                        💡 <span class="font-bold text-slate-300">نصيحة:</span> استخدم Ctrl+K للبحث السريع، واضغط Esc لإغلاقه.
-                    </p>
-                </div>
                 <p class="text-[11px] text-slate-500 m-0">
                     كوديفاي مصر © 2026 — جميع الحقوق محفوظة
                 </p>

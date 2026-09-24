@@ -18,60 +18,16 @@ document.addEventListener('DOMContentLoaded', function() {
     initSidebar();
 });
 
-// Collapsible Sidebar Management System
+// Collapsible Sidebar Management System (DEPRECATED - logic moved to scripts.js)
 function initializeSidebarCollapseControls() {
     const sidebar = document.getElementById('sidebar');
-    const collapseToggle = document.getElementById('sidebar-collapse-toggle');
-    const collapseIcon = document.getElementById('collapse-icon');
-
     if (!sidebar) return;
 
+    // Only add titles to navigation links (preserve this functionality)
     document.querySelectorAll('.nav-link[data-section]').forEach(function(link) {
         const label = link.querySelector('.nav-text');
         if (label) link.setAttribute('title', label.textContent.trim());
     });
-    
-    // Initialize sidebar collapsed state from localStorage
-    const isSidebarCollapsed = window.innerWidth >= 1024 && localStorage.getItem('sidebarCollapsed') === 'true';
-    if (isSidebarCollapsed) {
-        sidebar.classList.add('sidebar-collapsed');
-        document.body.classList.add('sidebar-is-collapsed');
-    }
-
-    function syncCollapseState(isCollapsed) {
-        if (!collapseToggle) return;
-        collapseToggle.setAttribute('aria-expanded', String(!isCollapsed));
-        collapseToggle.setAttribute('aria-label', isCollapsed ? 'توسيع الشريط الجانبي' : 'طي الشريط الجانبي');
-        collapseToggle.setAttribute('title', isCollapsed ? 'توسيع الشريط الجانبي' : 'طي الشريط الجانبي');
-        if (collapseIcon) {
-            collapseIcon.innerHTML = isCollapsed
-                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />'
-                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />';
-        }
-    }
-
-    syncCollapseState(sidebar.classList.contains('sidebar-collapsed'));
-
-    // Handle sidebar collapse/expand functionality
-    if (collapseToggle && sidebar) {
-        collapseToggle.addEventListener('click', function() {
-            if (window.innerWidth < 1024) return;
-            const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
-            
-            if (isCollapsed) {
-                // Expand sidebar
-                sidebar.classList.remove('sidebar-collapsed');
-                document.body.classList.remove('sidebar-is-collapsed');
-                localStorage.setItem('sidebarCollapsed', 'false');
-            } else {
-                // Collapse sidebar
-                sidebar.classList.add('sidebar-collapsed');
-                document.body.classList.add('sidebar-is-collapsed');
-                localStorage.setItem('sidebarCollapsed', 'true');
-            }
-            syncCollapseState(!isCollapsed);
-        });
-    }
 }
 
 // Sidebar Navigation & Mobile Drawer
@@ -265,4 +221,3 @@ function initializeSmartThemeToggle() {
         document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
     }
 }
-
