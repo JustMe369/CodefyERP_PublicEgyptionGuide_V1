@@ -1,1 +1,27 @@
-{"version": 2, "github": {"enabled": true, "autoJobCancellation": true}, "buildCommand": "npm run build", "outputDirectory": "dist", "headers": [{"source": "/(.*)", "headers": [{"key": "Access-Control-Allow-Origin", "value": "*"}, {"key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS"}, {"key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization"}]}], "rewrites": [{"source": "/", "destination": "/Temp/index.html"}, {"source": "/((?!api/|Statics/|Temp/).*)", "destination": "/Temp/index.html"}], "routes": [{"src": "/api/validate", "dest": "/api/validate.js"}, {"src": "/api/download-cleaned", "dest": "/api/download-cleaned.js"}, {"src": "/api/excel-analyzer", "dest": "/api/excel-analyzer.js"}]}
+{
+  "version": 2,
+  "github": { "enabled": true, "autoJobCancellation": true },
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm ci",
+  "framework": null,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/Temp/index.html" },
+    { "source": "/((?!api/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
+  ],
+  "routes": [
+    { "src": "/api/validate", "dest": "/api/validate.js" },
+    { "src": "/api/download-cleaned", "dest": "/api/download-cleaned.js" },
+    { "src": "/api/excel-analyzer", "dest": "/api/excel-analyzer.js" }
+  ]
+}

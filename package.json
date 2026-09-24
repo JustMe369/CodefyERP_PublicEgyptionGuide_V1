@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vercel dev",
     "build:css": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true tailwindcss -c tailwind.config.js -i ./Statics/CSS/tailwind.css -o ./Statics/CSS/tailwind.generated.css --minify",
-    "build": "npm run build:css && node -e \"require('fs').mkdirSync('dist', {recursive:true}); const fse = require('fs-extra'); fse.copySync('./Statics', './dist/Statics'); fse.copySync('./Temp', './dist/Temp'); fse.copySync('./.vercel', './dist/.vercel'); fse.copySync('./README.md', './dist/README.md'); fse.copySync('./api', './dist/api'); fse.copySync('./vercel.json', './dist/vercel.json');\"",
+    "build": "npm run build:css && node -e \"require('fs').mkdirSync('dist', {recursive:true}); const fse = require('fs-extra'); fse.copySync('./Statics', './dist/Statics'); fse.copySync('./Temp', './dist/Temp'); fse.copySync('./README.md', './dist/README.md'); fse.copySync('./vercel.json', './dist/vercel.json'); const apiFiles = ['validate.js', 'download-cleaned.js', 'excel-analyzer.js', 'serverless-api.js', 'excel-analyzer-express.js']; apiFiles.forEach(f => fse.copySync('./api/' + f, './dist/api/' + f));\"",
     "start": "vercel dev",
     "api": "cd Statics/PY && python api_server.py"
   },

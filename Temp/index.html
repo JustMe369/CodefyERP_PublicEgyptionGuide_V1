@@ -515,16 +515,17 @@
                         <h3 class="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
                             <span class="text-lg" aria-hidden="true">🗺️</span> مخطط توضيحي لخطوات تسجيل الدخول
                         </h3>
-                        <div class="mermaid flex justify-center" dir="ltr">
-                            graph LR
-                            A["🌐 فتح المتصفح"] --> B["🔗 صفحة الدخول"]
-                            B --> C["✉️ بريد إلكتروني / هاتف"]
-                            C --> D["🔑 كلمة المرور"]
-                            D --> E["👆 اضغط دخول"]
-                            E --> F["🏠 لوحة التحكم"]
-                            style A fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
-                            style F fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
-                        </div>
+                        <div class="mermaid flex justify-center" dir="rtl">
+    graph RL
+    A["🌐 فتح المتصفح"] --> B["🔗 صفحة الدخول"]
+    B --> C["✉️ بريد  / هاتف"]
+    C --> D["🔑 كلمة المرور"]
+    D --> E["👆 اضغط دخول"]
+    E --> F["🏠 لوحة التحكم"]
+    style A fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+    style F fill:#f0fdf4,stroke:#22c55e,stroke-width:2px
+</div>      
+                       
                     </div>
 
                     <!-- Steps -->
