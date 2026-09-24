@@ -6,10 +6,10 @@ const path = require('path');
 const os = require('os');
 const { promises: fsPromises, createReadStream } = require('fs');
 const { join } = require('path');
-const { tmpdir } = require('os');
 const formidable = require('formidable');
 const FormData = require('form-data');
 const { Buffer } = require('buffer');
+const fetch = (...args) => import('node-fetch').then(({ default: nodeFetch }) => nodeFetch(...args));
 
 module.exports = async function handler(req, res) {
   // Enable CORS
@@ -32,13 +32,9 @@ module.exports = async function handler(req, res) {
   // Check if this is a download request
   const isDownloadRequest = req.query.download === 'true';
   
-  // Create uploads directory if it doesn't exist
-  const uploadDir = join(process.cwd(), 'uploads');
-  try {
-    await fsPromises.access(uploadDir);
-  } catch {
-    await fsPromises.mkdir(uploadDir, { recursive: true });
-  }
+  const uploadDir = await fsPromises.mkdtemp(join(os.tmpdir(), 'codefy-upload-'));
+  let uploadedFile;
+  let tempFilePath;
 
   // Parse the incoming form data
   const form = formidable({
@@ -64,30 +60,38 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const file = Array.isArray(files.file) ? files.file[0] : files.file;
+    uploadedFile = Array.isArray(files.file) ? files.file[0] : files.file;
     
     // Check if this is a download request
     if (isDownloadRequest) {
       // Directly serve the uploaded file for download
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="${file.originalFilename}"`);
+      const downloadName = path.basename(uploadedFile.originalFilename || 'uploaded-file.xlsx').replace(/"/g, '');
+      res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
       
-      const fileStream = createReadStream(file.filepath);
+      const fileStream = createReadStream(uploadedFile.filepath);
       fileStream.pipe(res);
       return;
     }
     
-    // Determine the Python API endpoint
-    const pythonApiUrl = process.env.PYTHON_API_URL || 'http://localhost:5000';
+    const pythonApiUrl = process.env.PYTHON_API_URL;
+    if (!pythonApiUrl) {
+      res.status(503).json({
+        success: false,
+        error: 'Excel analyzer service is not configured',
+        message: 'Set PYTHON_API_URL to a deployed Python analyzer service.'
+      });
+      return;
+    }
+
     const validateEndpoint = `${pythonApiUrl}/api/validate-excel`;
     
     // Read the uploaded file
-    const fileData = await fsPromises.readFile(file.filepath);
+    const fileData = await fsPromises.readFile(uploadedFile.filepath);
     
     // Create a temporary file path
-    const tempDir = tmpdir();
-    const tempFileName = `temp_excel_analysis_${Date.now()}${path.extname(file.originalFilename || '')}`;
-    const tempFilePath = join(tempDir, tempFileName);
+    const tempFileName = `temp_excel_analysis_${Date.now()}${path.extname(uploadedFile.originalFilename || '')}`;
+    tempFilePath = join(uploadDir, tempFileName);
     
     // Write the file to temporary location
     await fsPromises.writeFile(tempFilePath, fileData);
@@ -97,15 +101,16 @@ module.exports = async function handler(req, res) {
     
     // Append the file to form data using a file stream
     formData.append('file', createReadStream(tempFilePath), {
-      filename: file.originalFilename || tempFileName,
-      contentType: file.mimetype || 'application/octet-stream'
+      filename: uploadedFile.originalFilename || tempFileName,
+      contentType: uploadedFile.mimetype || 'application/octet-stream'
     });
     
     // Call the Python API using Node.js compatible form data
     const response = await fetch(validateEndpoint, {
       method: 'POST',
       body: formData,
-      headers: formData.getHeaders() // Add proper headers for form data
+      headers: formData.getHeaders(),
+      signal: AbortSignal.timeout(30000)
     });
     
     if (!response.ok) {
@@ -117,11 +122,11 @@ module.exports = async function handler(req, res) {
     
     if (contentType && contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
       // This is a file download response - get the binary content
-      const buffer = Buffer.from(await response.buffer());
+      const buffer = Buffer.from(await response.arrayBuffer());
       
       // Set proper headers for Excel file download
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename="fixed_${file.originalFilename || 'file.xlsx'}"`);
+      res.setHeader('Content-Disposition', `attachment; filename="fixed_${path.basename(uploadedFile.originalFilename || 'file.xlsx')}"`);
       res.setHeader('Content-Length', buffer.length);
       
       // Send the binary Excel file
@@ -131,18 +136,22 @@ module.exports = async function handler(req, res) {
       const result = await response.json();
       
       // Clean up the temporary file
-      await fsPromises.unlink(tempFilePath);
-      
       // Return the result to the client
       res.status(200).json(result);
     }
   } catch (error) {
     console.error('Excel Analyzer API Error:', error);
-    res.status(500).json({
+    res.status(error.name === 'TimeoutError' ? 504 : 500).json({
       success: false,
       error: error.message || 'Internal server error',
       message: 'Error during Excel validation'
     });
+  } finally {
+    await Promise.allSettled([
+      uploadedFile?.filepath ? fsPromises.rm(uploadedFile.filepath, { force: true }) : Promise.resolve(),
+      tempFilePath ? fsPromises.rm(tempFilePath, { force: true }) : Promise.resolve(),
+      fsPromises.rm(uploadDir, { recursive: true, force: true })
+    ]);
   }
 }
 
