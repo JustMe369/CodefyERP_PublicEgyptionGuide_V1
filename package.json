@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "dev": "vercel dev",
-    "build": "node -e \"require('fs').mkdirSync('dist', {recursive:true}); const fse = require('fs-extra'); fse.copySync('./Statics', './dist/Statics'); fse.copySync('./Temp', './dist/Temp'); fse.copySync('./.vercel', './dist/.vercel'); fse.copySync('./README.md', './dist/README.md'); fse.copySync('./server.js', './dist/server.js'); fse.copySync('./vercel.json', './dist/vercel.json');\"",
+    "build:css": "tailwindcss -c tailwind.config.js -i ./Statics/CSS/tailwind.css -o ./Statics/CSS/tailwind.generated.css --minify",
+    "build": "npm run build:css && node -e \"require('fs').mkdirSync('dist', {recursive:true}); const fse = require('fs-extra'); fse.copySync('./Statics', './dist/Statics'); fse.copySync('./Temp', './dist/Temp'); fse.copySync('./.vercel', './dist/.vercel'); fse.copySync('./README.md', './dist/README.md'); fse.copySync('./server.js', './dist/server.js'); fse.copySync('./vercel.json', './dist/vercel.json');\"",
     "start": "node server.js",
     "local-server": "node server.js",
     "api": "cd Statics/PY && python api_server.py"
@@ -20,7 +21,10 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@vercel/node": "^2.10.3"
+    "@vercel/node": "^2.10.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
   },
   "engines": {
     "node": ">=14.0.0"

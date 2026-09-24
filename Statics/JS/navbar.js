@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Still initialize smart theme toggle even if scripts.js is loaded
         initializeSmartThemeToggle();
         // Initialize sidebar functionality regardless
-        initializeCollapsibleSidebar();
+        initializeSidebarCollapseControls();
         initSidebar();
         return;
     }
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.codefyNavbarLoaded = true;
 
     // Initialize all navbar functionality
-    initializeCollapsibleSidebar();
+    initializeSidebarCollapseControls();
     initSidebar();
     
     // Smart theme toggle functionality
@@ -24,15 +24,24 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Collapsible Sidebar Management System
-function initializeCollapsibleSidebar() {
+function initializeSidebarCollapseControls() {
     const sidebar = document.getElementById('sidebar');
     const collapseToggle = document.getElementById('sidebar-collapse-toggle');
     const collapseIcon = document.getElementById('collapse-icon');
+
+    if (!sidebar) return;
+
+    document.querySelectorAll('.nav-link[data-section]').forEach(function(link) {
+        const label = link.querySelector('.nav-text');
+        if (label) link.setAttribute('title', label.textContent.trim());
+    });
     
     // Initialize sidebar collapsed state from localStorage
     const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     if (isSidebarCollapsed) {
         sidebar.classList.add('sidebar-collapsed');
+        document.body.classList.add('sidebar-is-collapsed');
+        collapseToggle?.setAttribute('aria-expanded', 'false');
         if (collapseIcon) {
             collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
         }
@@ -46,14 +55,18 @@ function initializeCollapsibleSidebar() {
             if (isCollapsed) {
                 // Expand sidebar
                 sidebar.classList.remove('sidebar-collapsed');
+                document.body.classList.remove('sidebar-is-collapsed');
                 localStorage.setItem('sidebarCollapsed', 'false');
+                collapseToggle.setAttribute('aria-expanded', 'true');
                 if (collapseIcon) {
                     collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />';
                 }
             } else {
                 // Collapse sidebar
                 sidebar.classList.add('sidebar-collapsed');
+                document.body.classList.add('sidebar-is-collapsed');
                 localStorage.setItem('sidebarCollapsed', 'true');
+                collapseToggle.setAttribute('aria-expanded', 'false');
                 if (collapseIcon) {
                     collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
                 }
@@ -107,7 +120,7 @@ function openSidebar() {
     
     if (!sidebar || !sidebarOverlay) return;
     
-    sidebar.classList.remove('-translate-x-full');
+    sidebar.classList.remove('translate-x-full');
     sidebar.classList.add('translate-x-0');
     sidebarOverlay.classList.remove('hidden');
     
@@ -122,7 +135,7 @@ function closeSidebar() {
     if (!sidebar || !sidebarOverlay) return;
     
     sidebar.classList.remove('translate-x-0');
-    sidebar.classList.add('-translate-x-full');
+    sidebar.classList.add('translate-x-full');
     sidebarOverlay.classList.add('hidden');
     
     // Restore body scroll
@@ -253,3 +266,4 @@ function initializeSmartThemeToggle() {
         document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
     }
 }
+

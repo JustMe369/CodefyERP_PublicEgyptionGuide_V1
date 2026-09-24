@@ -661,21 +661,14 @@ function showCurrentSection(shouldScroll = true) {
  * Sidebar Navigation & Mobile Drawer
  */
 function initializeCollapsibleSidebar() {
+    // Sidebar click handlers are managed by the inline script in
+    // index.html for comprehensive toggle handling (overlay opacity,
+    // icon switching, body scroll). This function handles navigation only.
+
     const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-    if (!sidebar || !sidebarToggle || !sidebarOverlay) return;
-
-    sidebarToggle.addEventListener('click', function() {
-        sidebar.classList.toggle('open');
-        sidebarOverlay.classList.toggle('open');
-    });
-
-    sidebarOverlay.addEventListener('click', function() {
-        sidebar.classList.remove('open');
-        sidebarOverlay.classList.remove('open');
-    });
+    if (!sidebar || !sidebarOverlay) return;
 
     // Attach click handlers to all navigation links
     const navLinks = document.querySelectorAll('.nav-link[data-section]');
@@ -687,11 +680,10 @@ function initializeCollapsibleSidebar() {
             if (targetIndex !== -1) {
                 currentSectionIndex = targetIndex;
                 showCurrentSection(true);
-                // Ensure scroll to top happens after showing the section
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 100); // Small delay to ensure section is rendered
-                if (window.innerWidth < 1024) {
+                }, 100);
+                if (window.innerWidth < 1024 && typeof closeSidebar === 'function') {
                     closeSidebar();
                 }
             }
@@ -1011,3 +1003,5 @@ function initKeyboardShortcuts() {
 
 // Note: Analysis Configuration functions have been moved to analyzer_import_sheets.js
 // Functions like loadAnalysisConfig, saveAnalysisConfig, applyConfigToUI, etc.
+
+

@@ -606,6 +606,10 @@ input:focus-visible {
         margin-right: 18rem !important;
         margin-left: 0 !important;
     }
+
+    body.sidebar-is-collapsed #main-content {
+        margin-right: 6rem !important;
+    }
 }
 
 /* Collapsed sidebar state */
@@ -625,20 +629,28 @@ input:focus-visible {
     display: none !important;
 }
 
+.sidebar-collapsed .collapsible-brand-container {
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sidebar-collapsed .sidebar-icon-button,
+.sidebar-collapsed #sidebar-collapse-toggle {
+    display: flex;
+}
+
 .sidebar-collapsed .nav-icon {
     justify-content: center !important;
 }
 
-/* Sidebar visible by default (fallback for translate-x-full) */
-#sidebar {
-    transform: none !important;
-}
-
+/* Sidebar: use Tailwind classes for positioning, allow JS toggling on mobile */
 @media (max-width: 1023px) {
+    /* Hide sidebar by default on mobile - JS toggles translate-x-0 to show */
     #sidebar {
-        transform: translateX(100%) !important;
+        transform: translateX(100%);
     }
 }
+
 
 /* Ensure main content is never pushed off-screen */
 #main-content {
@@ -672,17 +684,166 @@ body {
 }
 
 .sidebar-collapsed .collapsible-nav-content {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.sidebar-collapsed .collapsible-nav-content > div {
     display: none;
 }
 
 .sidebar-collapsed .collapsible-nav-icon {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: 0;
+    border: 1px solid var(--border-primary);
+    border-radius: 0.95rem;
+    background: var(--bg-secondary);
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
+    justify-content: center;
+    font-size: 1.35rem;
+    line-height: 1;
+    transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 /* Collapsed state for navigation items */
 .sidebar-collapsed .nav-link {
-    padding: 12px 0.75rem !important; /* px-3 = 12px */
+    position: relative;
+    min-height: 4.25rem;
+    padding: 0.65rem 0.5rem !important;
     justify-content: center;
+    border-color: transparent;
+    animation: collapsedNavReveal 0.45s both;
+}
+
+.sidebar-collapsed .nav-link:nth-child(1) { animation-delay: 40ms; }
+.sidebar-collapsed .nav-link:nth-child(2) { animation-delay: 80ms; }
+.sidebar-collapsed .nav-link:nth-child(3) { animation-delay: 120ms; }
+.sidebar-collapsed .nav-link:nth-child(4) { animation-delay: 160ms; }
+.sidebar-collapsed .nav-link:nth-child(5) { animation-delay: 200ms; }
+.sidebar-collapsed .nav-link:nth-child(6) { animation-delay: 240ms; }
+.sidebar-collapsed .nav-link:nth-child(7) { animation-delay: 280ms; }
+
+.sidebar-collapsed .nav-link:hover {
+    transform: translateX(0) translateY(-3px);
+    background: transparent;
+}
+
+.sidebar-collapsed .nav-link:hover .collapsible-nav-icon {
+    border-color: var(--primary-400);
+    background: var(--primary-50);
+    box-shadow: 0 9px 20px rgba(37, 99, 235, 0.18);
+    transform: scale(1.08) rotate(-3deg);
+}
+
+.sidebar-collapsed .nav-link.active .collapsible-nav-icon {
+    border-color: var(--primary-500);
+    background: var(--primary-100);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-500) 14%, transparent), 0 9px 22px color-mix(in srgb, var(--primary-500) 25%, transparent);
+    transform: scale(1.04);
+}
+
+.sidebar-collapsed .nav-link[title]::after {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 0.75rem);
+    z-index: 70;
+    width: max-content;
+    max-width: 13rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 0.65rem;
+    background: var(--bg-secondary);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+    color: var(--text-primary);
+    content: attr(title);
+    font-size: 0.72rem;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) translateX(0.35rem);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-collapsed .nav-link[title]:hover::after,
+.sidebar-collapsed .nav-link[title]:focus-visible::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+@keyframes collapsedNavReveal {
+    from { opacity: 0; transform: scale(0.78) translateY(0.4rem); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar-collapsed .nav-link,
+    .sidebar-collapsed .collapsible-nav-icon {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* Sidebar surface and controls follow the active theme without decorative cards. */
+.sidebar-shell {
+    background: var(--bg-sidebar);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+.sidebar-icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 0.75rem;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar-collapse-button {
+    display: inline-flex;
+}
+
+@media (max-width: 1023px) {
+    .sidebar-collapse-button {
+        display: none;
+    }
+}
+
+.sidebar-icon-button:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-300);
+    color: var(--primary-700);
+}
+
+:root:not([data-theme="dark-blue"]) .sidebar-shell .brand-text,
+:root:not([data-theme="dark-blue"]) .sidebar-shell .nav-text {
+    color: var(--text-primary) !important;
+}
+
+:root:not([data-theme="dark-blue"]) .sidebar-shell .brand-subtitle,
+:root:not([data-theme="dark-blue"]) .sidebar-shell .nav-subtitle,
+:root:not([data-theme="dark-blue"]) .sidebar-shell .navigation-header,
+:root:not([data-theme="dark-blue"]) .sidebar-shell .footer-content {
+    color: var(--text-secondary) !important;
+}
+
+:root:not([data-theme="dark-blue"]) .sidebar-shell .nav-link {
+    color: var(--text-secondary);
+}
+
+:root:not([data-theme="dark-blue"]) .sidebar-shell .nav-link:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-100);
+    color: var(--primary-700);
 }
 
 /* Collapsed sidebar dark theme */

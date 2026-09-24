@@ -36,27 +36,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
-                    colors: {
-                        primary: {
-                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
-                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
-                        },
-                        brand: {
-                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
-                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         document.documentElement.classList.add('js-ready');
@@ -71,10 +50,11 @@
         }, 3000);
     </script>
 
-    <!-- Styles come AFTER the scripts -->
+    <link rel="stylesheet" href="../Statics/CSS/tailwind.generated.css">
     <link rel="stylesheet" href="../Statics/CSS/styles.css">
     <link rel="stylesheet" href="../Statics/CSS/navbar.css">
     <link rel="stylesheet" href="../Statics/CSS/global-theme.css">
+    <link rel="stylesheet" href="../Statics/CSS/mobile.css">
 </head>
 
 <body id="top" class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
@@ -134,96 +114,61 @@
 
     <div class="flex">
         <aside id="sidebar"
-            class="fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto border-e border-slate-200 bg-white pt-5 pb-8 transition-all duration-300 ease-in-out lg:translate-x-0 lg:pt-6">
-            <div class="flex items-center justify-between px-4 mb-4">
-                <!-- Logo and Brand Container -->
+            class="sidebar-shell fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto pt-5 pb-6 transition-all duration-300 ease-in-out lg:translate-x-0 shadow-xl backdrop-blur-2xl border-e">
+            
+            <div class="relative z-10 px-4 mb-5">
+                <!-- Streamlined Logo & Brand -->
                 <div id="brand-container" class="collapsible-brand-container flex items-center gap-3 flex-1 min-w-0">
-                    <!-- Logo only shown when collapsed -->
-                    <div class="logo-only flex items-center justify-center flex-shrink-0">
+                    <!-- Minimal Logo -->
+                    <div class="logo-container flex items-center justify-center flex-shrink-0">
                         <div
-                            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25 flex-shrink-0">
-                            <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
+                            class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-blue-600 text-white shadow-md shadow-primary-500/25 ring-1 ring-white/08">
+                            <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-6 w-6 object-contain"
                                 onerror="this.src='../Statics/img/login.png'">
                         </div>
                     </div>
 
-
-
-                    <!-- Full brand shown when expanded -->
-                    <div class="full-brand flex items-center gap-3 flex-1 min-w-0">
-                        <div
-                            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25 flex-shrink-0">
-                            <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
-                                onerror="this.src='../Statics/img/login.png'">
-                        </div>
-                        <div class="overflow-hidden flex-1 min-w-0">
-                            <span
-                                class="brand-text text-xl font-black text-slate-900 tracking-tight truncate">كوديفاي<span
-                                    class="text-primary-600">.</span></span>
-                            <span class="brand-subtitle block text-[11px] font-bold text-slate-400 truncate">دليل
-                                المستخدم</span>
-                        </div>
+                    <!-- Brand Text -->
+                    <div class="full-brand flex flex-col flex-1 min-w-0 transition-opacity duration-300" style="opacity: 1;">
+                        <span class="brand-text text-lg font-extrabold text-white tracking-tight truncate">كوديفاي<span class="text-primary-400">.</span></span>
+                        <span class="brand-subtitle block text-[10px] font-medium text-slate-500 truncate">دليل المستخدم الشامل</span>
                     </div>
-                </div>
-                <!-- Smart Theme Toggle Button - Next to Logo -->
-                <button id="smart-theme-toggle" type="button" aria-label="تبديل الثيم الذكي"
-                    class="smart-theme-toggle p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors flex-shrink-0">
-                    <svg id="smart-theme-icon" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path id="smart-sun-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        <path id="smart-moon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                            class="hidden" />
-                    </svg>
-                </button>
 
-                <!-- Collapse Toggle Button -->
-                <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي"
-                    class="lg:flex hidden ml-2 p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
-                    <svg id="collapse-icon" class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-            </div>
-
-            <div class="px-5 mb-6 hidden lg:flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25">
-                        <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
-                            onerror="this.src='../Statics/img/login.png'">
-
-                    </div>
-                    <div>
-                        <span class="text-xl font-black text-slate-900 tracking-tight">كوديفاي<span
-                                class="text-primary-600">.</span></span>
-                        <span class="block text-[11px] font-bold text-slate-400">دليل المستخدم</span>
-                    </div>
-                </div>
-                <span
-                    class="px-2 py-0.5 rounded-md bg-primary-50 text-primary-700 text-[11px] font-black border border-primary-100">v3.0</span>
-            </div>
-
-            <div class="px-5 mb-5 flex lg:hidden items-center justify-between pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-2.5">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white">
-                        <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-6 w-6 object-contain"
-                            onerror="this.src='../Statics/img/login.png'">
-                    </div>
-                    <div>
-                        <span class="text-lg font-black text-slate-900">كوديفاي</span>
-                        <span class="block text-xs text-slate-400">دليل التشغيل والنقل</span>
-                    </div>
+                    <!-- Theme Toggle -->
+                    <button id="smart-theme-toggle" type="button" aria-label="تبديل الوضع"
+                        class="sidebar-icon-button flex-shrink-0" style="opacity: 1;">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                                id="smart-sun-path" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                                class="hidden" id="smart-moon-path" />
+                        </svg>
+                    </button>
+                    
+                    <!-- Collapse Toggle - Professional Floating Action Button -->
+                    <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي" aria-expanded="true"
+                        class="sidebar-collapse-button p-2.5 rounded-full bg-gradient-to-br from-primary-500 to-blue-600 hover:from-primary-400 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:scale-105 active:scale-95 border border-primary-400/30">
+                        <svg id="collapse-icon" class="h-3 w-3 text-white transition-transform duration-500" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="search-container px-4 mb-4 relative">
-                <div class="relative">
-                    <input type="text" id="search-input" placeholder="ابحث في الدليل... (Ctrl+K)" autocomplete="off"
-                        class="w-full py-2.5 ps-10 pe-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs font-medium transition-all">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none text-slate-400">
+            <!-- Version Badge - Minimal Premium -->
+            <div class="relative z-10 px-4 mb-5">
+                <span class="inline-flex px-2.5 py-1 rounded-lg bg-primary-500/10 text-primary-400 text-[10px] font-bold border border-primary-500/15">الإصدار 3.0</span>
+            </div>
+
+            <!-- Search Container - Ultra Minimal Glass -->
+            <div class="search-container relative z-10 px-4 mb-5 transition-opacity duration-300">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="ابحث في الدليل... (Ctrl+K)" autocomplete="off"
+                    class="w-full py-2.5 ps-10 pe-4 rounded-xl border border-white/[0.05] bg-white/[0.02] focus:bg-white/[0.05] focus:outline-none focus:ring-1 focus:ring-primary-500/40 focus:border-primary-500/20 text-xs font-medium text-white placeholder-slate-600 transition-all duration-300 backdrop-blur-xl">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-slate-600">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -232,37 +177,261 @@
                 </div>
 
                 <div id="search-suggestions"
-                    class="absolute z-30 mt-1.5 start-4 end-4 bg-white border border-slate-200 rounded-xl shadow-xl hidden overflow-hidden">
-                    <ul id="suggestions-list" class="py-1 max-h-64 overflow-y-auto divide-y divide-slate-50"></ul>
+                    class="absolute z-30 mt-2 start-4 end-4 bg-slate-900/98 backdrop-blur-2xl border border-white/[0.05] rounded-xl shadow-2xl hidden overflow-hidden">
+                    <ul id="suggestions-list" class="py-2 max-h-64 overflow-y-auto divide-y divide-white/[0.03]"></ul>
                 </div>
             </div>
 
-            <div class="progress-container px-4 mb-5">
-                <div
-                    class="p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                            <span>📊</span> إنجازك في الدليل
+            <!-- Progress Container - Stunning Gradient Card -->
+            <div class="progress-container relative z-10 px-4 mb-6 transition-opacity duration-300">
+                <div class="p-4 rounded-3xl bg-gradient-to-br from-primary-600/20 via-blue-600/15 to-emerald-600/10 text-white border border-white/10 shadow-xl backdrop-blur-md">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[11px] font-bold text-slate-400 flex items-center gap-1.5">
+                            <span class="text-emerald-400">📊</span> تقدمك في الدليل
                         </span>
                         <span id="progress-percent" class="text-xs font-black text-emerald-400">0%</span>
                     </div>
-                    <div class="h-2 w-full bg-slate-700/80 rounded-full overflow-hidden p-0.5 mb-2">
+                    <div class="h-2.5 w-full bg-black/30 rounded-full overflow-hidden mb-3">
                         <div id="progress-bar-fill"
-                            class="h-full bg-gradient-to-r from-primary-400 to-emerald-400 rounded-full transition-all duration-500"
+                            class="h-full bg-gradient-to-r from-primary-500 via-blue-500 to-emerald-400 rounded-full transition-all duration-700 shadow-lg shadow-primary-500/40"
                             style="width: 0%"></div>
                     </div>
-                    <div class="flex items-center justify-between text-[11px] text-slate-400">
+                    <div class="flex items-center justify-between text-[10px] text-slate-500">
                         <span id="progress-count">0 من 6 أقسام</span>
-                        <span class="text-slate-400">خطوة بخطوة نحو الإتقان 🚀</span>
+                        <span class="text-slate-600">استمر في التقدم! ⭐</span>
                     </div>
                 </div>
             </div>
 
-            <div class="view-mode-container px-4 mb-4">
-                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">طريقة العرض المفضلة
+            <!-- View mode container removed from sidebar - moved to sticky position below -->
+
+            <!-- Navigation Section - Unified Modern Design -->
+            <div class="relative z-10 px-4 flex-1">
+                <div class="navigation-header text-[10px] font-black text-slate-600 uppercase tracking-[0.15em] mb-4 px-2 transition-opacity duration-300">خريطة النظام</div>
+                <ul id="navigation-links" class="space-y-1.5">
+                    <li>
+                        <a href="#login" data-section="login"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
+                            <div class="collapsible-nav-content flex items-center gap-4">
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300">🔐</span>
+                                <div>
+                                    <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300 transition-opacity duration-300" style="opacity: 1;">
+                                        تسجيل الدخول</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400 transition-opacity duration-300" style="opacity: 1;">الخطوة الأولى بكلمة المرور</div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="login" class="text-slate-500 group-hover:text-primary-400 transition-colors">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#bulk-import" data-section="bulk-import"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
+                            <div class="collapsible-nav-content flex items-center gap-4">
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300">📦</span>
+                                <div>
+                                    <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300">
+                                        تحديثات جماعية</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400">ملف الإكسل ينجز المهمة في ثوانٍ</div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="bulk-import" class="text-slate-500 group-hover:text-primary-400 transition-colors">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#relationships" data-section="relationships"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
+                            <div class="collapsible-nav-content flex items-center gap-4">
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300">🤝</span>
+                                <div>
+                                    <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300">
+                                        المورد والمركبة والسائق</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400">ربط المشاريع بالموردين والمركبات</div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="relationships" class="text-slate-500 group-hover:text-primary-400 transition-colors">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#assignments" data-section="assignments"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
+                            <div class="collapsible-nav-content flex items-center gap-4">
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300">📋</span>
+                                <div>
+                                    <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300">
+                                        توزيع المهام (الجداول)</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400">تحديد المهام لكل سائق</div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="assignments" class="text-slate-500 group-hover:text-primary-400 transition-colors">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#pricing" data-section="pricing"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
+                            <div class="collapsible-nav-content flex items-center gap-4">
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300">💰</span>
+                                <div>
+                                    <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300">
+                                        حساب التسعير والهامش الربحي</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400">معادلة بسيطة بين المورد والعميل</div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="pricing" class="text-slate-500 group-hover:text-primary-400 transition-colors">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#readiness" data-section="readiness"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
+                            <div class="collapsible-nav-content flex items-center gap-4">
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300">✅</span>
+                                <div>
+                                    <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300">
+                                        مراجعة الجاهزية</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400">التأكد من اكتمال جميع المتطلبات قبل الانطلاق</div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="readiness" class="text-slate-500 group-hover:text-primary-400 transition-colors">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#analysis-config" data-section="analysis-config"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
+                            <div class="collapsible-nav-content flex items-center gap-4">
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300">⚙️</span>
+                                <div>
+                                    <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300">
+                                        إعدادات تحليل الإكسل</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400">تخصيص قواعد التحقق والمعالجة</div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="analysis-config" class="text-slate-500 group-hover:text-primary-400 transition-colors">○</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Enhanced Footer Content -->
+            <div class="footer-content relative z-10 px-5 pt-5 mt-auto border-t border-white/10 text-center transition-opacity duration-300">
+                <div class="p-4 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 mb-4">
+                    <p class="text-[11px] font-medium text-slate-400 leading-normal m-0">
+                        💡 <span class="font-bold text-slate-300">نصيحة:</span> استخدم Ctrl+K للبحث السريع، واضغط Esc لإغلاقه.
+                    </p>
                 </div>
-                <div
-                    class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/70 text-center">
+                <p class="text-[11px] text-slate-500 m-0">
+                    كوديفاي مصر © 2026 — جميع الحقوق محفوظة
+                </p>
+            </div>
+        </aside>
+
+        <!-- Enhanced Mobile Overlay -->
+        <div id="sidebar-overlay"
+            class="fixed inset-0 z-40 hidden bg-slate-950/70 backdrop-blur-md transition-all duration-500 lg:hidden opacity-0"></div>
+
+        <!-- Additional JavaScript for the new features -->
+        <script>
+        // Active section highlighting with glow effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Active section highlighting with glow effects
+            const sidebar = document.getElementById('sidebar');
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link[data-section]');
+            
+            function highlightActiveSection() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (window.scrollY >= sectionTop - 200) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active', 'bg-primary-500/20', 'border-primary-500/50', 'shadow-lg', 'shadow-primary-500/30');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active', 'bg-primary-500/20', 'border-primary-500/50', 'shadow-lg', 'shadow-primary-500/30');
+                        // Add glow effect to active section
+                        link.style.boxShadow = '0 0 30px rgba(59, 130, 246, 0.4), inset 0 0 20px rgba(59, 130, 246, 0.1)';
+                    } else {
+                        link.style.boxShadow = 'none';
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', highlightActiveSection);
+            highlightActiveSection(); // Call on load
+
+            // Enhanced mobile sidebar functionality
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const iconMenu = document.getElementById('icon-menu');
+            const iconClose = document.getElementById('icon-close');
+
+            function openMobileSidebar() {
+                sidebar.classList.remove('translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                sidebarOverlay.classList.remove('hidden', 'opacity-0');
+                sidebarOverlay.classList.add('opacity-100');
+                iconMenu.classList.add('hidden');
+                iconClose.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMobileSidebar() {
+                sidebar.classList.add('translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                sidebarOverlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    sidebarOverlay.classList.add('hidden');
+                }, 300);
+                iconMenu.classList.remove('hidden');
+                iconClose.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    if (sidebar.classList.contains('translate-x-full')) {
+                        openMobileSidebar();
+                    } else {
+                        closeMobileSidebar();
+                    }
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', closeMobileSidebar);
+            }
+
+            // Close sidebar when clicking a nav link on mobile
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) {
+                        closeMobileSidebar();
+                    }
+                });
+            });
+
+            // Handle window resize for responsive behavior
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    sidebar.classList.remove('translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                    sidebarOverlay.classList.add('hidden', 'opacity-0');
+                    document.body.style.overflow = '';
+                    if (iconMenu && iconClose) {
+                        iconMenu.classList.remove('hidden');
+                        iconClose.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        </script>
+
+        <!-- Sticky View Mode Container - moved from sidebar, remains functional -->
+        <!-- <div class="fixed bottom-6 right-1/2 translate-x-1/2 z-50 view-mode-container">
+            <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-slate-900/15 border border-slate-200/80 p-4">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 text-center">طريقة العرض المفضلة</div>
+                <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/70 text-center min-w-[280px]">
                     <button type="button" class="btn-mode-single view-mode-pill active justify-center py-1.5 text-xs">
                         <span>🎯</span> قسم بقسم
                     </button>
@@ -271,141 +440,7 @@
                     </button>
                 </div>
             </div>
-
-            <div class="px-3 flex-1">
-                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">خطوات العمل في
-                    النظام</div>
-                <ul id="navigation-links" class="space-y-1">
-                    <li>
-                        <a href="#login" data-section="login"
-                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="collapsible-nav-content flex items-center gap-3">
-                                <span class="collapsible-nav-icon text-lg flex-shrink-0">🔐</span>
-                                <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        تسجيل
-                                        الدخول</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">الخطوة الأولى بكلمة المرور
-                                    </div>
-                                </div>
-                            </div>
-                            <span class="nav-badge section-check-badge" data-badge-section="login">○</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#bulk-import" data-section="bulk-import"
-                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="collapsible-nav-content flex items-center gap-3">
-                                <span class="collapsible-nav-icon text-lg flex-shrink-0">📦</span>
-                                <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        تحديثات جماعية </div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">
-                                        ملف الإكسل ينجز المهمة في ثوانٍ
-                                    </div>
-                                </div>
-                            </div>
-                            <span class="nav-badge section-check-badge" data-badge-section="bulk-import">○</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#relationships" data-section="relationships"
-                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="collapsible-nav-content flex items-center gap-3">
-                                <span class="collapsible-nav-icon text-lg flex-shrink-0">🤝</span>
-                                <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        المورد
-                                        والمركبة والسائق</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">ربط المشاريع بالموردين
-                                        والمركبات</div>
-                                </div>
-                            </div>
-                            <span class="nav-badge section-check-badge" data-badge-section="relationships">○</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#assignments" data-section="assignments"
-                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="collapsible-nav-content flex items-center gap-3">
-                                <span class="collapsible-nav-icon text-lg flex-shrink-0">📋</span>
-                                <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        توزيع
-                                        المهام (الجداول)</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">تحديد المهام لكل سائق</div>
-                                </div>
-                            </div>
-                            <span class="nav-badge section-check-badge" data-badge-section="assignments">○</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#pricing" data-section="pricing"
-                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="collapsible-nav-content flex items-center gap-3">
-                                <span class="collapsible-nav-icon text-lg flex-shrink-0">💰</span>
-                                <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        حساب
-                                        التسعير والهامش الربحي</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">معادلة بسيطة بين المورد والعميل
-                                    </div>
-                                </div>
-                            </div>
-                            <span class="nav-badge section-check-badge" data-badge-section="pricing">○</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#readiness" data-section="readiness"
-                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="collapsible-nav-content flex items-center gap-3">
-                                <span class="collapsible-nav-icon text-lg flex-shrink-0">✅</span>
-                                <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        مراجعة
-                                        الجاهزية</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">التأكد من اكتمال جميع المتطلبات
-                                        قبل الانطلاق
-                                    </div>
-                                </div>
-                            </div>
-                            <span class="nav-badge section-check-badge" data-badge-section="readiness">○</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#analysis-config" data-section="analysis-config"
-                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="collapsible-nav-content flex items-center gap-3">
-                                <span class="collapsible-nav-icon text-lg flex-shrink-0">⚙️</span>
-                                <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        إعدادات
-                                        تحليل الإكسل</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">تخصيص قواعد التحقق والمعالجة
-                                    </div>
-                                </div>
-                            </div>
-                            <span class="nav-badge section-check-badge" data-badge-section="analysis-config">○</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="footer-content px-5 pt-4 mt-auto border-t border-slate-100 text-center">
-                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 mb-2">
-                    <p class="text-[11px] font-medium text-slate-600 leading-normal m-0">
-                        💡 <span class="font-bold text-slate-800">معلومة سريعة:</span> يمكنك استخدام مفاتيح الأسهم في
-                        لوحة المفاتيح للتنقل بين الأقسام.
-                    </p>
-                </div>
-                <p class="text-[11px] text-slate-400 m-0">
-                    كوديفاي مصر © 2026 — جميع الحقوق محفوظة
-                </p>
-            </div>
-        </aside>
-
-        <div id="sidebar-overlay"
-            class="fixed inset-0 z-40 hidden bg-slate-950/50 backdrop-blur-sm transition-opacity lg:hidden"></div>
+        </div> -->
 
         <main id="main-content"
             class="mx-auto max-w-5xl px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:ms-72 flex-grow min-h-screen">
@@ -1714,6 +1749,7 @@
     <script src="../Statics/JS/navbar.js"></script>
     <script src="../Statics/JS/analyzer_import_sheets.js"></script>
     <script src="../Statics/JS/scripts.js?v=20260923-3"></script>
+    <script src="../Statics/JS/mobile.js"></script>
 
     <style>
         .sr-only {
