@@ -1,96 +1,4 @@
 /**
- * Excel Analyzer API Route Module
- * Handles Excel file analysis requests
- */
-
-const express = require('express');
-const router = express.Router();
-const multer = require('multer');
-const { spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-
-// Setup multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, os.tmpdir());
-  },
-  filename: (req, file, cb) => {
-    cb(null, `excel-${Date.now()}${path.extname(file.originalname)}`);
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 50 * 1024 * 1024 } // 50MB file size limit
-});
-
-// POST /api/excel-analyzer/analyze
-router.post('/analyze', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ 
-      success: false,
-      error: 'No file uploaded' 
-    });
-  }
-
-  // Path to the Python analyzer script
-  const pythonScriptPath = path.join(__dirname, '..', 'Statics', 'PY', 'CodefyExcelAnalyzer_V11.3.1.py');
-  
-  // Execute the Python analyzer with the uploaded file
-  const pythonProcess = spawn('python', [pythonScriptPath, '--analyze', req.file.path]);
-
-  let stdout = '';
-  let stderr = '';
-
-  pythonProcess.stdout.on('data', (data) => {
-    stdout += data.toString();
-  });
-
-  pythonProcess.stderr.on('data', (data) => {
-    stderr += data.toString();
-  });
-
-  pythonProcess.on('close', (code) => {
-    // Clean up the uploaded file
-    fs.unlinkSync(req.file.path);
-
-    if (code !== 0) {
-      console.error('Python process exited with code:', code);
-      console.error('Error output:', stderr);
-      return res.status(500).json({
-        success: false,
-        error: `Python analyzer failed with code ${code}`,
-        details: stderr
-      });
-    }
-
-    try {
-      // Parse the output from the Python script
-      const result = JSON.parse(stdout);
-      res.status(200).json(result);
-    } catch (parseError) {
-      // If parsing fails, return an error
-      console.error('Failed to parse Python output:', parseError);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to parse analyzer output',
-        details: stdout
-      });
-    }
-  });
-});
-
-// Health check endpoint
-router.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'healthy',
-    message: 'Excel analyzer service is running'
-  });
-});
-
-module.exports = router;
-/*
  * Simple local server for CodefyERP Data Validation System
  * This server serves the static files and provides a proxy to the Python API
  */
@@ -101,6 +9,7 @@ const cors = require('cors');
 const multer = require('multer');
 const fs = require('fs');
 const os = require('os');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 const PORT = 3000;
@@ -109,29 +18,35 @@ const API_PORT = 5000;
 // Setup multer for file uploads
 const upload = multer({ dest: os.tmpdir() });
 
-// Rate limiting
-const rateLimit = require('express-rate-limit');
-const session = require('express-session');
+// Rate limiting (optional in local dev)
+try {
+  const rateLimit = require('express-rate-limit');
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again after 15 minutes'
+  });
+  app.use(limiter);
+} catch (e) {
+  // express-rate-limit not installed, proceed without it
+}
 
-// Rate limiting middleware
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again after 15 minutes'
-});
-app.use(limiter);
-
-// Session configuration
-app.use(session({
-  secret: 'codefy_erp_secret_key', // In production, this should be in an environment variable
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    secure: false, // Set to true if using HTTPS
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+// Session configuration (optional in local dev)
+try {
+  const session = require('express-session');
+  app.use(session({
+    secret: 'codefy_erp_secret_key', // In production, this should be in an environment variable
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+  }));
+} catch (e) {
+  // express-session not installed, proceed without it
+}
 
 // Middleware
 app.use(cors({
@@ -203,7 +118,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`CodefyERP Data Validation System Server running at http://localhost:${PORT}`);
   console.log(`\nTo use the full validation features:`);

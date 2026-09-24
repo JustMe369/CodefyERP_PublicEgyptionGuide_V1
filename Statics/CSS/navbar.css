@@ -81,23 +81,24 @@
   }
 }
 
-/* Custom scrollbar for sidebar */
+/* Modern minimal scrollbar for sidebar — handled by global-theme.css */
+/* Fallback for browsers not covered by theme selectors */
 #sidebar::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 #sidebar::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
+  background: transparent;
 }
 
 #sidebar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: rgba(100, 116, 139, 0.2);
+  border-radius: 100px;
 }
 
 #sidebar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
 }
 
 /* Improved focus states for accessibility */

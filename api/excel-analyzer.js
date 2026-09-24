@@ -2,17 +2,16 @@
 /* Vercel Serverless API - Excel Analyzer Endpoint */
 /* Handles Excel file validation through Python API */
 
-import path from 'path';
-import os from 'os';
-import { promises as fsPromises } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
-import formidable from 'formidable';
-import FormData from 'form-data'; // Add form-data for Node.js compatibility
-import { createReadStream } from 'fs';
-import { Buffer } from 'buffer';
+const path = require('path');
+const os = require('os');
+const { promises: fsPromises, createReadStream } = require('fs');
+const { join } = require('path');
+const { tmpdir } = require('os');
+const formidable = require('formidable');
+const FormData = require('form-data');
+const { Buffer } = require('buffer');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');

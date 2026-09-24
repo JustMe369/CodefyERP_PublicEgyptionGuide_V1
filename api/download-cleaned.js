@@ -2,7 +2,7 @@
 /* Vercel Serverless API - Download Cleaned File Endpoint */
 /* Handles POST /api/download-cleaned for cleaned Excel file download */
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
