@@ -9,18 +9,28 @@
     <meta name="theme-color" content="#2563eb">
     <title>دليل نظام كوديفاي - دليل المستخدم الشامل</title>
 
-    <!-- Early JS-ready flag + fallback reveal -->
+    <!-- Early JS-ready flag + fallback reveal - deferred to avoid FOUC -->
     <script>
-        document.documentElement.classList.add('js-ready');
-        window.__jsReadyTimer = setTimeout(function () {
-            if (!window.codefyAppLoaded) {
-                document.documentElement.classList.remove('js-ready');
-                var reveals = document.querySelectorAll('.reveal');
-                for (var i = 0; i < reveals.length; i++) {
-                    reveals[i].classList.add('is-visible');
+        // Defer js-ready until after stylesheets are parsed to prevent FOUC
+        function initJsReady() {
+            document.documentElement.classList.add('js-ready');
+            window.__jsReadyTimer = setTimeout(function () {
+                if (!window.codefyAppLoaded) {
+                    document.documentElement.classList.remove('js-ready');
+                    var reveals = document.querySelectorAll('.reveal');
+                    for (var i = 0; i < reveals.length; i++) {
+                        reveals[i].classList.add('is-visible');
+                    }
                 }
-            }
-        }, 3000);
+            }, 3000);
+        }
+        // Use requestAnimationFrame to ensure styles are parsed first
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initJsReady);
+        } else {
+            // Already loaded, defer to next frame
+            requestAnimationFrame(initJsReady);
+        }
     </script>
 
     <noscript>
@@ -37,8 +47,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Load mermaid asynchronously with defer to avoid blocking and reduce console warnings -->
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <link rel="stylesheet" href="../Statics/CSS/tailwind.generated.css">
     <link rel="stylesheet" href="../Statics/CSS/styles.css">
