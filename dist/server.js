@@ -144,7 +144,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/Statics', express.static(path.join(__dirname, 'Statics')));
+app.use('/Temp', express.static(path.join(__dirname, 'Temp')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(__dirname));
 
 // Import API routes
 const excelAnalyzerRoutes = require('./api/excel-analyzer-express'); // Changed to the Express route file

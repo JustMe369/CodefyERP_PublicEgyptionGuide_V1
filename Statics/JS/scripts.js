@@ -350,10 +350,12 @@ function updateProgressUI() {
     const percentElem = document.getElementById('progress-percent');
     const countElem = document.getElementById('progress-count');
     const fillElem = document.getElementById('progress-bar-fill');
+    const footerFill = document.getElementById('footer-progress-fill');
     
     if (percentElem) percentElem.textContent = `${percent}%`;
     if (countElem) countElem.textContent = `${completed} من ${total}`;
     if (fillElem) fillElem.style.width = `${percent}%`;
+    if (footerFill) footerFill.style.width = `${percent}%`;
     
     // Update check badges on all sidebar links
     SECTIONS.forEach(sec => {
@@ -376,67 +378,64 @@ function updateSectionStepper(sectionId) {
     const stepperContainer = document.getElementById('section-stepper-container');
     if (!stepperContainer) return;
 
+    const currentSec = SECTIONS[currentSectionIndex] || { title: '', icon: '📄' };
     const prevSec = currentSectionIndex > 0 ? SECTIONS[currentSectionIndex - 1] : null;
     const nextSec = currentSectionIndex < SECTIONS.length - 1 ? SECTIONS[currentSectionIndex + 1] : null;
     const isDone = completedSections.has(sectionId);
+    const progressPct = Math.round((completedSections.size / SECTIONS.length) * 100);
 
     stepperContainer.innerHTML = `
-        <div class="mt-16 pt-8 border-t border-slate-200">
-            <!-- Mark as Done Toggle -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-white border border-blue-100 mb-8">
-                <div class="flex items-center gap-3">
-                    <span class="text-3xl">${isDone ? '🎉' : '✨'}</span>
-                    <div>
-                        <div class="font-black text-slate-900 text-sm">
-                            ${isDone ? 'الله ينور! خلصت القسم ده' : 'خلصت قراءة القسم وفهمت المطلوب؟'}
-                        </div>
-                        <p class="text-xs text-slate-500 m-0">علّم عليه عشان تتابع تقدمك خطوة بخطوة في القائمة الجانبية.</p>
-                    </div>
+        <div class="stepper-dock-row">
+            <!-- Stepper Prev Button -->
+            ${prevSec ? `
+                <button type="button" id="btn-prev-section" class="stepper-nav-btn text-start" title="العودة إلى: ${prevSec.title}">
+                    <span aria-hidden="true" class="text-base">➔</span>
+                    <span class="flex items-center gap-1.5">
+                        <span>${prevSec.icon}</span>
+                        <span class="font-bold">${prevSec.title}</span>
+                    </span>
+                </button>
+            ` : `
+                <button type="button" class="stepper-nav-btn disabled" disabled aria-disabled="true">
+                    <span aria-hidden="true">➔</span>
+                    <span class="text-xs text-slate-400">بداية الدليل</span>
+                </button>
+            `}
+
+            <!-- Stepper Center Capsule -->
+            <div class="stepper-center-capsule">
+                <div class="stepper-section-badge" title="القسم الحالي: ${currentSec.title}">
+                    <span class="water-droplet-dot" aria-hidden="true"></span>
+                    <span class="truncate">${currentSec.icon} ${currentSec.title}</span>
                 </div>
-                <button type="button" id="btn-toggle-done" class="px-5 py-2.5 rounded-xl font-black text-sm flex items-center gap-2 transition-all shadow-sm ${
-                    isDone 
-                        ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20' 
-                        : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
-                }">
+
+                <button type="button" id="btn-toggle-done" class="btn-toggle-done-pill ${isDone ? 'is-done' : ''}" title="${isDone ? 'إلغاء تعليم الإنجاز' : 'علّم هذا القسم كمنجز'}">
                     <span>${isDone ? '✓ تم الإنجاز' : '○ علّم كمنجز'}</span>
                 </button>
+
+                <div class="water-progress-track" title="إجمالي إنجاز الدليل: ${progressPct}%" aria-hidden="true">
+                    <div id="footer-progress-fill" class="water-progress-fill" style="width: ${progressPct}%;"></div>
+                </div>
             </div>
 
-            <!-- Stepper Prev / Next Buttons -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                ${prevSec ? `
-                    <button type="button" id="btn-prev-section" class="section-stepper-card text-start">
-                        <span class="text-xs font-bold text-slate-400 mb-1 flex items-center gap-1">
-                            <span>➔</span> القسم السابق
-                        </span>
-                        <span class="text-base font-black text-slate-800 flex items-center gap-2">
-                            <span>${prevSec.icon}</span>
-                            <span>${prevSec.title}</span>
-                        </span>
-                    </button>
-                ` : `<div></div>`}
-
-                ${nextSec ? `
-                    <button type="button" id="btn-next-section" class="section-stepper-card text-end sm:text-end">
-                        <span class="text-xs font-bold text-primary-600 mb-1 flex items-center justify-end gap-1">
-                            القسم التالي <span>←</span>
-                        </span>
-                        <span class="text-base font-black text-slate-900 flex items-center justify-end gap-2">
-                            <span>${nextSec.title}</span>
-                            <span>${nextSec.icon}</span>
-                        </span>
-                    </button>
-                ` : `
-                    <button type="button" id="btn-finish-guide" class="section-stepper-card text-end bg-gradient-to-l from-emerald-50 to-white border-emerald-200 hover:border-emerald-400">
-                        <span class="text-xs font-bold text-emerald-600 mb-1 flex items-center justify-end gap-1">
-                            مبروك! <span>🎉</span>
-                        </span>
-                        <span class="text-base font-black text-emerald-900 flex items-center justify-end gap-2">
-                            <span>تم الانتهاء من الدليل بالكامل</span>
-                        </span>
-                    </button>
-                `}
-            </div>
+            <!-- Stepper Next Button / Finish -->
+            ${nextSec ? `
+                <button type="button" id="btn-next-section" class="stepper-nav-btn primary text-end" title="الانتقال إلى: ${nextSec.title}">
+                    <span class="flex items-center gap-1.5">
+                        <span class="font-bold">${nextSec.title}</span>
+                        <span>${nextSec.icon}</span>
+                    </span>
+                    <span aria-hidden="true" class="text-base">←</span>
+                </button>
+            ` : `
+                <button type="button" id="btn-finish-guide" class="stepper-nav-btn finish text-end" title="إنهاء الدليل بالكامل">
+                    <span class="flex items-center gap-1.5 font-black">
+                        <span>تم الانتهاء!</span>
+                        <span>🎉</span>
+                    </span>
+                    <span aria-hidden="true" class="text-base">✓</span>
+                </button>
+            `}
         </div>
     `;
 
@@ -454,7 +453,6 @@ function updateSectionStepper(sectionId) {
             if (currentSectionIndex > 0) {
                 currentSectionIndex--;
                 showCurrentSection(true);
-                // Ensure scroll to top happens after showing the section
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 100);
@@ -468,7 +466,6 @@ function updateSectionStepper(sectionId) {
             if (currentSectionIndex < SECTIONS.length - 1) {
                 currentSectionIndex++;
                 showCurrentSection(true);
-                // Ensure scroll to top happens after showing the section
                 setTimeout(() => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 100);
@@ -479,7 +476,7 @@ function updateSectionStepper(sectionId) {
     const finishBtn = document.getElementById('btn-finish-guide');
     if (finishBtn) {
         finishBtn.addEventListener('click', () => {
-            showToast('مبروك يا بطل! كده انت جاهز تدير شغلك بكل ثقة 🚀', 'success');  // This function is now in analyzer_import_sheets.js
+            showToast('مبروك يا بطل! كده انت جاهز تدير شغلك بكل ثقة 🚀', 'success');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
