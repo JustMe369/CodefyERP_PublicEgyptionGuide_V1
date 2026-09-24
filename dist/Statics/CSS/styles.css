@@ -7,6 +7,46 @@
     --transition-fast: 150ms;
     --transition-base: 300ms;
     --transition-slow: 700ms;
+    
+    /* Light theme colors */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-primary: #e2e8f0;
+    --primary-50: #eff6ff;
+    --primary-100: #dbeafe;
+    --primary-200: #bfdbfe;
+    --primary-300: #93c5fd;
+    --primary-400: #60a5fa;
+    --primary-500: #3b82f6;
+    --primary-600: #2563eb;
+    --primary-700: #1d4ed8;
+    --primary-800: #1e40af;
+    --primary-900: #1e3a8a;
+}
+
+/* Dark Blue Theme Colors - Egyptian Inspired */
+[data-theme="dark-blue"] {
+    --bg-primary: #0a1929; /* Deep blue like the Nile at night */
+    --bg-secondary: #0f2a4a; /* Egyptian blue */
+    --bg-card: #123354; /* Deeper blue for cards */
+    --bg-sidebar: #0c2035; /* Dark blue sidebar */
+    --text-primary: #e2f0ff; /* Light blue-white text */
+    --text-secondary: #a3c8e8; /* Softer blue text */
+    --border-primary: #1e4a7a; /* Dark blue border */
+    --primary-50: #1a3d6d;
+    --primary-100: #224e82;
+    --primary-200: #2a5f97;
+    --primary-300: #3270ac;
+    --primary-400: #3b82c1;
+    --primary-500: #4494d6;
+    --primary-600: #4da5eb;
+    --primary-700: #6bb4f0;
+    --primary-800: #89c3f5;
+    --primary-900: #a7d2fa;
 }
 
 /* =========================================================
@@ -615,4 +655,104 @@ html {
 /* Ensure body always has a visible background */
 body {
     background-color: #f8fafc;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.theme-toggle:hover {
+    background: var(--primary-50);
+    transform: scale(1.05);
+}
+
+[data-theme="dark-blue"] .theme-toggle {
+    background: var(--primary-900);
+}
+/* Update body background and text */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Update card backgrounds */
+.bg-white {
+    background-color: var(--bg-card) !important;
+}
+
+/* Update borders */
+.border-slate-200 {
+    border-color: var(--border-primary) !important;
+}
+
+/* Update text colors */
+.text-slate-900 {
+    color: var(--text-primary) !important;
+}
+
+.text-slate-500,
+.text-slate-600,
+.text-slate-700 {
+    color: var(--text-secondary) !important;
+}
+
+/* Update sidebar */
+.sidebar,
+#sidebar {
+    background-color: var(--bg-sidebar);
+    border-color: var(--border-primary);
+}
+
+/* Update mobile header */
+#mobile-header {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-primary);
+}
+
+/* Update input fields */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    background-color: var(--bg-card);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px rgba(var(--primary-500), 0.1);
+}
+
+/* Update buttons */
+.btn-primary {
+    background-color: var(--primary-600);
+    border-color: var(--primary-600);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-700);
+    border-color: var(--primary-700);
+}
+
+.callout {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-primary);
 }

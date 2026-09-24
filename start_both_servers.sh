@@ -1,61 +1,77 @@
 #!/bin/bash
+# Start script for CodefyERP Data Validation System
+# Starts both the main server and the Python API server
 
-echo "Starting CodefyERP Data Validation System..."
-echo
+echo ""
+echo "================================="
+echo "  CodefyERP Data Validation System - Dual Server Startup"
+echo "================================="
+echo ""
 
-# Check if node is installed
+# Check if Node.js is available
 if ! command -v node &> /dev/null; then
-    echo "Error: Node.js is not installed. Please install Node.js first."
+    echo "ERROR: Node.js is not installed or not in PATH"
+    echo "Please install Node.js from https://nodejs.org/"
     exit 1
 fi
 
-# Check if python is installed
+# Check if Python is available
 if ! command -v python3 &> /dev/null; then
-    echo "Error: Python is not installed. Please install Python first."
+    echo "ERROR: Python3 is not installed or not in PATH"
+    echo "Please install Python from https://www.python.org/"
     exit 1
 fi
 
-echo "Installing required Node.js packages..."
-npm install
-
-if [ $? -ne 0 ]; then
-    echo "Error installing packages"
-    exit 1
+# Check if required Python packages are installed
+echo "Checking Python packages..."
+if ! python3 -c "import pandas, openpyxl, numpy, chardet, flask" &> /dev/null; then
+    echo "Installing required Python packages..."
+    pip3 install pandas openpyxl numpy chardet flask python-dateutil
 fi
 
-# Start the local server in the background
-echo "Starting local server on http://localhost:3000"
-node server.js > server.log 2>&1 &
-SERVER_PID=$!
-
-# Give the server a moment to start
-sleep 3
-
-# Start the Python API server in the background
-echo "Starting Python API server on http://localhost:5000"
-cd Statics/PY && python3 api_server.py > api.log 2>&1 &
-API_PID=$!
-
-echo
-echo "Servers started successfully!"
-echo
-echo "- Local Server: http://localhost:3000"
-echo "- API Server: http://localhost:5000"
-echo
-
-# Open the application in the default browser (works on macOS and some Linux distros)
-if command -v xdg-open &> /dev/null; then
-    xdg-open http://localhost:3000
-elif command -v open &> /dev/null; then
-    open http://localhost:3000
-else
-    echo "Please open http://localhost:3000 in your browser"
+# Check if required Node.js packages are installed
+if [ ! -d "node_modules" ]; then
+    echo "Installing required Node.js packages..."
+    npm install
 fi
 
-echo
-echo "Note: The servers are running in the background."
-echo "To stop the services, run: kill $SERVER_PID $API_PID"
-echo
+echo ""
+echo "Starting servers..."
+echo ""
 
-# Keep the script running
-wait $SERVER_PID $API_PID
+# Start the Python API server in background
+echo "Starting Python API server on port 5000..."
+cd Statics/PY &
+python3 api_server.py &
+PYTHON_PID=$!
+cd ..
+
+# Wait a moment for the Python server to start
+echo "Waiting for Python API server to start..."
+sleep 5
+
+# Start the main server
+echo "Starting main server on port 3000..."
+echo "Access the application at: http://localhost:3000"
+echo ""
+echo "Press Ctrl+C to stop both servers"
+echo ""
+
+# Start the main server and capture its PID
+node server.js &
+MAIN_PID=$!
+
+# Function to handle shutdown
+cleanup() {
+    echo ""
+    echo "Shutting down servers..."
+    kill $MAIN_PID $PYTHON_PID 2>/dev/null
+    echo "Servers stopped."
+    exit 0
+}
+
+# Trap Ctrl+C to perform cleanup
+trap cleanup INT
+
+# Wait for the main server to finish
+wait $MAIN_PID

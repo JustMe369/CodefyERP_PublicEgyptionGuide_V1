@@ -73,8 +73,9 @@
         });
     </script>
 
-    <link rel="stylesheet" href="./../Statics/CSS/styles.css">
-    <link rel="stylesheet" href="./../Statics/CSS/navbar.css">
+    <!-- Styles come AFTER the scripts -->
+    <link rel="stylesheet" href="../Statics/CSS/styles.css">
+    <link rel="stylesheet" href="../Statics/CSS/navbar.css">
 </head>
 
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
@@ -103,6 +104,19 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" type="button" aria-label="تبديل الثيم"
+                class="codefy-theme-toggle p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
+                <svg id="theme-icon" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path id="sun-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <path id="moon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                        class="hidden" />
+                </svg>
+            </button>
+
             <button id="mobile-menu-btn" type="button" aria-label="فتح القائمة" aria-controls="sidebar"
                 aria-expanded="false"
                 class="text-slate-600 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
@@ -120,8 +134,59 @@
 
     <div class="flex">
         <aside id="sidebar"
-            class="fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto border-e border-slate-200 bg-white pt-5 pb-8 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:pt-6"
-            aria-label="قائمة الدليل والتنقل">
+            class="fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto border-e border-slate-200 bg-white pt-5 pb-8 transition-all duration-300 ease-in-out lg:translate-x-0 lg:pt-6">
+            <div class="flex items-center justify-between px-4 mb-4">
+                <!-- Logo and Brand Container -->
+                <div id="brand-container" class="collapsible-brand-container flex items-center gap-3 flex-1 min-w-0">
+                    <!-- Logo only shown when collapsed -->
+                    <div class="logo-only flex items-center justify-center flex-shrink-0">
+                        <div
+                            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25 flex-shrink-0">
+                            <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
+                                onerror="this.src='../Statics/img/login.png'">
+                        </div>
+                    </div>
+
+
+
+                    <!-- Full brand shown when expanded -->
+                    <div class="full-brand flex items-center gap-3 flex-1 min-w-0">
+                        <div
+                            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25 flex-shrink-0">
+                            <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
+                                onerror="this.src='../Statics/img/login.png'">
+                        </div>
+                        <div class="overflow-hidden flex-1 min-w-0">
+                            <span
+                                class="brand-text text-xl font-black text-slate-900 tracking-tight truncate">كوديفاي<span
+                                    class="text-primary-600">.</span></span>
+                            <span class="brand-subtitle block text-[11px] font-bold text-slate-400 truncate">دليل
+                                المستخدم</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Smart Theme Toggle Button - Next to Logo -->
+                <button id="smart-theme-toggle" type="button" aria-label="تبديل الثيم الذكي"
+                    class="smart-theme-toggle p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors flex-shrink-0">
+                    <svg id="smart-theme-icon" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path id="smart-sun-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        <path id="smart-moon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                            class="hidden" />
+                    </svg>
+                </button>
+
+                <!-- Collapse Toggle Button -->
+                <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي"
+                    class="lg:flex hidden ml-2 p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
+                    <svg id="collapse-icon" class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
 
             <div class="px-5 mb-6 hidden lg:flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -129,6 +194,7 @@
                         class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25">
                         <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
                             onerror="this.src='../Statics/img/login.png'">
+
                     </div>
                     <div>
                         <span class="text-xl font-black text-slate-900 tracking-tight">كوديفاي<span
@@ -153,7 +219,7 @@
                 </div>
             </div>
 
-            <div class="px-4 mb-4 relative">
+            <div class="search-container px-4 mb-4 relative">
                 <div class="relative">
                     <input type="text" id="search-input" placeholder="ابحث في الدليل... (Ctrl+K)" autocomplete="off"
                         class="w-full py-2.5 ps-10 pe-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs font-medium transition-all">
@@ -171,7 +237,7 @@
                 </div>
             </div>
 
-            <div class="px-4 mb-5">
+            <div class="progress-container px-4 mb-5">
                 <div
                     class="p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-sm">
                     <div class="flex items-center justify-between mb-2">
@@ -192,7 +258,7 @@
                 </div>
             </div>
 
-            <div class="px-4 mb-4">
+            <!-- <div class="view-mode-container px-4 mb-4">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">طريقة العرض المفضلة
                 </div>
                 <div
@@ -204,7 +270,7 @@
                         <span>📜</span> الكل متتابعاً
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <div class="px-3 flex-1">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">خطوات العمل في
@@ -212,93 +278,120 @@
                 <ul id="navigation-links" class="space-y-1">
                     <li>
                         <a href="#login" data-section="login"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">🔐</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">🔐</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">تسجيل
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        تسجيل
                                         الدخول</div>
-                                    <div class="text-[11px] text-slate-400">الخطوة الأولى بكلمة المرور</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">الخطوة الأولى بكلمة المرور
+                                    </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="login">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="login">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#bulk-import" data-section="bulk-import"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">📦</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">📦</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">رفع
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        رفع
                                         المشاريع بالجملة</div>
-                                    <div class="text-[11px] text-slate-400">ملف الإكسل ينجز المهمة في ثوانٍ</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">ملف الإكسل ينجز المهمة في ثوانٍ
+                                    </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="bulk-import">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="bulk-import">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#relationships" data-section="relationships"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">🤝</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">🤝</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">المورد
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        المورد
                                         والمركبة والسائق</div>
-                                    <div class="text-[11px] text-slate-400">ربط المشاريع بالموردين والمركبات</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">ربط المشاريع بالموردين
+                                        والمركبات</div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="relationships">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="relationships">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#assignments" data-section="assignments"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">📋</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">📋</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">توزيع
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        توزيع
                                         المهام (الجداول)</div>
-                                    <div class="text-[11px] text-slate-400">تحديد المهام لكل سائق</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">تحديد المهام لكل سائق</div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="assignments">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="assignments">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#pricing" data-section="pricing"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">💰</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">💰</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">حساب
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        حساب
                                         التسعير والهامش الربحي</div>
-                                    <div class="text-[11px] text-slate-400">معادلة بسيطة بين المورد والعميل</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">معادلة بسيطة بين المورد والعميل
+                                    </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="pricing">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="pricing">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#readiness" data-section="readiness"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">✅</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">✅</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">مراجعة
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        مراجعة
                                         الجاهزية</div>
-                                    <div class="text-[11px] text-slate-400">التأكد من اكتمال جميع المتطلبات قبل الانطلاق
+                                    <div class="nav-subtitle text-[11px] text-slate-400">التأكد من اكتمال جميع المتطلبات
+                                        قبل الانطلاق
                                     </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="readiness">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="readiness">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#analysis-config" data-section="analysis-config"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">⚙️</span>
+                                <div>
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        إعدادات
+                                        تحليل الإكسل</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">تخصيص قواعد التحقق والمعالجة
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="analysis-config">○</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <div class="px-5 pt-4 mt-auto border-t border-slate-100 text-center">
+            <div class="footer-content px-5 pt-4 mt-auto border-t border-slate-100 text-center">
                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 mb-2">
                     <p class="text-[11px] font-medium text-slate-600 leading-normal m-0">
                         💡 <span class="font-bold text-slate-800">معلومة سريعة:</span> يمكنك استخدام مفاتيح الأسهم في
@@ -347,7 +440,7 @@
                     <div>
                         <div
                             class="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1 text-xs font-bold text-primary-700 mb-2 border border-primary-100 shadow-sm">
-                            <span>🇪🇬</span> دليلك الشامل — الإصدار 1.0
+                            <span>🇪🇬</span> دليلك الشامل — الإصدار 3.0
                         </div>
                         <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                             دليل نظام كوديفاي الشامل
@@ -537,6 +630,243 @@
                         </div>
                     </div>
 
+                    <!-- Tabs -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-2 mb-6 shadow-sm">
+                        <div class="grid grid-cols-4 gap-2">
+                            <button type="button"
+                                class="tab-btn active rounded-xl py-3 px-3 text-sm font-bold transition-all"
+                                data-tab="validation">
+                                <span class="block text-lg mb-1" aria-hidden="true">🔍</span> التحقق
+                            </button>
+                            <button type="button" class="tab-btn rounded-xl py-3 px-3 text-sm font-bold transition-all"
+                                data-tab="routes">
+                                <span class="block text-lg mb-1" aria-hidden="true">🛣️</span> المسارات
+                            </button>
+                            <button type="button"
+                                class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
+                                data-tab="schedules">
+                                <span class="block text-lg mb-1" aria-hidden="true">📅</span> الجداول
+                            </button>
+                            <button type="button"
+                                class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
+                                data-tab="trips">
+                                <span class="block text-lg mb-1" aria-hidden="true">🚐</span> الرحلات
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab content -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                        <!-- Validation Tab Content -->
+                        <div class="tab-content fade-in" data-content="validation">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl" aria-hidden="true">🔍</span>
+                                <div>
+                                    <h3 class="font-black text-slate-900 text-lg">التحقق من جودة البيانات</h3>
+                                    <p class="text-sm text-slate-500">افحص ملف الإكسل قبل الرفع للتأكد من جاهزيته</p>
+                                </div>
+                            </div>
+                            <ul class="space-y-3 text-sm">
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>التحقق من تنسيق الأرقام</strong> — التأكد من
+                                        أرقام
+                                        الهواتف المصرية</span></li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>التحقق من التنسيقات التاريخية</strong> — تحويل
+                                        التواريخ إلى الشكل الصحيح</span>
+                                </li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>تحليل الورديات</strong> — التحقق من تعارضات
+                                        الورديات</span></li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>إدارة الموردين</strong> — التحقق من معلومات
+                                        الموردين</span></li>
+                            </ul>
+
+                            <div class="mt-4 flex items-center gap-3">
+                                <a href="#analysis-config"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-lg shadow-cyan-600/20">
+                                    <span class="text-lg" aria-hidden="true">⚙️</span>
+                                    <span>إعدادات التحليل المتقدمة</span>
+                                </a>
+                                <span class="text-xs text-slate-400">تخصيص القواعد وحفظ ملفات التعريف</span>
+                            </div>
+
+                            <!-- Validation Tool Container -->
+                            <div id="validation-container" class="mt-6">
+                                <div class="upload-section" id="dropZone"
+                                    style="text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 8px; margin-bottom: 20px; transition: border-color 0.3s;">
+                                    <h4 style="margin-bottom: 15px;">📁 رفع ملف الإكسل للتحليل</h4>
+                                    <p style="margin-bottom: 20px;">اسحب الملف هنا أو انقر لاختياره</p>
+                                    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+                                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()"
+                                        style="background: #4f46e5; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px;">اختر
+                                        ملف</button>
+                                </div>
+
+                                <div id="fileInfo" class="file-info"
+                                    style="display: none; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                                </div>
+
+                                <div class="progress-bar" id="progressBar"
+                                    style="display: none; width: 100%; height: 20px; background-color: #e9ecef; border-radius: 10px; overflow: hidden; margin: 20px 0;">
+                                    <div class="progress-fill" id="progressFill"
+                                        style="height: 100%; background-color: #28a745; width: 0%; transition: width 0.3s;">
+                                    </div>
+                                </div>
+
+                                <div class="analysis-results" id="analysisResults"
+                                    style="display: none; margin-top: 20px;">
+                                    <h4 style="margin-bottom: 15px;">📈 نتائج التحليل</h4>
+
+                                    <div class="summary-card" id="summaryCard"
+                                        style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
+                                        <!-- Summary cards will be populated here -->
+                                    </div>
+
+                                    <div class="action-buttons" style="text-align: center; margin: 20px 0;">
+                                        <button class="btn btn-primary" id="downloadCleanBtn" disabled
+                                            style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #007bff; color: white;">📥
+                                            تحميل الملف بعد التنظيف</button>
+                                        <button class="btn btn-success" id="proceedImportBtn" disabled
+                                            style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #28a745; color: white;">✅
+                                            الاستمرار في الرفع</button>
+                                        <button class="btn btn-secondary" id="resetBtn"
+                                            style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; background: #6c757d; color: white;">🔄
+                                            إعادة</button>
+                                    </div>
+
+                                    <h5 style="margin: 20px 0 10px;">⚠️ المشاكل المكتشفة</h5>
+                                    <div style="overflow-x: auto;">
+                                        <table class="issues-table" id="issuesTable"
+                                            style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                                            <thead>
+                                                <tr style="background-color: #f8f9fa;">
+                                                    <th
+                                                        style="border: 1px solid #ddd; padding: 12px; text-align: left;">
+                                                        الشدة</th>
+                                                    <th
+                                                        style="border: 1px solid #ddd; padding: 12px; text-align: left;">
+                                                        النوع</th>
+                                                    <th
+                                                        style="border: 1px solid #ddd; padding: 12px; text-align: left;">
+                                                        الورقة</th>
+                                                    <th
+                                                        style="border: 1px solid #ddd; padding: 12px; text-align: left;">
+                                                        الصف</th>
+                                                    <th
+                                                        style="border: 1px solid #ddd; padding: 12px; text-align: left;">
+                                                        العمود</th>
+                                                    <th
+                                                        style="border: 1px solid #ddd; padding: 12px; text-align: left;">
+                                                        الوصف</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="issuesTableBody">
+                                                <!-- Issues will be populated here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-content hidden fade-in" data-content="routes">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl" aria-hidden="true">🛣️</span>
+                                <div>
+                                    <h3 class="font-black text-slate-900 text-lg">رفع المسارات</h3>
+                                    <p class="text-sm text-slate-500">خطوط السير — من نقطة الانطلاق إلى نقطة الوصول</p>
+                                </div>
+                            </div>
+                            <ul class="space-y-3 text-sm">
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>ربط المسار بالمشروع</strong> — تحديد المشروع
+                                        التابع
+                                        له المسار</span></li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>اسم الخط</strong> — مثل "خط المعادي - وسط
+                                        البلد"</span>
+                                </li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>نقطة البداية والنهاية</strong> — تحديد موقع
+                                        الانطلاق
+                                        والوصول</span>
+                                </li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
+                                        class="text-slate-700"><strong>الحالة</strong> — نشط أو متوقف</span></li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content hidden fade-in" data-content="schedules">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl" aria-hidden="true">📅</span>
+                                <div>
+                                    <h3 class="font-black text-slate-900 text-lg">رفع الجداول</h3>
+                                    <p class="text-sm text-slate-500">أوقات التشغيل — تحديد مواعيد انطلاق المركبات</p>
+                                </div>
+                            </div>
+                            <ul class="space-y-3 text-sm">
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                        class="text-slate-700"><strong>ربط الجدول بالمسار</strong> — تحديد الخط التابع
+                                        له
+                                        الجدول</span></li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                        class="text-slate-700"><strong>أيام التشغيل</strong> — أيام محددة أم
+                                        يومياً؟</span>
+                                </li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                        class="text-slate-700"><strong>وقت البداية والنهاية</strong> — من ساعة كذا إلى
+                                        ساعة
+                                        كذا</span>
+                                </li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
+                                        class="text-slate-700"><strong>فترة الصلاحية</strong> — من تاريخ إلى
+                                        تاريخ</span></li>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content hidden fade-in" data-content="trips">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-3xl" aria-hidden="true">🚐</span>
+                                <div>
+                                    <h3 class="font-black text-slate-900 text-lg">رفع الرحلات</h3>
+                                    <p class="text-sm text-slate-500">السجلات التنفيذية — الرحلات الفعلية المنفذة</p>
+                                </div>
+                            </div>
+                            <ul class="space-y-3 text-sm">
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                        class="text-slate-700"><strong>وقت الرحلة</strong> — ساعة الانطلاق</span></li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                        class="text-slate-700"><strong>ربط الرحلة بالجدول</strong> — الجدول التابعة له
+                                        الرحلة</span></li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                        class="text-slate-700"><strong>السائق والمركبة</strong> — تحديد السائق والمركبة
+                                        المستخدمة</span>
+                                </li>
+                                <li class="flex gap-3 items-start"><span
+                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
+                                        class="text-slate-700"><strong>الحالة</strong> — مكتملة، ملغاة، أو متأخرة</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <!-- Workflow Order -->
                     <div class="callout callout-example mb-8">
                         <div class="flex items-start gap-3 mb-4">
@@ -582,394 +912,6 @@
                         </figcaption>
                     </figure>
 
-                    <!-- ========== TAB NAVIGATION ========== -->
-                    <div class="bg-white rounded-2xl border border-slate-200 p-2 mb-6 shadow-sm">
-                        <div class="grid grid-cols-4 gap-2">
-                            <button type="button"
-                                class="tab-btn active rounded-xl py-3 px-3 text-sm font-bold transition-all"
-                                data-tab="validation">
-                                <span class="block text-lg mb-1" aria-hidden="true">🔍</span> التحقق
-                            </button>
-                            <button type="button" class="tab-btn rounded-xl py-3 px-3 text-sm font-bold transition-all"
-                                data-tab="routes">
-                                <span class="block text-lg mb-1" aria-hidden="true">🛣️</span> المسارات
-                            </button>
-                            <button type="button"
-                                class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
-                                data-tab="schedules">
-                                <span class="block text-lg mb-1" aria-hidden="true">📅</span> الجداول
-                            </button>
-                            <button type="button"
-                                class="tab-btn rounded-xl py-3 px-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
-                                data-tab="trips">
-                                <span class="block text-lg mb-1" aria-hidden="true">🚐</span> الرحلات
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- ========== TAB CONTENT AREA ========== -->
-                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
-
-                        <div class="tab-content fade-in" data-content="validation">
-
-                            <!-- Quality Score & Settings — shown after results -->
-                            <div class="flex flex-col lg:flex-row gap-4 mb-6" style="display: none;">
-                                <div
-                                    class="flex-shrink-0 flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-lg min-w-[300px]">
-                                    <div class="relative flex-shrink-0">
-                                        <div id="quality-score-ring"
-                                            class="w-16 h-16 rounded-full border-4 border-slate-600 flex items-center justify-center transition-all">
-                                            <span id="quality-score-display" class="text-2xl font-black">--</span>
-                                        </div>
-                                        <div id="quality-grade-badge"
-                                            class="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-md bg-slate-700 text-[10px] font-black text-white border border-slate-600 hidden">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="text-xs font-bold text-slate-400">جودة التحليل</div>
-                                        <div id="quality-grade-label" class="text-lg font-black">انتظر التحليل</div>
-                                        <div id="quality-detail" class="text-[11px] text-slate-400">ارفع ملف إكسل لبدء
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                                    <div
-                                        class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                                        <span>⚙️</span> إعدادات التحليل المتقدمة
-                                    </div>
-                                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                                        <label
-                                            class="flex items-center gap-1.5 cursor-pointer p-2 rounded-xl bg-white border border-slate-200 hover:border-primary-300 transition-colors">
-                                            <input type="checkbox" id="setting-shift-engine" checked
-                                                class="w-3.5 h-3.5 text-primary-600 rounded">
-                                            <span class="text-[10px] font-bold text-slate-700">محرك الورديات</span>
-                                        </label>
-                                        <label
-                                            class="flex items-center gap-1.5 cursor-pointer p-2 rounded-xl bg-white border border-slate-200 hover:border-primary-300 transition-colors">
-                                            <input type="checkbox" id="setting-time-conflict" checked
-                                                class="w-3.5 h-3.5 text-primary-600 rounded">
-                                            <span class="text-[10px] font-bold text-slate-700">تعارضات الوقت</span>
-                                        </label>
-                                        <label
-                                            class="flex items-center gap-1.5 cursor-pointer p-2 rounded-xl bg-white border border-slate-200 hover:border-primary-300 transition-colors">
-                                            <input type="checkbox" id="setting-time-normalize" checked
-                                                class="w-3.5 h-3.5 text-primary-600 rounded">
-                                            <span class="text-[10px] font-bold text-slate-700">تطبيع الوقت</span>
-                                        </label>
-                                        <label
-                                            class="flex items-center gap-1.5 cursor-pointer p-2 rounded-xl bg-white border border-slate-200 hover:border-primary-300 transition-colors">
-                                            <input type="checkbox" id="setting-12h" checked
-                                                class="w-3.5 h-3.5 text-primary-600 rounded">
-                                            <span class="text-[10px] font-bold text-slate-700">12h وقت</span>
-                                        </label>
-                                        <div
-                                            class="flex items-center gap-1 p-2 rounded-xl bg-white border border-slate-200">
-                                            <span class="text-[10px] font-bold text-slate-500">تعويض:</span>
-                                            <select id="setting-offset"
-                                                class="text-[10px] font-bold text-slate-700 bg-transparent border-none outline-none flex-1">
-                                                <option value="15">15د</option>
-                                                <option value="30" selected>30د</option>
-                                                <option value="45">45د</option>
-                                                <option value="60">60د</option>
-                                            </select>
-                                        </div>
-                                        <div
-                                            class="flex items-center gap-1 p-2 rounded-xl bg-white border border-slate-200">
-                                            <span class="text-[10px] font-bold text-slate-500">الهدف:</span>
-                                            <select id="setting-target"
-                                                class="text-[10px] font-bold text-slate-700 bg-transparent border-none outline-none flex-1">
-                                                <option value="dropoff_arrival_time" selected>وصول</option>
-                                                <option value="dropoff_departure_time">مغادرة</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Executive Summary — shown after results -->
-                            <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white"
-                                style="display: none;">
-                                <div class="flex items-center gap-3 mb-3">
-                                    <span class="text-xl" aria-hidden="true">📊</span>
-                                    <h4 class="font-black text-base">التنفيذي ملخص</h4>
-                                    <span id="exec-summary-status"
-                                        class="text-[11px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">انتظر
-                                        التحليل</span>
-                                </div>
-                                <div id="exec-summary-content" class="text-sm text-slate-300 leading-relaxed">
-                                    سيتم عرض ملخص التحليل هنا بعد رفع الملف
-                                </div>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4" id="exec-summary-stats">
-                                    <div class="bg-white/10 rounded-xl p-3 text-center">
-                                        <div id="stat-total" class="text-2xl font-black">--</div>
-                                        <div class="text-[10px] text-slate-400">إجمالي الصفوف</div>
-                                    </div>
-                                    <div class="bg-white/10 rounded-xl p-3 text-center">
-                                        <div id="stat-issues" class="text-2xl font-black">--</div>
-                                        <div class="text-[10px] text-slate-400">مشاكل مكتشفة</div>
-                                    </div>
-                                    <div class="bg-white/10 rounded-xl p-3 text-center">
-                                        <div id="stat-clean" class="text-2xl font-black">--</div>
-                                        <div class="text-[10px] text-slate-400">صفوف نظيفة</div>
-                                    </div>
-                                    <div class="bg-white/10 rounded-xl p-3 text-center">
-                                        <div id="stat-warnings" class="text-2xl font-black">--</div>
-                                        <div class="text-[10px] text-slate-400">تحذيرات</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="text-3xl" aria-hidden="true">🔍</span>
-                                <div>
-                                    <h3 class="font-black text-slate-900 text-lg">التحقق من جودة البيانات</h3>
-                                    <p class="text-sm text-slate-500">افحص ملف الإكسل قبل الرفع للتأكد من جاهزيته</p>
-                                </div>
-                            </div>
-                            <ul class="space-y-3 text-sm">
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>التحقق من تنسيق الأرقام</strong> — التأكد من
-                                        أرقام الهواتف المصرية</span></li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>التحقق من التنسيقات التاريخية</strong> — تحويل
-                                        التواريخ إلى الشكل الصحيح</span>
-                                </li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>تحليل الورديات</strong> — التحقق من تعارضات
-                                        الورديات</span></li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>إدارة الموردين</strong> — التحقق من معلومات
-                                        الموردين</span></li>
-                            </ul>
-
-                            <!-- Validation Tool Container -->
-                            <div id="validation-container" class="mt-6">
-                                <!-- Professional Upload Zone -->
-                                <div class="upload-section" id="dropZone"
-                                    style="text-align: center; padding: 48px 32px; border: 2px dashed #cbd5e1; border-radius: 16px; margin-bottom: 20px; transition: all 0.3s; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
-                                    <div
-                                        class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-50 flex items-center justify-center">
-                                        <svg class="w-10 h-10 text-primary-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                        </svg>
-                                    </div>
-                                    <h4 class="text-lg font-black text-slate-800 mb-2">ارفع ملف إكسل للتحليل</h4>
-                                    <p class="text-sm text-slate-500 mb-4">اسحب الملف هنا أو انقر لاختياره</p>
-                                    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
-                                    <button
-                                        class="upload-btn px-6 py-3 text-base font-bold rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-colors shadow-lg shadow-primary-600/20"
-                                        onclick="document.getElementById('fileInput').click()">
-                                        اختر ملف
-                                    </button>
-                                    <p class="text-[11px] text-slate-400 mt-3">يدعم .xlsx و .xls</p>
-                                </div>
-
-                                <!-- File Info Banner -->
-                                <div id="fileInfo" class="file-info"
-                                    style="display: none; margin: 15px 0; padding: 12px 16px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px; border: 1px solid #bfdbfe;">
-                                </div>
-
-                                <!-- Progress Bar -->
-                                <div class="progress-bar" id="progressBar"
-                                    style="display: none; width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; margin: 20px 0;">
-                                    <div class="progress-fill" id="progressFill"
-                                        style="height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); width: 0%; transition: width 0.3s; border-radius: 9999px;">
-                                    </div>
-                                </div>
-
-                                <!-- Analysis Results -->
-                                <div class="analysis-results" id="analysisResults"
-                                    style="display: none; margin-top: 24px;">
-
-                                    <!-- Summary Cards -->
-                                    <div class="summary-card" id="summaryCard"
-                                        style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 12px; margin: 20px 0;">
-                                    </div>
-
-                                    <!-- Column Profiling Table -->
-                                    <div class="mt-6">
-                                        <h5 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                                            <span>📋</span> ملخص أعمدة الملف
-                                        </h5>
-                                        <div class="overflow-x-auto rounded-xl border border-slate-200">
-                                            <table class="w-full text-sm" id="column-profile-table"
-                                                style="border-collapse: collapse;">
-                                                <thead>
-                                                    <tr style="background: #f1f5f9;">
-                                                        <th class="font-bold text-slate-700 p-3 text-right"
-                                                            style="border-bottom: 2px solid #e2e8f0;">#</th>
-                                                        <th class="font-bold text-slate-700 p-3 text-right"
-                                                            style="border-bottom: 2px solid #e2e8f0;">اسم العمود</th>
-                                                        <th class="font-bold text-slate-700 p-3 text-right"
-                                                            style="border-bottom: 2px solid #e2e8f0;">النوع</th>
-                                                        <th class="font-bold text-slate-700 p-3 text-right"
-                                                            style="border-bottom: 2px solid #e2e8f0;">الملء %</th>
-                                                        <th class="font-bold text-slate-700 p-3 text-right"
-                                                            style="border-bottom: 2px solid #e2e8f0;">قيم فريدة</th>
-                                                        <th class="font-bold text-slate-700 p-3 text-right"
-                                                            style="border-bottom: 2px solid #e2e8f0;">الحالة</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="column-profile-body">
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                    <!-- Action Buttons -->
-                                    <div class="action-buttons" style="text-align: center; margin: 20px 0;">
-                                        <button
-                                            class="btn px-5 py-2.5 rounded-xl font-bold text-sm transition-colors mr-2 mb-2"
-                                            id="downloadCleanBtn" disabled
-                                            style="background: #3b82f6; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 14px;">📥
-                                            تحميل الجدول النظيف</button>
-                                        <button
-                                            class="btn px-5 py-2.5 rounded-xl font-bold text-sm transition-colors mr-2 mb-2"
-                                            id="proceedImportBtn" disabled
-                                            style="background: #22c55e; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 14px;">الاستمرار
-                                            في الرفع</button>
-                                        <button
-                                            class="btn px-5 py-2.5 rounded-xl font-bold text-sm transition-colors mr-2 mb-2"
-                                            id="resetBtn"
-                                            style="background: #64748b; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 14px;">إعادة</button>
-                                    </div>
-
-                                    <!-- Issues Table -->
-                                    <div class="overflow-x-auto rounded-2xl border border-slate-200 mt-4">
-                                        <table class="issues-table w-full text-sm" id="issuesTable"
-                                            style="border-collapse: collapse;">
-                                            <thead>
-                                                <tr
-                                                    style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
-                                                    <th class="text-white font-bold"
-                                                        style="padding: 12px; text-align: right; border-bottom: 2px solid #475569;">
-                                                        الشدة</th>
-                                                    <th class="text-white font-bold"
-                                                        style="padding: 12px; text-align: right; border-bottom: 2px solid #475569;">
-                                                        التصنيف</th>
-                                                    <th class="text-white font-bold"
-                                                        style="padding: 12px; text-align: right; border-bottom: 2px solid #475569;">
-                                                        الورقة</th>
-                                                    <th class="text-white font-bold"
-                                                        style="padding: 12px; text-align: right; border-bottom: 2px solid #475569;">
-                                                        الصف</th>
-                                                    <th class="text-white font-bold"
-                                                        style="padding: 12px; text-align: right; border-bottom: 2px solid #475569;">
-                                                        العمود</th>
-                                                    <th class="text-white font-bold"
-                                                        style="padding: 12px; text-align: right; border-bottom: 2px solid #475569;">
-                                                        الوصف</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="issuesTableBody">
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Routes Tab -->
-                        <div class="tab-content hidden fade-in" data-content="routes">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="text-3xl" aria-hidden="true">🛣️</span>
-                                <div>
-                                    <h3 class="font-black text-slate-900 text-lg">رفع المسارات</h3>
-                                    <p class="text-sm text-slate-500">خطوط السير — من نقطة الانطلاق إلى نقطة الوصول</p>
-                                </div>
-                            </div>
-                            <ul class="space-y-3 text-sm">
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>ربط المسار بالمشروع</strong> — تحديد المشروع
-                                        التابع
-                                        له المسار</span></li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>اسم الخط</strong> — مثل "خط المعادي - وسط
-                                        البلد"</span>
-                                </li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>نقطة البداية والنهاية</strong> — تحديد موقع
-                                        الانطلاق
-                                        والوصول</span>
-                                </li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-indigo-100 text-indigo-600">✓</span><span
-                                        class="text-slate-700"><strong>الحالة</strong> — نشط أو متوقف</span></li>
-                            </ul>
-                        </div>
-
-                        <!-- Schedules Tab -->
-                        <div class="tab-content hidden fade-in" data-content="schedules">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="text-3xl" aria-hidden="true">📅</span>
-                                <div>
-                                    <h3 class="font-black text-slate-900 text-lg">رفع الجداول</h3>
-                                    <p class="text-sm text-slate-500">أوقات التشغيل — تحديد مواعيد انطلاق المركبات</p>
-                                </div>
-                            </div>
-                            <ul class="space-y-3 text-sm">
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
-                                        class="text-slate-700"><strong>ربط الجدول بالمسار</strong> — تحديد الخط التابع
-                                        له
-                                        الجدول</span></li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
-                                        class="text-slate-700"><strong>أيام التشغيل</strong> — أيام محددة أم
-                                        يومياً؟</span>
-                                </li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
-                                        class="text-slate-700"><strong>وقت البداية والنهاية</strong> — من ساعة كذا إلى
-                                        ساعة
-                                        كذا</span>
-                                </li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-purple-100 text-purple-600">✓</span><span
-                                        class="text-slate-700"><strong>فترة الصلاحية</strong> — من تاريخ إلى
-                                        تاريخ</span></li>
-                            </ul>
-                        </div>
-
-                        <!-- Trips Tab -->
-                        <div class="tab-content hidden fade-in" data-content="trips">
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="text-3xl" aria-hidden="true">🚐</span>
-                                <div>
-                                    <h3 class="font-black text-slate-900 text-lg">رفع الرحلات</h3>
-                                    <p class="text-sm text-slate-500">السجلات التنفيذية — الرحلات الفعلية المنفذة</p>
-                                </div>
-                            </div>
-                            <ul class="space-y-3 text-sm">
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
-                                        class="text-slate-700"><strong>وقت الرحلة</strong> — ساعة الانطلاق</span></li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
-                                        class="text-slate-700"><strong>ربط الرحلة بالجدول</strong> — الجدول التابعة له
-                                        الرحلة</span></li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
-                                        class="text-slate-700"><strong>السائق والمركبة</strong> — تحديد السائق والمركبة
-                                        المستخدمة</span>
-                                </li>
-                                <li class="flex gap-3 items-start"><span
-                                        class="check-dot bg-pink-100 text-pink-600">✓</span><span
-                                        class="text-slate-700"><strong>الحالة</strong> — مكتملة، ملغاة، أو متأخرة</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                 </section>
             </template>
             <template id="tpl-relationships">
@@ -1219,7 +1161,7 @@
                                 <span class="text-lg" aria-hidden="true">🖼️</span>
                                 <span class="font-bold text-slate-800 text-sm">واجهة التعيين</span>
                             </div>
-                            <img src="../Statics/Presentation/10.png" alt="واجهة التعيين"
+                            <img src="../Statics/img/dashboard.png" alt="واجهة التعيين"
                                 class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
                             <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
                                 يتم هنا ربط المورد والمركبة والسائق بالجدول.
@@ -1230,7 +1172,7 @@
                                 <span class="text-lg" aria-hidden="true">🔍</span>
                                 <span class="font-bold text-slate-800 text-sm">تفاصيل التعيين</span>
                             </div>
-                            <img src="../Statics/Presentation/10r.png" alt="تفاصيل التعيين"
+                            <img src="../Statics/img/vvdr1.jpg" alt="تفاصيل التعيين"
                                 class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
                             <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">
                                 تفاصيل ربط الموارد بالجداول.
@@ -1244,7 +1186,7 @@
                                 <span class="text-lg" aria-hidden="true">✏️</span>
                                 <span class="font-bold text-slate-800 text-sm">تعديل التعيينات — الجزء 1</span>
                             </div>
-                            <img src="../Statics/Presentation/10rrl.png" alt="تعديل جزء 1"
+                            <img src="../Statics/img/workflow.jpg" alt="تعديل جزء 1"
                                 class="lightbox-trigger w-full h-auto max-h-[300px] object-contain" loading="lazy">
                         </figure>
                         <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
@@ -1252,7 +1194,7 @@
                                 <span class="text-lg" aria-hidden="true">✏️</span>
                                 <span class="font-bold text-slate-800 text-sm">تعديل التعيينات — الجزء 2</span>
                             </div>
-                            <img src="../Statics/Presentation/10r2rl.png" alt="تعديل جزء 2"
+                            <img src="../Statics/img/workflow1.jpg" alt="تعديل جزء 2"
                                 class="lightbox-trigger w-full h-auto max-h-[300px] object-contain" loading="lazy">
                         </figure>
                     </div>
@@ -1558,7 +1500,131 @@
                     </div>
                 </section>
             </template>
+            <template id="tpl-analysis-config">
+                <section id="analysis-config" class="mb-24 section-content reveal">
+                    <div class="flex items-start gap-4 mb-8">
+                        <div class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white text-2xl shadow-lg shadow-cyan-500/30"
+                            aria-hidden="true">
+                            ⚙️</div>
+                        <div>
+                            <div class="pill bg-cyan-50 text-cyan-700 mb-2">إعدادات متقدمة</div>
+                            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">إعدادات تحليل
+                                الإكسل</h2>
+                            <p class="text-slate-500 font-medium mt-1">تخصيص قواعد التحقق والمعالجة التلقائية</p>
+                        </div>
+                    </div>
 
+                    <div class="callout callout-info mb-8">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                            <div>
+                                <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                                <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                    هنا يمكنك تخصيص كيفية تحليل ملفات الإكسل: تفعيل/تعطيل محركات التحقق، إعداد قواعد
+                                    تنسيق التواريخ والأرقام، وحفظ ملفات تعريف مكررة لسيناريوهات مختلفة.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Settings Card -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="text-xl" aria-hidden="true">⚡</span> الإعدادات السريعة
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-shift-engine" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">محرك الورديات</span>
+                            </label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-time-conflict" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">تعارضات الوقت</span>
+                            </label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-time-normalize" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">تطبيع الوقت</span>
+                            </label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-12h-format" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">تنسيق 12 ساعة</span>
+                            </label>
+                            <div
+                                class="flex flex-col gap-1.5 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-xs font-bold text-slate-500">تعويض الوقت:</span>
+                                <select id="cfg-offset"
+                                    class="text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="15">15 دقيقة</option>
+                                    <option value="30" selected>30 دقيقة</option>
+                                    <option value="45">45 دقيقة</option>
+                                    <option value="60">60 دقيقة</option>
+                                </select>
+                            </div>
+                            <div
+                                class="flex flex-col gap-1.5 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-xs font-bold text-slate-500">الهدف:</span>
+                                <select id="cfg-target"
+                                    class="text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="dropoff_arrival_time" selected>وصول</option>
+                                    <option value="dropoff_departure_time">مغادرة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-200">
+                            <button type="button" id="cfg-save-profile"
+                                class="px-4 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors">
+                                💾 حفظ كملف تعريف
+                            </button>
+                            <button type="button" id="cfg-reset"
+                                class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                                ↩️ إعادة للتعيين الافتراضي
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Saved Profiles -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="text-xl" aria-hidden="true">📋</span> ملفات التعريف المحفوظة
+                        </h3>
+                        <div id="cfg-profiles-list" class="space-y-3 min-h-[100px]">
+                            <div class="text-center text-slate-500 py-8" id="cfg-empty-profiles">
+                                <div class="text-4xl mb-2">📭</div>
+                                <p>لا توجد ملفات تعريف محفوظة بعد</p>
+                                <p class="text-xs mt-1">اضبط الإعدادات واضغط "حفظ كملف تعريف"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Import/Export -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="text-xl" aria-hidden="true">🔄</span> استيراد / تصدير الإعدادات
+                        </h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button type="button" id="cfg-export"
+                                class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors">
+                                📤 تصدير (JSON)
+                            </button>
+                            <input type="file" id="cfg-import-file" accept=".json" class="hidden">
+                            <button type="button" id="cfg-import"
+                                class="px-4 py-2 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-700 transition-colors"
+                                onclick="document.getElementById('cfg-import-file').click()">
+                                📥 استيراد
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-3">شارك إعداداتك مع الزملاء أو انقلها بين الأجهزة</p>
+                    </div>
+                </section>
+            </template>
             <div id="section-stepper-container"></div>
 
             <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary-600 to-indigo-700 p-8 sm:p-12 text-white text-center shadow-2xl shadow-primary-600/30 reveal mt-16 hidden"
@@ -1625,7 +1691,7 @@
 
     <script>
         (function () {
-            var sectionIds = ['login', 'bulk-import', 'relationships', 'assignments', 'pricing', 'readiness'];
+            var sectionIds = ['login', 'bulk-import', 'relationships', 'assignments', 'pricing', 'readiness', 'analysis-config'];
             sectionIds.forEach(function (id) {
                 var template = document.getElementById('tpl-' + id);
                 if (template) {
@@ -1639,24 +1705,8 @@
         })();
     </script>
 
+    <script src="../Statics/JS/navbar.js"></script>
     <script src="../Statics/JS/scripts.js?v=20260923-3"></script>
-    <script>
-        (function () {
-            var analysisResults = document.getElementById('analysisResults');
-            var qualityScore = document.querySelector('#bulk-import .flex.flex-col.lg\\:flex-row.gap-4.mb-6');
-            var execSummary = document.querySelector('#bulk-import .mb-6.p-4.rounded-2xl.bg-gradient-to-r');
-            if (analysisResults && qualityScore && execSummary) {
-                var observer = new MutationObserver(function () {
-                    if (analysisResults.style.display === 'block') {
-                        qualityScore.style.display = '';
-                        execSummary.style.display = '';
-                        observer.disconnect();
-                    }
-                });
-                observer.observe(analysisResults, { attributes: true, attributeFilter: ['style'] });
-            }
-        })();
-    </script>
 
     <style>
         .sr-only {

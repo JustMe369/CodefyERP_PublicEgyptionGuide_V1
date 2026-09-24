@@ -1,55 +1,76 @@
 @echo off
-echo Starting CodefyERP Data Validation System...
+REM Start script for CodefyERP Data Validation System
+REM Starts both the main server and the Python API server with proper process management
+
+echo.
+echo ================================================
+echo    CodefyERP Data Validation System - Dual Server Startup
+echo ================================================
 echo.
 
-REM Check if node is installed
+REM Check if Node.js is available
 node --version >nul 2>&1
-if errorlevel 1 (
-    echo Error: Node.js is not installed. Please install Node.js first.
+if %errorlevel% neq 0 (
+    echo ERROR: Node.js is not installed or not in PATH
+    echo Please install Node.js from https://nodejs.org/
     pause
     exit /b 1
 )
 
-REM Check if python is installed
+REM Check if Python is available
 python --version >nul 2>&1
-if errorlevel 1 (
-    echo Error: Python is not installed. Please install Python first.
+if %errorlevel% neq 0 (
+    echo ERROR: Python is not installed or not in PATH
+    echo Please install Python from https://www.python.org/
     pause
     exit /b 1
 )
 
-echo Installing required Node.js packages...
-npm install
-
-if errorlevel 1 (
-    echo Error installing packages
-    pause
-    exit /b 1
+REM Check if required Python packages are installed
+echo Checking Python packages...
+python -c "import pandas, openpyxl, numpy, chardet, flask" >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Installing required Python packages...
+    pip install pandas openpyxl numpy chardet flask python-dateutil
 )
 
-REM Start the local server in the background
-echo Starting local server on http://localhost:3000
-start "CodefyERP Local Server" cmd /c "node server.js"
-
-REM Give the server a moment to start
-timeout /t 3 /nobreak >nul
-
-REM Start the Python API server in the background
-echo Starting Python API server on http://localhost:5000
-start "CodefyERP API Server" cmd /c "cd Statics/PY && python api_server.py"
+REM Check if required Node.js packages are installed
+if not exist node_modules (
+    echo Installing required Node.js packages...
+    npm install
+)
 
 echo.
-echo Servers started successfully!
-echo.
-echo - Local Server: http://localhost:3000
-echo - API Server: http://localhost:5000
-echo.
-echo Opening the application in your default browser...
-start http://localhost:3000
-
-echo.
-echo Note: Keep this command window open while using the application.
-echo Press Ctrl+C in each server window to stop the services.
+echo Starting servers...
 echo.
 
+REM Create temporary batch file to start Python API server
+echo @echo off > temp_python_start.bat
+echo cd Statics/PY >> temp_python_start.bat
+echo echo Starting Python API Server... >> temp_python_start.bat
+echo python api_server.py >> temp_python_start.bat
+
+REM Start the Python API server in background
+echo Starting Python API server on port 5000...
+start "CodefyERP Python API Server" cmd /c "temp_python_start.bat"
+
+REM Wait a moment for the Python server to start
+echo Waiting for Python API server to start...
+timeout /t 5 /nobreak >nul
+
+REM Start the main server in the current window
+echo Starting main server on port 3000...
+echo Access the application at: http://localhost:3000
+echo.
+echo Press Ctrl+C to stop both servers
+echo.
+
+REM Start the main server
+node server.js
+
+REM Cleanup
+del temp_python_start.bat
+
+echo.
+echo Servers stopped.
 pause

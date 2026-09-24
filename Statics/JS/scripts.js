@@ -11,7 +11,8 @@ const SECTIONS = [
     { id: 'relationships', title: 'المورد والمركبة والسائق', icon: '🤝', subtitle: 'مين راكب إيه ومع مين' },
     { id: 'assignments', title: 'توزيع الشغل (الجداول)', icon: '📋', subtitle: 'توزيع النقلات ع الرجالة' },
     { id: 'pricing', title: 'حسبة التسعير', icon: '💰', subtitle: 'التكلفة والإيراد والمكسب' },
-    { id: 'readiness', title: 'مراجعة الجاهزية', icon: '✅', subtitle: 'التأكيد قبل ما تدور العربية' }
+    { id: 'readiness', title: 'مراجعة الجاهزية', icon: '✅', subtitle: 'التأكيد قبل ما تدور العربية' },
+    { id: 'analysis-config', title: 'إعدادات تحليل الإكسل', icon: '⚙️', subtitle: 'تخصيص قواعد التحقق والمعالجة' }
 ];
 
 // App State
@@ -33,7 +34,184 @@ document.addEventListener('DOMContentLoaded', function() {
     initApp();
     initializeValidationTool();
     initializeTabSwitching();
+    // Initialize theme functionality with unique names to avoid conflicts
+    initializeCodefyThemeSystem();
+    // Initialize collapsible sidebar functionality
+    initializeCollapsibleSidebar();
 });
+
+// Collapsible Sidebar Management System
+function initializeCollapsibleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const collapseToggle = document.getElementById('sidebar-collapse-toggle');
+    const collapseIcon = document.getElementById('collapse-icon');
+    
+    // Initialize sidebar collapsed state from localStorage
+    const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (isSidebarCollapsed) {
+        sidebar.classList.add('sidebar-collapsed');
+        if (collapseIcon) {
+            collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
+        }
+    }
+
+    // Handle sidebar collapse/expand functionality
+    if (collapseToggle && sidebar) {
+        collapseToggle.addEventListener('click', function() {
+            const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
+            
+            if (isCollapsed) {
+                // Expand sidebar
+                sidebar.classList.remove('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', 'false');
+                if (collapseIcon) {
+                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />';
+                }
+            } else {
+                // Collapse sidebar
+                sidebar.classList.add('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', 'true');
+                if (collapseIcon) {
+                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
+                }
+            }
+        });
+    }
+}
+
+// Theme Management System with unique function names to avoid conflicts
+function initializeCodefyThemeSystem() {
+    const themeToggleButton = document.getElementById('theme-toggle');
+    const themeIconElement = document.getElementById('theme-icon');
+    const sunPathElement = document.getElementById('sun-path');
+    const moonPathElement = document.getElementById('moon-path');
+    
+    // Desktop theme toggle elements
+    const desktopThemeButton = document.getElementById('desktop-theme-toggle');
+    const desktopThemeIcon = document.getElementById('desktop-theme-icon');
+    const desktopSunPath = document.getElementById('desktop-sun-path');
+    const desktopMoonPath = document.getElementById('desktop-moon-path');
+    
+    // Check for saved theme preference or respect OS preference
+    const currentThemePref = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-blue' : 'light');
+    
+    // Apply the saved theme on page load
+    if (currentThemePref === 'dark-blue') {
+        document.documentElement.setAttribute('data-theme', 'dark-blue');
+        // Update mobile theme icon
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.add('hidden');
+            moonPathElement.classList.remove('hidden');
+        }
+        // Update desktop theme icon
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.add('hidden');
+            desktopMoonPath.classList.remove('hidden');
+        }
+    } else if (currentThemePref === 'sunny-light') {
+        document.documentElement.setAttribute('data-theme', 'sunny-light');
+        // Update mobile theme icon
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.remove('hidden');
+            moonPathElement.classList.add('hidden');
+        }
+        // Update desktop theme icon
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.remove('hidden');
+            desktopMoonPath.classList.add('hidden');
+        }
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        // Update mobile theme icon
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.remove('hidden');
+            moonPathElement.classList.add('hidden');
+        }
+        // Update desktop theme icon
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.remove('hidden');
+            desktopMoonPath.classList.add('hidden');
+        }
+    }
+    
+    // Function to update theme elements
+    function updateThemeDisplay(isDark) {
+        if (isDark) {
+            // Dark theme active
+            if (sunPathElement && moonPathElement) {
+                sunPathElement.classList.add('hidden');
+                moonPathElement.classList.remove('hidden');
+            }
+            if (desktopSunPath && desktopMoonPath) {
+                desktopSunPath.classList.add('hidden');
+                desktopMoonPath.classList.remove('hidden');
+            }
+        } else {
+            // Light theme active
+            if (sunPathElement && moonPathElement) {
+                sunPathElement.classList.remove('hidden');
+                moonPathElement.classList.add('hidden');
+            }
+            if (desktopSunPath && desktopMoonPath) {
+                desktopSunPath.classList.remove('hidden');
+                desktopMoonPath.classList.add('hidden');
+            }
+        }
+    }
+    
+    // Function to update theme display for sunny theme
+    function updateThemeDisplaySunny() {
+        // Light theme active (same as regular light)
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.remove('hidden');
+            moonPathElement.classList.add('hidden');
+        }
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.remove('hidden');
+            desktopMoonPath.classList.add('hidden');
+        }
+    }
+    
+    // Toggle theme when mobile button is clicked
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener('click', function() {
+            toggleCodefyTheme();
+        });
+    }
+    
+    // Toggle theme when desktop button is clicked
+    if (desktopThemeButton) {
+        desktopThemeButton.addEventListener('click', function() {
+            toggleCodefyTheme();
+        });
+    }
+    
+    // Common toggle function with unique name
+    function toggleCodefyTheme() {
+        const currentThemeAttribute = document.documentElement.getAttribute('data-theme');
+        
+        if (currentThemeAttribute === 'dark-blue') {
+            // Switch to sunny light theme
+            document.documentElement.setAttribute('data-theme', 'sunny-light');
+            localStorage.setItem('theme', 'sunny-light');
+            updateThemeDisplaySunny();
+        } else if (currentThemeAttribute === 'sunny-light') {
+            // Switch to regular light theme
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            updateThemeDisplay(false);
+        } else {
+            // Switch to dark blue theme
+            document.documentElement.setAttribute('data-theme', 'dark-blue');
+            localStorage.setItem('theme', 'dark-blue');
+            updateThemeDisplay(true);
+        }
+        
+        // Optional: Add a subtle transition effect
+        document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+    }
+}
 
 function initApp() {
     // Load saved progress from localStorage
@@ -66,6 +244,9 @@ function initApp() {
     
     // Initialize Scroll Reveal Animations
     initScrollReveal();
+    
+    // Initialize Analysis Configuration
+    initializeAnalysisConfig();
     
     // Render initial progress
     updateProgressUI();
@@ -819,6 +1000,313 @@ function initKeyboardShortcuts() {
             }
         }
     });
+}
+
+/**
+ * Analysis Configuration Management
+ * Handles settings persistence, profiles, import/export, and sync with validation tool
+ */
+const ANALYSIS_CONFIG_KEY = 'codefy_analysis_config_v1';
+const ANALYSIS_PROFILES_KEY = 'codefy_analysis_profiles_v1';
+
+let analysisConfig = {
+    shiftEngine: true,
+    timeConflict: true,
+    timeNormalize: true,
+    format12h: true,
+    offset: 30,
+    target: 'dropoff_arrival_time'
+};
+
+function loadAnalysisConfig() {
+    try {
+        const saved = localStorage.getItem(ANALYSIS_CONFIG_KEY);
+        if (saved) {
+            analysisConfig = { ...analysisConfig, ...JSON.parse(saved) };
+        }
+    } catch (e) {
+        console.warn('Could not load analysis config', e);
+    }
+    applyConfigToUI();
+    syncConfigToValidationTab();
+}
+
+function saveAnalysisConfig() {
+    try {
+        localStorage.setItem(ANALYSIS_CONFIG_KEY, JSON.stringify(analysisConfig));
+    } catch (e) {
+        console.warn('Could not save analysis config', e);
+    }
+}
+
+function applyConfigToUI() {
+    const elements = {
+        'cfg-shift-engine': 'shiftEngine',
+        'cfg-time-conflict': 'timeConflict',
+        'cfg-time-normalize': 'timeNormalize',
+        'cfg-12h-format': 'format12h',
+        'cfg-offset': 'offset',
+        'cfg-target': 'target'
+    };
+    
+    Object.entries(elements).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.type === 'checkbox') {
+                el.checked = analysisConfig[key];
+            } else {
+                el.value = analysisConfig[key];
+            }
+        }
+    });
+}
+
+function syncConfigToValidationTab() {
+    // Sync to inline validation tab settings
+    const mapping = {
+        'setting-shift-engine': 'shiftEngine',
+        'setting-time-conflict': 'timeConflict',
+        'setting-time-normalize': 'timeNormalize',
+        'setting-12h': 'format12h',
+        'setting-offset': 'offset',
+        'setting-target': 'target'
+    };
+    
+    Object.entries(mapping).forEach(([id, key]) => {
+        const configEl = document.getElementById(id);
+        if (configEl) {
+            if (configEl.type === 'checkbox') {
+                configEl.checked = analysisConfig[key];
+            } else {
+                configEl.value = analysisConfig[key];
+            }
+        }
+    });
+}
+
+function getConfigFromUI() {
+    const elements = {
+        'cfg-shift-engine': 'shiftEngine',
+        'cfg-time-conflict': 'timeConflict',
+        'cfg-time-normalize': 'timeNormalize',
+        'cfg-12h-format': 'format12h',
+        'cfg-offset': 'offset',
+        'cfg-target': 'target'
+    };
+    
+    Object.entries(elements).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.type === 'checkbox') {
+                analysisConfig[key] = el.checked;
+            } else {
+                analysisConfig[key] = el.value;
+            }
+        }
+    });
+}
+
+function loadProfiles() {
+    try {
+        const saved = localStorage.getItem(ANALYSIS_PROFILES_KEY);
+        return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+        console.warn('Could not load profiles', e);
+        return {};
+    }
+}
+
+function saveProfiles(profiles) {
+    try {
+        localStorage.setItem(ANALYSIS_PROFILES_KEY, JSON.stringify(profiles));
+    } catch (e) {
+        console.warn('Could not save profiles', e);
+    }
+}
+
+function renderProfiles() {
+    const container = document.getElementById('cfg-profiles-list');
+    const emptyState = document.getElementById('cfg-empty-profiles');
+    if (!container) return;
+    
+    const profiles = loadProfiles();
+    const profileNames = Object.keys(profiles);
+    
+    if (profileNames.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) container.appendChild(emptyState);
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    if (emptyState) emptyState.style.display = 'none';
+    
+    container.innerHTML = profileNames.map(name => {
+        const p = profiles[name];
+        const updated = new Date(p.updated).toLocaleDateString('ar-EG');
+        return `
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-primary-300 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-900">${name}</div>
+                        <div class="text-xs text-slate-500">محدّث: ${updated}</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="applyProfile('${name}')"
+                        class="px-3 py-1.5 bg-primary-600 text-white text-sm font-bold rounded-lg hover:bg-primary-700 transition-colors">
+                        تطبيق
+                    </button>
+                    <button type="button" onclick="deleteProfile('${name}')"
+                        class="px-3 py-1.5 bg-red-100 text-red-600 text-sm font-bold rounded-lg hover:bg-red-200 transition-colors">
+                        حذف
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function applyProfile(name) {
+    const profiles = loadProfiles();
+    if (profiles[name]) {
+        analysisConfig = { ...analysisConfig, ...profiles[name].config };
+        saveAnalysisConfig();
+        applyConfigToUI();
+        syncConfigToValidationTab();
+        showToast(`تم تطبيق ملف التعريف: ${name}`, 'success');
+    }
+}
+
+function deleteProfile(name) {
+    if (confirm(`حذف ملف التعريف "${name}"؟`)) {
+        const profiles = loadProfiles();
+        delete profiles[name];
+        saveProfiles(profiles);
+        renderProfiles();
+        showToast('تم حذف ملف التعريف', 'info');
+    }
+}
+
+function initializeAnalysisConfig() {
+    loadAnalysisConfig();
+    renderProfiles();
+    
+    // Bind UI events
+    const configElements = [
+        'cfg-shift-engine', 'cfg-time-conflict', 'cfg-time-normalize', 
+        'cfg-12h-format', 'cfg-offset', 'cfg-target'
+    ];
+    
+    configElements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', () => {
+                getConfigFromUI();
+                saveAnalysisConfig();
+                syncConfigToValidationTab();
+            });
+        }
+    });
+    
+    // Save profile button
+    const saveBtn = document.getElementById('cfg-save-profile');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            const name = prompt('اسم ملف التعريف:', `ملف تعريف ${new Date().toLocaleDateString('ar-EG')}`);
+            if (name) {
+                getConfigFromUI();
+                const profiles = loadProfiles();
+                profiles[name] = {
+                    config: { ...analysisConfig },
+                    updated: Date.now()
+                };
+                saveProfiles(profiles);
+                renderProfiles();
+                showToast('تم حفظ ملف التعريف', 'success');
+            }
+        });
+    }
+    
+    // Reset button
+    const resetBtn = document.getElementById('cfg-reset');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (confirm('إعادة جميع الإعدادات للقيم الافتراضية؟')) {
+                analysisConfig = {
+                    shiftEngine: true,
+                    timeConflict: true,
+                    timeNormalize: true,
+                    format12h: true,
+                    offset: 30,
+                    target: 'dropoff_arrival_time'
+                };
+                saveAnalysisConfig();
+                applyConfigToUI();
+                syncConfigToValidationTab();
+                showToast('تم إعادة التعيين للافتراضي', 'info');
+            }
+        });
+    }
+    
+    // Export button
+    const exportBtn = document.getElementById('cfg-export');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            getConfigFromUI();
+            const data = {
+                config: analysisConfig,
+                profiles: loadProfiles(),
+                exportedAt: new Date().toISOString(),
+                version: '1.0'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `codefy-analysis-config-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('تم تصدير الإعدادات', 'success');
+        });
+    }
+    
+    // Import file input
+    const importFile = document.getElementById('cfg-import-file');
+    if (importFile) {
+        importFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.config) {
+                        analysisConfig = { ...analysisConfig, ...data.config };
+                        saveAnalysisConfig();
+                        applyConfigToUI();
+                        syncConfigToValidationTab();
+                    }
+                    if (data.profiles) {
+                        saveProfiles(data.profiles);
+                        renderProfiles();
+                    }
+                    showToast('تم استيراد الإعدادات بنجاح', 'success');
+                } catch (err) {
+                    console.error('Import error:', err);
+                    showToast('خطأ في قراءة الملف', 'error');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+    }
 }
 
 /**
