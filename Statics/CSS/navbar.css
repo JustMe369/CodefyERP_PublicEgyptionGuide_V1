@@ -66,13 +66,18 @@
 }
 
 @media (max-width: 1023px) {
+  /* Sidebar overlay: show when 'open' class is present (used by JS) */
+  #sidebar-overlay.open,
   #sidebar-overlay.is-visible {
-    display: block;
+    display: block !important;
+    opacity: 1;
+    visibility: visible;
   }
-  
-  /* Ensure proper positioning on mobile */
+
+  /* Sidebar: slide off-canvas on mobile when translate-x-full class is present */
+  /* Do NOT use !important here - it would override JS class toggles */
   #sidebar.translate-x-full {
-    transform: translateX(100%) !important;
+    transform: translateX(100%);
   }
 }
 
