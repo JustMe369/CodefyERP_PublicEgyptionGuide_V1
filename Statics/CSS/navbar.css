@@ -3,29 +3,37 @@
   transition: all 0.3s ease;
 }
 
+/* Sidebar RTL-safe base */
 #sidebar {
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition:
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s ease;
+  will-change: transform;
 }
 
 #sidebar.shown {
   transform: translateX(0);
-  box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 32px rgba(0, 0, 0, 0.18);
 }
 
+/* Nav link base */
 .nav-link {
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
 }
 
+/* RTL-safe hover nudge */
 .nav-link:hover {
-  transform: translateX(-4px);
+  transform: translateX(4px); /* positive = start direction in RTL */
 }
 
+/* Active nav link — RTL-aware inline-start indicator */
 .nav-link.active {
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.03));
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.14), rgba(37, 99, 235, 0.03));
   color: #2563eb !important;
   font-weight: 700;
-  box-shadow: inset -3px 0 0 #2563eb;
+  /* RTL-safe indicator on the inline-end edge */
+  box-shadow: inset 3px 0 0 #2563eb;
 }
 
 /* Search input animations */
@@ -49,24 +57,26 @@
   }
 }
 
-/* Responsive adjustments for navigation */
+/* Responsive — desktop */
 @media (min-width: 1024px) {
   #mobile-header {
     display: none;
   }
-  
+
   #sidebar {
+    /* Always visible on desktop — reset any mobile transform */
     transform: translateX(0) !important;
+    box-shadow: none;
   }
-  
-  /* Ensure sidebar remains visible on large screens */
+
   #sidebar.lg\:translate-x-0 {
     transform: translateX(0) !important;
   }
 }
 
+/* Responsive — mobile */
 @media (max-width: 1023px) {
-  /* Sidebar overlay: show when 'open' class is present (used by JS) */
+  /* Overlay visible states */
   #sidebar-overlay.open,
   #sidebar-overlay.is-visible {
     display: block !important;
@@ -74,8 +84,13 @@
     visibility: visible;
   }
 
-  /* Sidebar: slide off-canvas on mobile when translate-x-full class is present */
-  /* Do NOT use !important here - it would override JS class toggles */
+  /*
+   * RTL sidebar off-canvas:
+   * In RTL the sidebar is on the right (inline-start = right).
+   * translate-x-full moves it to the right = off screen correctly.
+   * JS toggles between translate-x-full (hidden) and translate-x-0 (shown).
+   * Do NOT use !important here — it would break JS class toggles.
+   */
   #sidebar.translate-x-full {
     transform: translateX(100%);
   }
