@@ -1,0 +1,34 @@
+# Exclude Python/local development files from Vercel deployment
+requirements.txt
+Statics/PY/
+Statics/PY/**
+*.py
+*.pyc
+__pycache__/
+venv/
+env/
+*.egg-info/
+
+# Exclude local server files
+server.js
+local-server.js
+
+# Exclude node_modules (handled by Vercel)
+node_modules/
+
+# Exclude source maps
+*.map
+
+# Exclude test files
+*.test.js
+*.spec.js
+
+# Exclude IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
