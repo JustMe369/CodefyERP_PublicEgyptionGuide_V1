@@ -73,8 +73,9 @@
         });
     </script>
 
-    <link rel="stylesheet" href="./../Statics/CSS/styles.css">
-    <link rel="stylesheet" href="./../Statics/CSS/navbar.css">
+    <!-- Styles come AFTER the scripts -->
+    <link rel="stylesheet" href="../Statics/CSS/styles.css">
+    <link rel="stylesheet" href="../Statics/CSS/navbar.css">
 </head>
 
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
@@ -103,6 +104,19 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" type="button" aria-label="تبديل الثيم"
+                class="codefy-theme-toggle p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
+                <svg id="theme-icon" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path id="sun-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    <path id="moon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                        class="hidden" />
+                </svg>
+            </button>
+
             <button id="mobile-menu-btn" type="button" aria-label="فتح القائمة" aria-controls="sidebar"
                 aria-expanded="false"
                 class="text-slate-600 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
@@ -120,8 +134,59 @@
 
     <div class="flex">
         <aside id="sidebar"
-            class="fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto border-e border-slate-200 bg-white pt-5 pb-8 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:pt-6"
-            aria-label="قائمة الدليل والتنقل">
+            class="fixed inset-y-0 start-0 z-50 flex w-72 translate-x-full transform flex-col overflow-y-auto border-e border-slate-200 bg-white pt-5 pb-8 transition-all duration-300 ease-in-out lg:translate-x-0 lg:pt-6">
+            <div class="flex items-center justify-between px-4 mb-4">
+                <!-- Logo and Brand Container -->
+                <div id="brand-container" class="collapsible-brand-container flex items-center gap-3 flex-1 min-w-0">
+                    <!-- Logo only shown when collapsed -->
+                    <div class="logo-only flex items-center justify-center flex-shrink-0">
+                        <div
+                            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25 flex-shrink-0">
+                            <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
+                                onerror="this.src='../Statics/img/login.png'">
+                        </div>
+                    </div>
+
+
+
+                    <!-- Full brand shown when expanded -->
+                    <div class="full-brand flex items-center gap-3 flex-1 min-w-0">
+                        <div
+                            class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25 flex-shrink-0">
+                            <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
+                                onerror="this.src='../Statics/img/login.png'">
+                        </div>
+                        <div class="overflow-hidden flex-1 min-w-0">
+                            <span
+                                class="brand-text text-xl font-black text-slate-900 tracking-tight truncate">كوديفاي<span
+                                    class="text-primary-600">.</span></span>
+                            <span class="brand-subtitle block text-[11px] font-bold text-slate-400 truncate">دليل
+                                المستخدم</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Smart Theme Toggle Button - Next to Logo -->
+                <button id="smart-theme-toggle" type="button" aria-label="تبديل الثيم الذكي"
+                    class="smart-theme-toggle p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors flex-shrink-0">
+                    <svg id="smart-theme-icon" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path id="smart-sun-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        <path id="smart-moon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                            class="hidden" />
+                    </svg>
+                </button>
+
+                <!-- Collapse Toggle Button -->
+                <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي"
+                    class="lg:flex hidden ml-2 p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
+                    <svg id="collapse-icon" class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+            </div>
 
             <div class="px-5 mb-6 hidden lg:flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -129,6 +194,7 @@
                         class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/25">
                         <img src="../Statics/img/CodefyLogo.png" alt="شعار كوديفاي" class="h-7 w-7 object-contain"
                             onerror="this.src='../Statics/img/login.png'">
+
                     </div>
                     <div>
                         <span class="text-xl font-black text-slate-900 tracking-tight">كوديفاي<span
@@ -153,7 +219,7 @@
                 </div>
             </div>
 
-            <div class="px-4 mb-4 relative">
+            <div class="search-container px-4 mb-4 relative">
                 <div class="relative">
                     <input type="text" id="search-input" placeholder="ابحث في الدليل... (Ctrl+K)" autocomplete="off"
                         class="w-full py-2.5 ps-10 pe-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs font-medium transition-all">
@@ -171,7 +237,7 @@
                 </div>
             </div>
 
-            <div class="px-4 mb-5">
+            <div class="progress-container px-4 mb-5">
                 <div
                     class="p-3.5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-sm">
                     <div class="flex items-center justify-between mb-2">
@@ -192,7 +258,7 @@
                 </div>
             </div>
 
-            <div class="px-4 mb-4">
+            <!-- <div class="view-mode-container px-4 mb-4">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">طريقة العرض المفضلة
                 </div>
                 <div
@@ -204,7 +270,7 @@
                         <span>📜</span> الكل متتابعاً
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <div class="px-3 flex-1">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">خطوات العمل في
@@ -212,93 +278,120 @@
                 <ul id="navigation-links" class="space-y-1">
                     <li>
                         <a href="#login" data-section="login"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">🔐</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">🔐</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">تسجيل
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        تسجيل
                                         الدخول</div>
-                                    <div class="text-[11px] text-slate-400">الخطوة الأولى بكلمة المرور</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">الخطوة الأولى بكلمة المرور
+                                    </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="login">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="login">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#bulk-import" data-section="bulk-import"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">📦</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">📦</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">رفع
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        رفع
                                         المشاريع بالجملة</div>
-                                    <div class="text-[11px] text-slate-400">ملف الإكسل ينجز المهمة في ثوانٍ</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">ملف الإكسل ينجز المهمة في ثوانٍ
+                                    </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="bulk-import">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="bulk-import">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#relationships" data-section="relationships"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">🤝</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">🤝</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">المورد
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        المورد
                                         والمركبة والسائق</div>
-                                    <div class="text-[11px] text-slate-400">ربط المشاريع بالموردين والمركبات</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">ربط المشاريع بالموردين
+                                        والمركبات</div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="relationships">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="relationships">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#assignments" data-section="assignments"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">📋</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">📋</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">توزيع
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        توزيع
                                         المهام (الجداول)</div>
-                                    <div class="text-[11px] text-slate-400">تحديد المهام لكل سائق</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">تحديد المهام لكل سائق</div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="assignments">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="assignments">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#pricing" data-section="pricing"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">💰</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">💰</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">حساب
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        حساب
                                         التسعير والهامش الربحي</div>
-                                    <div class="text-[11px] text-slate-400">معادلة بسيطة بين المورد والعميل</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">معادلة بسيطة بين المورد والعميل
+                                    </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="pricing">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="pricing">○</span>
                         </a>
                     </li>
                     <li>
                         <a href="#readiness" data-section="readiness"
-                            class="nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <span class="text-lg flex-shrink-0">✅</span>
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">✅</span>
                                 <div>
-                                    <div class="font-bold text-xs text-slate-900 group-hover:text-primary-600">مراجعة
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        مراجعة
                                         الجاهزية</div>
-                                    <div class="text-[11px] text-slate-400">التأكد من اكتمال جميع المتطلبات قبل الانطلاق
+                                    <div class="nav-subtitle text-[11px] text-slate-400">التأكد من اكتمال جميع المتطلبات
+                                        قبل الانطلاق
                                     </div>
                                 </div>
                             </div>
-                            <span class="section-check-badge" data-badge-section="readiness">○</span>
+                            <span class="nav-badge section-check-badge" data-badge-section="readiness">○</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#analysis-config" data-section="analysis-config"
+                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-xl px-3 py-2.5 text-slate-700 hover:bg-slate-50 transition-all group">
+                            <div class="collapsible-nav-content flex items-center gap-3">
+                                <span class="collapsible-nav-icon text-lg flex-shrink-0">⚙️</span>
+                                <div>
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
+                                        إعدادات
+                                        تحليل الإكسل</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">تخصيص قواعد التحقق والمعالجة
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="nav-badge section-check-badge" data-badge-section="analysis-config">○</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <div class="px-5 pt-4 mt-auto border-t border-slate-100 text-center">
+            <div class="footer-content px-5 pt-4 mt-auto border-t border-slate-100 text-center">
                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 mb-2">
                     <p class="text-[11px] font-medium text-slate-600 leading-normal m-0">
                         💡 <span class="font-bold text-slate-800">معلومة سريعة:</span> يمكنك استخدام مفاتيح الأسهم في
@@ -593,6 +686,15 @@
                                         class="text-slate-700"><strong>إدارة الموردين</strong> — التحقق من معلومات
                                         الموردين</span></li>
                             </ul>
+
+                            <div class="mt-4 flex items-center gap-3">
+                                <a href="#analysis-config"
+                                    class="inline-flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition-colors shadow-lg shadow-cyan-600/20">
+                                    <span class="text-lg" aria-hidden="true">⚙️</span>
+                                    <span>إعدادات التحليل المتقدمة</span>
+                                </a>
+                                <span class="text-xs text-slate-400">تخصيص القواعد وحفظ ملفات التعريف</span>
+                            </div>
 
                             <!-- Validation Tool Container -->
                             <div id="validation-container" class="mt-6">
@@ -1084,7 +1186,7 @@
                                 <span class="text-lg" aria-hidden="true">✏️</span>
                                 <span class="font-bold text-slate-800 text-sm">تعديل التعيينات — الجزء 1</span>
                             </div>
-                            <img src="../Statics/img/workfllow.jpg" alt="تعديل جزء 1"
+                            <img src="../Statics/img/workflow.jpg" alt="تعديل جزء 1"
                                 class="lightbox-trigger w-full h-auto max-h-[300px] object-contain" loading="lazy">
                         </figure>
                         <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
@@ -1092,7 +1194,7 @@
                                 <span class="text-lg" aria-hidden="true">✏️</span>
                                 <span class="font-bold text-slate-800 text-sm">تعديل التعيينات — الجزء 2</span>
                             </div>
-                            <img src="../Statics/img/workfllow1.jpg" alt="تعديل جزء 2"
+                            <img src="../Statics/img/workflow1.jpg" alt="تعديل جزء 2"
                                 class="lightbox-trigger w-full h-auto max-h-[300px] object-contain" loading="lazy">
                         </figure>
                     </div>
@@ -1240,7 +1342,7 @@
                                 <span class="text-lg" aria-hidden="true">🛒</span>
                                 <span class="font-bold text-slate-800 text-sm">واجهة الإمداد</span>
                             </div>
-                            <img src="../Statics/img/login.png" alt="واجهة الإمداد"
+                            <img src="../Statics/Presentation/3.png" alt="واجهة الإمداد"
                                 class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
                         </figure>
                         <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
@@ -1248,7 +1350,7 @@
                                 <span class="text-lg" aria-hidden="true">💵</span>
                                 <span class="font-bold text-slate-800 text-sm">واجهة المبيعات</span>
                             </div>
-                            <img src="../Statics/img/dashboard.png" alt="واجهة المبيعات"
+                            <img src="../Statics/Presentation/4.png" alt="واجهة المبيعات"
                                 class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
                         </figure>
                     </div>
@@ -1384,7 +1486,7 @@
                                 <span class="text-lg" aria-hidden="true">🖼️</span>
                                 <span class="font-bold text-slate-800 text-sm">واجهة الجاهزية</span>
                             </div>
-                            <img src="../Statics/img/dashboard.png" alt="واجهة الجاهزية"
+                            <img src="../Statics/Presentation/5.png" alt="واجهة الجاهزية"
                                 class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
                         </figure>
                         <figure class="bg-white rounded-2xl border border-slate-200 overflow-hidden m-0 hover-lift">
@@ -1392,13 +1494,137 @@
                                 <span class="text-lg" aria-hidden="true">🔗</span>
                                 <span class="font-bold text-slate-800 text-sm">العلاقة مع المسارات</span>
                             </div>
-                            <img src="../Statics/img/vvdr.jpg" alt="العلاقة مع المسارات"
+                            <img src="../Statics/Presentation/6.png" alt="العلاقة مع المسارات"
                                 class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
                         </figure>
                     </div>
                 </section>
             </template>
+            <template id="tpl-analysis-config">
+                <section id="analysis-config" class="mb-24 section-content reveal">
+                    <div class="flex items-start gap-4 mb-8">
+                        <div class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white text-2xl shadow-lg shadow-cyan-500/30"
+                            aria-hidden="true">
+                            ⚙️</div>
+                        <div>
+                            <div class="pill bg-cyan-50 text-cyan-700 mb-2">إعدادات متقدمة</div>
+                            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">إعدادات تحليل
+                                الإكسل</h2>
+                            <p class="text-slate-500 font-medium mt-1">تخصيص قواعد التحقق والمعالجة التلقائية</p>
+                        </div>
+                    </div>
 
+                    <div class="callout callout-info mb-8">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl flex-shrink-0" aria-hidden="true">🎯</span>
+                            <div>
+                                <div class="font-black text-blue-900 mb-1">الخلاصة في سطرين</div>
+                                <p class="text-slate-700 text-sm leading-relaxed m-0">
+                                    هنا يمكنك تخصيص كيفية تحليل ملفات الإكسل: تفعيل/تعطيل محركات التحقق، إعداد قواعد
+                                    تنسيق التواريخ والأرقام، وحفظ ملفات تعريف مكررة لسيناريوهات مختلفة.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Settings Card -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="text-xl" aria-hidden="true">⚡</span> الإعدادات السريعة
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-shift-engine" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">محرك الورديات</span>
+                            </label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-time-conflict" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">تعارضات الوقت</span>
+                            </label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-time-normalize" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">تطبيع الوقت</span>
+                            </label>
+                            <label
+                                class="flex items-center gap-2 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input type="checkbox" id="cfg-12h-format" checked
+                                    class="w-4 h-4 text-primary-600 rounded">
+                                <span class="text-sm font-medium text-slate-700">تنسيق 12 ساعة</span>
+                            </label>
+                            <div
+                                class="flex flex-col gap-1.5 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-xs font-bold text-slate-500">تعويض الوقت:</span>
+                                <select id="cfg-offset"
+                                    class="text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="15">15 دقيقة</option>
+                                    <option value="30" selected>30 دقيقة</option>
+                                    <option value="45">45 دقيقة</option>
+                                    <option value="60">60 دقيقة</option>
+                                </select>
+                            </div>
+                            <div
+                                class="flex flex-col gap-1.5 cursor-pointer p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <span class="text-xs font-bold text-slate-500">الهدف:</span>
+                                <select id="cfg-target"
+                                    class="text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="dropoff_arrival_time" selected>وصول</option>
+                                    <option value="dropoff_departure_time">مغادرة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-3 pt-4 border-t border-slate-200">
+                            <button type="button" id="cfg-save-profile"
+                                class="px-4 py-2 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition-colors">
+                                💾 حفظ كملف تعريف
+                            </button>
+                            <button type="button" id="cfg-reset"
+                                class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                                ↩️ إعادة للتعيين الافتراضي
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Saved Profiles -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-8 shadow-sm">
+                        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="text-xl" aria-hidden="true">📋</span> ملفات التعريف المحفوظة
+                        </h3>
+                        <div id="cfg-profiles-list" class="space-y-3 min-h-[100px]">
+                            <div class="text-center text-slate-500 py-8" id="cfg-empty-profiles">
+                                <div class="text-4xl mb-2">📭</div>
+                                <p>لا توجد ملفات تعريف محفوظة بعد</p>
+                                <p class="text-xs mt-1">اضبط الإعدادات واضغط "حفظ كملف تعريف"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Import/Export -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+                            <span class="text-xl" aria-hidden="true">🔄</span> استيراد / تصدير الإعدادات
+                        </h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button type="button" id="cfg-export"
+                                class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-colors">
+                                📤 تصدير (JSON)
+                            </button>
+                            <input type="file" id="cfg-import-file" accept=".json" class="hidden">
+                            <button type="button" id="cfg-import"
+                                class="px-4 py-2 bg-violet-600 text-white font-bold rounded-xl hover:bg-violet-700 transition-colors"
+                                onclick="document.getElementById('cfg-import-file').click()">
+                                📥 استيراد
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-3">شارك إعداداتك مع الزملاء أو انقلها بين الأجهزة</p>
+                    </div>
+                </section>
+            </template>
             <div id="section-stepper-container"></div>
 
             <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary-600 to-indigo-700 p-8 sm:p-12 text-white text-center shadow-2xl shadow-primary-600/30 reveal mt-16 hidden"
@@ -1465,7 +1691,7 @@
 
     <script>
         (function () {
-            var sectionIds = ['login', 'bulk-import', 'relationships', 'assignments', 'pricing', 'readiness'];
+            var sectionIds = ['login', 'bulk-import', 'relationships', 'assignments', 'pricing', 'readiness', 'analysis-config'];
             sectionIds.forEach(function (id) {
                 var template = document.getElementById('tpl-' + id);
                 if (template) {
@@ -1479,6 +1705,7 @@
         })();
     </script>
 
+    <script src="../Statics/JS/navbar.js"></script>
     <script src="../Statics/JS/scripts.js?v=20260923-3"></script>
 
     <style>

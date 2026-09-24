@@ -11,7 +11,8 @@ const SECTIONS = [
     { id: 'relationships', title: 'المورد والمركبة والسائق', icon: '🤝', subtitle: 'مين راكب إيه ومع مين' },
     { id: 'assignments', title: 'توزيع الشغل (الجداول)', icon: '📋', subtitle: 'توزيع النقلات ع الرجالة' },
     { id: 'pricing', title: 'حسبة التسعير', icon: '💰', subtitle: 'التكلفة والإيراد والمكسب' },
-    { id: 'readiness', title: 'مراجعة الجاهزية', icon: '✅', subtitle: 'التأكيد قبل ما تدور العربية' }
+    { id: 'readiness', title: 'مراجعة الجاهزية', icon: '✅', subtitle: 'التأكيد قبل ما تدور العربية' },
+    { id: 'analysis-config', title: 'إعدادات تحليل الإكسل', icon: '⚙️', subtitle: 'تخصيص قواعد التحقق والمعالجة' }
 ];
 
 // App State
@@ -33,14 +34,150 @@ document.addEventListener('DOMContentLoaded', function() {
     initApp();
     initializeValidationTool();
     initializeTabSwitching();
+    // Initialize theme functionality with unique names to avoid conflicts
+    initializeCodefyThemeSystem();
+    // Initialize collapsible sidebar functionality
+    initializeCollapsibleSidebar();
 });
+
+
+// Theme Management System with unique function names to avoid conflicts
+function initializeCodefyThemeSystem() {
+    const themeToggleButton = document.getElementById('theme-toggle');
+    const themeIconElement = document.getElementById('theme-icon');
+    const sunPathElement = document.getElementById('sun-path');
+    const moonPathElement = document.getElementById('moon-path');
+    
+    // Desktop theme toggle elements
+    const desktopThemeButton = document.getElementById('desktop-theme-toggle');
+    const desktopThemeIcon = document.getElementById('desktop-theme-icon');
+    const desktopSunPath = document.getElementById('desktop-sun-path');
+    const desktopMoonPath = document.getElementById('desktop-moon-path');
+    
+    // Check for saved theme preference or respect OS preference
+    const currentThemePref = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-blue' : 'light');
+    
+    // Apply the saved theme on page load
+    if (currentThemePref === 'dark-blue') {
+        document.documentElement.setAttribute('data-theme', 'dark-blue');
+        // Update mobile theme icon
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.add('hidden');
+            moonPathElement.classList.remove('hidden');
+        }
+        // Update desktop theme icon
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.add('hidden');
+            desktopMoonPath.classList.remove('hidden');
+        }
+    } else if (currentThemePref === 'sunny-light') {
+        document.documentElement.setAttribute('data-theme', 'sunny-light');
+        // Update mobile theme icon
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.remove('hidden');
+            moonPathElement.classList.add('hidden');
+        }
+        // Update desktop theme icon
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.remove('hidden');
+            desktopMoonPath.classList.add('hidden');
+        }
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        // Update mobile theme icon
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.remove('hidden');
+            moonPathElement.classList.add('hidden');
+        }
+        // Update desktop theme icon
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.remove('hidden');
+            desktopMoonPath.classList.add('hidden');
+        }
+    }
+    
+    // Function to update theme elements
+    function updateThemeDisplay(isDark) {
+        if (isDark) {
+            // Dark theme active
+            if (sunPathElement && moonPathElement) {
+                sunPathElement.classList.add('hidden');
+                moonPathElement.classList.remove('hidden');
+            }
+            if (desktopSunPath && desktopMoonPath) {
+                desktopSunPath.classList.add('hidden');
+                desktopMoonPath.classList.remove('hidden');
+            }
+        } else {
+            // Light theme active
+            if (sunPathElement && moonPathElement) {
+                sunPathElement.classList.remove('hidden');
+                moonPathElement.classList.add('hidden');
+            }
+            if (desktopSunPath && desktopMoonPath) {
+                desktopSunPath.classList.remove('hidden');
+                desktopMoonPath.classList.add('hidden');
+            }
+        }
+    }
+    
+    // Function to update theme display for sunny theme
+    function updateThemeDisplaySunny() {
+        // Light theme active (same as regular light)
+        if (sunPathElement && moonPathElement) {
+            sunPathElement.classList.remove('hidden');
+            moonPathElement.classList.add('hidden');
+        }
+        if (desktopSunPath && desktopMoonPath) {
+            desktopSunPath.classList.remove('hidden');
+            desktopMoonPath.classList.add('hidden');
+        }
+    }
+    
+    // Toggle theme when mobile button is clicked
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener('click', function() {
+            toggleCodefyTheme();
+        });
+    }
+    
+    // Toggle theme when desktop button is clicked
+    if (desktopThemeButton) {
+        desktopThemeButton.addEventListener('click', function() {
+            toggleCodefyTheme();
+        });
+    }
+    
+    // Common toggle function with unique name
+    function toggleCodefyTheme() {
+        const currentThemeAttribute = document.documentElement.getAttribute('data-theme');
+        
+        if (currentThemeAttribute === 'dark-blue') {
+            // Switch to sunny light theme
+            document.documentElement.setAttribute('data-theme', 'sunny-light');
+            localStorage.setItem('theme', 'sunny-light');
+            updateThemeDisplaySunny();
+        } else if (currentThemeAttribute === 'sunny-light') {
+            // Switch to regular light theme
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            updateThemeDisplay(false);
+        } else {
+            // Switch to dark blue theme
+            document.documentElement.setAttribute('data-theme', 'dark-blue');
+            localStorage.setItem('theme', 'dark-blue');
+            updateThemeDisplay(true);
+        }
+        
+        // Optional: Add a subtle transition effect
+        document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+    }
+}
 
 function initApp() {
     // Load saved progress from localStorage
     loadProgress();
-    
-    // Initialize Sidebar & Mobile Menu
-    initSidebar();
     
     // Initialize View Mode & Section Navigation
     initSectionMode();
@@ -66,6 +203,9 @@ function initApp() {
     
     // Initialize Scroll Reveal Animations
     initScrollReveal();
+    
+    // Initialize Analysis Configuration
+    initializeAnalysisConfig();
     
     // Render initial progress
     updateProgressUI();
@@ -263,6 +403,10 @@ function updateSectionStepper(sectionId) {
             if (currentSectionIndex > 0) {
                 currentSectionIndex--;
                 showCurrentSection(true);
+                // Ensure scroll to top happens after showing the section
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
             }
         });
     }
@@ -273,6 +417,10 @@ function updateSectionStepper(sectionId) {
             if (currentSectionIndex < SECTIONS.length - 1) {
                 currentSectionIndex++;
                 showCurrentSection(true);
+                // Ensure scroll to top happens after showing the section
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
             }
         });
     }
@@ -299,38 +447,11 @@ function initSectionMode() {
     const foundIndex = SECTIONS.findIndex(s => s.id === hash);
     currentSectionIndex = foundIndex !== -1 ? foundIndex : 0;
 
-    // Bind mode toggle buttons
-    const modeSingleBtns = document.querySelectorAll('.btn-mode-single');
-    const modeAllBtns = document.querySelectorAll('.btn-mode-all');
-
-    modeSingleBtns.forEach(btn => {
-        btn.addEventListener('click', () => setViewMode('single'));
-    });
-
-    modeAllBtns.forEach(btn => {
-        btn.addEventListener('click', () => setViewMode('all'));
-    });
 
     // Apply initial view mode
     applyViewMode();
     showCurrentSection(false);
 
-    // Attach click handlers to all navigation links
-    const navLinks = document.querySelectorAll('.nav-link[data-section]');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetSecId = this.getAttribute('data-section');
-            const targetIndex = SECTIONS.findIndex(s => s.id === targetSecId);
-            if (targetIndex !== -1) {
-                currentSectionIndex = targetIndex;
-                showCurrentSection(true);
-                if (window.innerWidth < 1024) {
-                    closeSidebar();
-                }
-            }
-        });
-    });
 
     // Hash change event listener
     window.addEventListener('hashchange', function() {
@@ -338,7 +459,11 @@ function initSectionMode() {
         const targetIndex = SECTIONS.findIndex(s => s.id === newHash);
         if (targetIndex !== -1 && targetIndex !== currentSectionIndex) {
             currentSectionIndex = targetIndex;
-            showCurrentSection(false);
+            showCurrentSection(true);
+            // Ensure scroll to top happens after showing the section
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 100);
         }
     });
 }
@@ -348,6 +473,11 @@ function setViewMode(mode) {
     viewMode = mode;
     applyViewMode();
     showCurrentSection(true);
+    
+    // Always scroll to top when changing view mode
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
     
     if (mode === 'single') {
         showToast('تم تفعيل وضع التركيز (عرض قسم بقسم) 🎯', 'info');
@@ -452,84 +582,51 @@ function showCurrentSection(shouldScroll = true) {
 /**
  * Sidebar Navigation & Mobile Drawer
  */
-function initSidebar() {
+function initializeCollapsibleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    if (!sidebar || !mobileMenuBtn || !sidebarOverlay) return;
-    
-    // Toggle sidebar on mobile menu button click
-    mobileMenuBtn.addEventListener('click', function() {
-        openSidebar();
-    });
-    
-    // Close sidebar when clicking overlay
-    sidebarOverlay.addEventListener('click', function() {
-        closeSidebar();
-    });
-    
-    // Close sidebar when clicking outside
-    document.addEventListener('click', function(e) {
-        if (sidebar.classList.contains('translate-x-0') && 
-            !sidebar.contains(e.target) && 
-            e.target !== mobileMenuBtn &&
-            !mobileMenuBtn.contains(e.target)) {
-            closeSidebar();
-        }
-    });
-    
-    // Close sidebar on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('translate-x-0')) {
-            closeSidebar();
-        }
-    });
-    
-    // Initialize active section highlighting
-    updateActiveSection();
-}
 
-function openSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    if (!sidebar || !sidebarOverlay) return;
-    
-    sidebar.classList.remove('-translate-x-full');
-    sidebar.classList.add('translate-x-0');
-    sidebarOverlay.classList.remove('hidden');
-    
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
+    if (!sidebar || !sidebarToggle || !sidebarOverlay) return;
+
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('open');
+    });
+
+    sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+    });
+
+    // Attach click handlers to all navigation links
+    const navLinks = document.querySelectorAll('.nav-link[data-section]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetSecId = this.getAttribute('data-section');
+            const targetIndex = SECTIONS.findIndex(s => s.id === targetSecId);
+            if (targetIndex !== -1) {
+                currentSectionIndex = targetIndex;
+                showCurrentSection(true);
+                // Ensure scroll to top happens after showing the section
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100); // Small delay to ensure section is rendered
+                if (window.innerWidth < 1024) {
+                    closeSidebar();
+                }
+            }
+        });
+    });
 }
 
 function closeSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    if (!sidebar || !sidebarOverlay) return;
-    
-    sidebar.classList.remove('translate-x-0');
-    sidebar.classList.add('-translate-x-full');
-    sidebarOverlay.classList.add('hidden');
-    
-    // Restore body scroll
-    document.body.style.overflow = '';
-}
 
-function updateActiveSection() {
-    const currentHash = window.location.hash.substring(1) || 'login';
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
-        const sectionId = link.getAttribute('data-section');
-        if (sectionId === currentHash) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
+    if (sidebar) sidebar.classList.remove('open');
+    if (sidebarOverlay) sidebarOverlay.classList.remove('open');
 }
 
 /**
@@ -786,39 +883,324 @@ function initFloatingHelp() {
  */
 function initKeyboardShortcuts() {
     document.addEventListener('keydown', function(e) {
-        // Ctrl + K for search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        // Arrow keys for navigation
+        if (e.key === 'ArrowLeft' && currentSectionIndex > 0) {
             e.preventDefault();
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                if (window.innerWidth < 1024) openSidebar();
-                searchInput.focus();
-            }
+            currentSectionIndex--;
+            showCurrentSection();
+        } else if (e.key === 'ArrowRight' && currentSectionIndex < SECTIONS.length - 1) {
+            e.preventDefault();
+            currentSectionIndex++;
+            showCurrentSection();
         }
-        // Escape closes sidebar / lightbox
-        if (e.key === 'Escape') {
-            closeSidebar();
-            const lightbox = document.getElementById('lightbox');
-            if (lightbox && !lightbox.classList.contains('hidden')) {
-                lightbox.classList.add('opacity-0');
-                setTimeout(() => lightbox.classList.add('hidden'), 300);
-            }
+    });
+}
+
+/**
+ * Analysis Configuration Management
+ * Handles settings persistence, profiles, import/export, and sync with validation tool
+ */
+const ANALYSIS_CONFIG_KEY = 'codefy_analysis_config_v1';
+const ANALYSIS_PROFILES_KEY = 'codefy_analysis_profiles_v1';
+
+let analysisConfig = {
+    shiftEngine: true,
+    timeConflict: true,
+    timeNormalize: true,
+    format12h: true,
+    offset: 30,
+    target: 'dropoff_arrival_time'
+};
+
+function loadAnalysisConfig() {
+    try {
+        const saved = localStorage.getItem(ANALYSIS_CONFIG_KEY);
+        if (saved) {
+            analysisConfig = { ...analysisConfig, ...JSON.parse(saved) };
         }
-        // In single mode: ArrowLeft moves to next section in RTL
-        if (viewMode === 'single' && !['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) {
-            if (e.key === 'ArrowLeft') {
-                if (currentSectionIndex < SECTIONS.length - 1) {
-                    currentSectionIndex++;
-                    showCurrentSection(true);
-                }
-            } else if (e.key === 'ArrowRight') {
-                if (currentSectionIndex > 0) {
-                    currentSectionIndex--;
-                    showCurrentSection(true);
-                }
+    } catch (e) {
+        console.warn('Could not load analysis config', e);
+    }
+    applyConfigToUI();
+    syncConfigToValidationTab();
+}
+
+function saveAnalysisConfig() {
+    try {
+        localStorage.setItem(ANALYSIS_CONFIG_KEY, JSON.stringify(analysisConfig));
+    } catch (e) {
+        console.warn('Could not save analysis config', e);
+    }
+}
+
+function applyConfigToUI() {
+    const elements = {
+        'cfg-shift-engine': 'shiftEngine',
+        'cfg-time-conflict': 'timeConflict',
+        'cfg-time-normalize': 'timeNormalize',
+        'cfg-12h-format': 'format12h',
+        'cfg-offset': 'offset',
+        'cfg-target': 'target'
+    };
+    
+    Object.entries(elements).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.type === 'checkbox') {
+                el.checked = analysisConfig[key];
+            } else {
+                el.value = analysisConfig[key];
             }
         }
     });
+}
+
+function syncConfigToValidationTab() {
+    // Sync to inline validation tab settings
+    const mapping = {
+        'setting-shift-engine': 'shiftEngine',
+        'setting-time-conflict': 'timeConflict',
+        'setting-time-normalize': 'timeNormalize',
+        'setting-12h': 'format12h',
+        'setting-offset': 'offset',
+        'setting-target': 'target'
+    };
+    
+    Object.entries(mapping).forEach(([id, key]) => {
+        const configEl = document.getElementById(id);
+        if (configEl) {
+            if (configEl.type === 'checkbox') {
+                configEl.checked = analysisConfig[key];
+            } else {
+                configEl.value = analysisConfig[key];
+            }
+        }
+    });
+}
+
+function getConfigFromUI() {
+    const elements = {
+        'cfg-shift-engine': 'shiftEngine',
+        'cfg-time-conflict': 'timeConflict',
+        'cfg-time-normalize': 'timeNormalize',
+        'cfg-12h-format': 'format12h',
+        'cfg-offset': 'offset',
+        'cfg-target': 'target'
+    };
+    
+    Object.entries(elements).forEach(([id, key]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.type === 'checkbox') {
+                analysisConfig[key] = el.checked;
+            } else {
+                analysisConfig[key] = el.value;
+            }
+        }
+    });
+}
+
+function loadProfiles() {
+    try {
+        const saved = localStorage.getItem(ANALYSIS_PROFILES_KEY);
+        return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+        console.warn('Could not load profiles', e);
+        return {};
+    }
+}
+
+function saveProfiles(profiles) {
+    try {
+        localStorage.setItem(ANALYSIS_PROFILES_KEY, JSON.stringify(profiles));
+    } catch (e) {
+        console.warn('Could not save profiles', e);
+    }
+}
+
+function renderProfiles() {
+    const container = document.getElementById('cfg-profiles-list');
+    const emptyState = document.getElementById('cfg-empty-profiles');
+    if (!container) return;
+    
+    const profiles = loadProfiles();
+    const profileNames = Object.keys(profiles);
+    
+    if (profileNames.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) container.appendChild(emptyState);
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    if (emptyState) emptyState.style.display = 'none';
+    
+    container.innerHTML = profileNames.map(name => {
+        const p = profiles[name];
+        const updated = new Date(p.updated).toLocaleDateString('ar-EG');
+        return `
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-primary-300 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-900">${name}</div>
+                        <div class="text-xs text-slate-500">محدّث: ${updated}</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="applyProfile('${name}')"
+                        class="px-3 py-1.5 bg-primary-600 text-white text-sm font-bold rounded-lg hover:bg-primary-700 transition-colors">
+                        تطبيق
+                    </button>
+                    <button type="button" onclick="deleteProfile('${name}')"
+                        class="px-3 py-1.5 bg-red-100 text-red-600 text-sm font-bold rounded-lg hover:bg-red-200 transition-colors">
+                        حذف
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function applyProfile(name) {
+    const profiles = loadProfiles();
+    if (profiles[name]) {
+        analysisConfig = { ...analysisConfig, ...profiles[name].config };
+        saveAnalysisConfig();
+        applyConfigToUI();
+        syncConfigToValidationTab();
+        showToast(`تم تطبيق ملف التعريف: ${name}`, 'success');
+    }
+}
+
+function deleteProfile(name) {
+    if (confirm(`حذف ملف التعريف "${name}"؟`)) {
+        const profiles = loadProfiles();
+        delete profiles[name];
+        saveProfiles(profiles);
+        renderProfiles();
+        showToast('تم حذف ملف التعريف', 'info');
+    }
+}
+
+function initializeAnalysisConfig() {
+    loadAnalysisConfig();
+    renderProfiles();
+    
+    // Bind UI events
+    const configElements = [
+        'cfg-shift-engine', 'cfg-time-conflict', 'cfg-time-normalize', 
+        'cfg-12h-format', 'cfg-offset', 'cfg-target'
+    ];
+    
+    configElements.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', () => {
+                getConfigFromUI();
+                saveAnalysisConfig();
+                syncConfigToValidationTab();
+            });
+        }
+    });
+    
+    // Save profile button
+    const saveBtn = document.getElementById('cfg-save-profile');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            const name = prompt('اسم ملف التعريف:', `ملف تعريف ${new Date().toLocaleDateString('ar-EG')}`);
+            if (name) {
+                getConfigFromUI();
+                const profiles = loadProfiles();
+                profiles[name] = {
+                    config: { ...analysisConfig },
+                    updated: Date.now()
+                };
+                saveProfiles(profiles);
+                renderProfiles();
+                showToast('تم حفظ ملف التعريف', 'success');
+            }
+        });
+    }
+    
+    // Reset button
+    const resetBtn = document.getElementById('cfg-reset');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (confirm('إعادة جميع الإعدادات للقيم الافتراضية؟')) {
+                analysisConfig = {
+                    shiftEngine: true,
+                    timeConflict: true,
+                    timeNormalize: true,
+                    format12h: true,
+                    offset: 30,
+                    target: 'dropoff_arrival_time'
+                };
+                saveAnalysisConfig();
+                applyConfigToUI();
+                syncConfigToValidationTab();
+                showToast('تم إعادة التعيين للافتراضي', 'info');
+            }
+        });
+    }
+    
+    // Export button
+    const exportBtn = document.getElementById('cfg-export');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            getConfigFromUI();
+            const data = {
+                config: analysisConfig,
+                profiles: loadProfiles(),
+                exportedAt: new Date().toISOString(),
+                version: '1.0'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `codefy-analysis-config-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('تم تصدير الإعدادات', 'success');
+        });
+    }
+    
+    // Import file input
+    const importFile = document.getElementById('cfg-import-file');
+    if (importFile) {
+        importFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.config) {
+                        analysisConfig = { ...analysisConfig, ...data.config };
+                        saveAnalysisConfig();
+                        applyConfigToUI();
+                        syncConfigToValidationTab();
+                    }
+                    if (data.profiles) {
+                        saveProfiles(data.profiles);
+                        renderProfiles();
+                    }
+                    showToast('تم استيراد الإعدادات بنجاح', 'success');
+                } catch (err) {
+                    console.error('Import error:', err);
+                    showToast('خطأ في قراءة الملف', 'error');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+    }
 }
 
 /**

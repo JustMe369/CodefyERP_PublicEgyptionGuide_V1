@@ -19,8 +19,10 @@ from openpyxl.utils import get_column_letter
 from openpyxl.comments import Comment
 from datetime import datetime, date, timedelta
 from collections import defaultdict, Counter
-import re, os, sys, csv, json, copy, subprocess
+import re, os, sys, csv, json, copy, subprocess, traceback
 import threading, queue, webbrowser, urllib.parse
+import argparse
+from typing import Dict, List, Any
 
 try:
     import arabic_reshaper
@@ -30,38 +32,150 @@ except Exception:
     HAS_SHAPER = False
 
 
-# ═══════════════════════════════ CONSTANTS ════════════════════════════════════
+# =============================================================================
+# CONSTANTS
+# =============================================================================
 COL_DRIVER_NAME     = 'assigned_driver_full_name'
-COL_DRIVER_PHONE    = 'driver_phone_number'
-COL_DRIVER_LIC_NUM  = 'driver_license_number'
-COL_DRIVER_LIC_EXP  = 'driver_license_expiry_date'
-COL_EMP_TYPE        = 'driver_employment_type'
-COL_SUPPLIER_PRICE  = 'supplier_price'
-COL_PLATE           = 'assigned_vehicle_plate_number'
-COL_VEHICLE_MAKE    = 'vehicle_make'
-COL_VEHICLE_TYPE    = 'vehicle_type'
-COL_VEHICLE_YEAR    = 'vehicle_year'
-COL_VEHICLE_EXP     = 'vehicle_expiry_date'
-COL_SUPPLIER_UNIT   = 'supplier_pricing_unit'
-COL_DIRECTION       = 'schedule_direction'
-COL_COMPANY         = 'company_name'
-COL_PROJECT         = 'project_name'
-COL_SHIFT           = 'shift_name'
-COL_ROUTE           = 'route_code'
-COL_SCHEDULE        = 'schedule_name'
-COL_SCHEDULE_TIME   = 'schedule_time'
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='CodefyExcelAnalyzer - Advanced Fleet Data Quality Tool')
+    parser.add_argument('file_path', nargs='?', help='Path to Excel/CSV file to analyze')
+    parser.add_argument('--analyze', dest='file_path_cmd', help='Analyze specified file (for API usage)')
+    parser.add_argument('--export-fixed', dest='export_fixed', help='Export fixed file to specified path')
+    parser.add_argument('--export-issues', dest='export_issues', help='Export issues to specified path')
+    parser.add_argument('--format', choices=['excel', 'csv', 'json', 'html'], default='excel', 
+                        help='Export format (default: excel)')
+    
+    args = parser.parse_args()
+    
+    file_path = args.file_path or args.file_path_cmd
+    
+    if file_path:
+        if not os.path.exists(file_path):
+            print(f"Error: File does not exist: {file_path}")
+            sys.exit(1)
+        
+        try:
+            analyzer = CodefyAnalyzer(file_path)
+            report, fixes = analyzer.run()
+            
+            # Output results as JSON for API consumption
+            result = analyzer.to_dict()
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            
+            # Optionally export files
+            if args.export_fixed:
+                if args.format == 'csv':
+                    analyzer.export_fixed_csv(args.export_fixed)
+                else:
+                    analyzer.export_fixed(args.export_fixed)
+                print(f"Fixed file exported to: {args.export_fixed}")
+                
+            if args.export_issues:
+                if args.format == 'json':
+                    analyzer.export_issues_json(args.export_issues)
+                elif args.format == 'excel':
+                    analyzer.export_issues_excel(args.export_issues)
+                elif args.format == 'csv':
+                    analyzer.export_issues_csv(args.export_issues)
+                else:  # html
+                    analyzer.export_html_report(args.export_issues)
+                print(f"Issues exported to: {args.export_issues}")
+                
+        except Exception as e:
+            error_result = {
+                'success': False,
+                'error': str(e),
+                'traceback': str(traceback.format_exc()) if 'traceback' in globals() else 'Import error occurred'
+            }
+            print(json.dumps(error_result, ensure_ascii=False, indent=2))
+            sys.exit(1)
+    else:
+        # If no file provided, launch GUI as before
+        try:
+            import tkinter as tk
+            from tkinter import ttk, filedialog, messagebox
+            # Launch the GUI application
+            root = tk.Tk()
+            app = App(root)
+            root.mainloop()
+        except ImportError:
+            print("GUI dependencies not available. Please provide a file path to analyze.")
+            print("Usage: python CodefyExcelAnalyzer_V11.3.1.py <file_path>")
+
+# Handle the HAS_SHAPER exception
+except Exception:
+    HAS_SHAPER = False
+
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+COL_DRIVER_NAME     = 'assigned_driver_full_name'
+COL_PLATE_NUMBER    = 'assigned_vehicle_plate_number'
+COL_PHONE_NUMBER    = 'driver_phone_number'
+COL_SHIFT_NAME      = 'shift_name'
+COL_SCHEDULE_NAME   = 'schedule_name'
+COL_ROUTE_CODE      = 'route_code'
 COL_SUPPLIER_NAME   = 'supplier_name'
 COL_SUPPLIER_PHONE  = 'supplier_phone_number'
-COL_WORKING_DAYS    = 'working_days'
+COL_DRIVER_LICENSE_EXPIRY = 'driver_license_expiry_date'
+COL_VEHICLE_EXPIRY  = 'vehicle_expiry_date'
+COL_EMPLOYMENT_TYPE = 'driver_employment_type'
+COL_VEHICLE_TYPE    = 'vehicle_type'
+COL_VEHICLE_OWNER   = 'vehicle_owner_type'
 COL_CLIENT_PRICE    = 'client_sales_price'
-COL_CLIENT_UNIT     = 'client_pricing_unit'
-COL_DROPOFF_ARR     = 'dropoff_arrival_time'
-COL_DROPOFF_TIME    = 'dropoff_departure_time'
-COL_DROPOFF_LAT     = 'dropoff_lat'
-COL_DROPOFF_LONG    = 'dropoff_long'
+COL_SUPPLIER_PRICE  = 'supplier_price'
+COL_PICKUP_TIME     = 'pickup_arrival_time'
+COL_DROPOFF_TIME    = 'dropoff_arrival_time'
+COL_SCHEDULE_TIME   = 'schedule_time'
+COL_DIRECTION       = 'schedule_direction'
+COL_ROUTE_TYPE      = 'route_type'
+COL_PICKUP_NAME     = 'pickup_name'
 COL_DROPOFF_NAME    = 'dropoff_name'
-COL_PICKUP_LAT      = 'pickup_lat'
-COL_PICKUP_LONG     = 'pickup_long'
+COL_LINE_NAME       = 'line_name'
+COL_COMPANY_NAME    = 'company_name'
+COL_PROJECT_NAME    = 'project_name'
+COL_ASSIGNMENT_RULE = 'assignment_rule_type'
+COL_ROW_TYPE        = 'row_type'
+
+ERP_COLUMN_SPEC = {
+    COL_DRIVER_NAME:     {'cat': 'driver', 'required': True},
+    COL_PLATE_NUMBER:    {'cat': 'vehicle', 'required': True},
+    COL_PHONE_NUMBER:    {'cat': 'driver', 'required': True},
+    COL_SHIFT_NAME:      {'cat': 'schedule', 'required': True},
+    COL_SCHEDULE_NAME:   {'cat': 'schedule', 'required': False},
+    COL_ROUTE_CODE:      {'cat': 'routing', 'required': True},
+    COL_SUPPLIER_NAME:   {'cat': 'supplier', 'required': False},
+    COL_SUPPLIER_PHONE:  {'cat': 'supplier', 'required': False},
+    COL_DRIVER_LICENSE_EXPIRY: {'cat': 'driver', 'required': False},
+    COL_VEHICLE_EXPIRY:  {'cat': 'vehicle', 'required': False},
+    COL_EMPLOYMENT_TYPE: {'cat': 'driver', 'required': False},
+    COL_VEHICLE_TYPE:    {'cat': 'vehicle', 'required': False},
+    COL_VEHICLE_OWNER:   {'cat': 'vehicle', 'required': False},
+    COL_CLIENT_PRICE:    {'cat': 'pricing', 'required': False},
+    COL_SUPPLIER_PRICE:  {'cat': 'pricing', 'required': False},
+    COL_PICKUP_TIME:     {'cat': 'schedule', 'required': False},
+    COL_DROPOFF_TIME:    {'cat': 'schedule', 'required': False},
+    COL_SCHEDULE_TIME:   {'cat': 'schedule', 'required': False},
+    COL_DIRECTION:       {'cat': 'schedule', 'required': False},
+    COL_ROUTE_TYPE:      {'cat': 'routing', 'required': False},
+    COL_PICKUP_NAME:     {'cat': 'location', 'required': False},
+    COL_DROPOFF_NAME:    {'cat': 'location', 'required': False},
+    COL_LINE_NAME:       {'cat': 'line', 'required': False},
+    COL_COMPANY_NAME:    {'cat': 'core', 'required': True},
+    COL_PROJECT_NAME:    {'cat': 'core', 'required': True},
+    COL_ASSIGNMENT_RULE: {'cat': 'core', 'required': False},
+    COL_ROW_TYPE:        {'cat': 'core', 'required': False},
+}
+
+COLUMN_CLEAR_DEFAULTS = {
+    COL_ASSIGNMENT_RULE, COL_ROW_TYPE,  # Technical columns
+    COL_SUPPLIER_NAME, COL_SUPPLIER_PHONE,  # May be cleared for main suppliers
+    COL_SUPPLIER_PRICE  # Often not needed
+}
+
+# ... existing code continues ...
 COL_PICKUP_NAME     = 'pickup_name'
 COL_PICKUP_RADIUS   = 'pickup_radius'
 COL_PICKUP_ARR      = 'pickup_arrival_time'
@@ -109,7 +223,7 @@ DATE_KEYWORDS_IN_NAME = (
 EXCEL_SERIAL_MIN = 20000
 EXCEL_SERIAL_MAX = 80000
 
-ARABIC_INDIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
+ARABIC_INDIC_DIGITS = str.maketrans("٠٢٢٣٤٥٦٧٨٩", "0123456789")
 CSV_ENCODINGS = ['utf-8-sig', 'utf-8', 'cp1256', 'iso-8859-6', 'latin1']
 CSV_DELIMS    = [',', ';', '\t', '|']
 
@@ -277,7 +391,6 @@ COLUMN_ALIASES = {
     COL_ASSIGNMENT_TYPE:['assignment_type','assignment','نوع التعيين','نوع التكليف'],
 }
 
-
 # ═══════════════════════════════ UTILITIES ════════════════════════════════════
 def to_str(v):
     if v is None: return ''
@@ -443,7 +556,6 @@ def is_phone_column_name(col_name):
            'هاتف', 'تليفون', 'موبايل', 'جوال', 'رقم_الهاتف', 'رقم_هاتف')
     return any(k in cn for k in kws)
 
-
 # ═══════════════════════════════ SETTINGS MANAGER ═════════════════════════════
 DEFAULT_SETTINGS_FILE = os.path.join(os.path.expanduser('~'),
                                       '.codefy_settings_v11.json')
@@ -533,7 +645,6 @@ class SettingsManager:
     def get_normalized_set(self):
         return {normalize_name(x) for x in self.main_suppliers}
 
-
 # ═══════════════════════════════ PHONE VALIDATOR ═════════════════════════════
 class PhoneValidator:
     REQUIRED_DIGITS = 11
@@ -578,7 +689,6 @@ class PhoneValidator:
         if st == 'ok':
             return re.sub(r'\D', '', to_str(raw).translate(ARABIC_INDIC_DIGITS))
         return None
-
 
 # ═══════════════════════════════ DATE VALIDATOR ═══════════════════════════════
 ARABIC_MONTHS = {
@@ -693,7 +803,6 @@ class DateValidator:
         if st in ('fixable', 'ok'): return fx
         return None
 
-
 # ═══════════════════════════════ CSV LOADER ═══════════════════════════════════
 class CSVLoader:
     @staticmethod
@@ -747,7 +856,6 @@ class CSVLoader:
             if re.match(r'^-?\d+\.\d+$', s): return float(s)
         except Exception: pass
         return s
-
 
 # ═══════════════════════════════ COLUMN CONTROLLER ════════════════════════════
 class ColumnController:
@@ -837,7 +945,6 @@ class ColumnController:
             except Exception: pass
         return counts
 
-
 # ═══════════════════════════════ SHIFT ENGINE ════════════════════════════════
 class ShiftEngine:
     def __init__(self, settings=None):
@@ -911,7 +1018,6 @@ class ShiftEngine:
         return {'new_shift': new_shift, 'new_schedule': new_schedule,
                 'reason': ' · '.join(reasons), 'base': base,
                 'ordinal': ordinal[0] if ordinal else None}
-
 
 # ═══════════════════════════════ ANALYZER ════════════════════════════════════
 class CodefyAnalyzer:
@@ -2268,6 +2374,160 @@ Generated {datetime.now():%Y-%m-%d %H:%M:%S} · CodefyERP v11.3.1 🌊</p>
         with open(out_path, 'w', encoding='utf-8') as f:
             f.write(html)
 
+    def to_api_dict(self):
+        """
+        Convert analyzer results to a dictionary format suitable for API responses
+        """
+        # Count different types of issues
+        critical_count = 0
+        warning_count = 0
+        info_count = 0
+        
+        # Calculate issue counts
+        critical_issues = []
+        warning_issues = []
+        info_issues = []
+        
+        # Add invalid phones as critical
+        for issue in self.issues.get('invalid_phones', []):
+            if issue.get('kind') in ['invalid', 'short', 'arabic']:
+                critical_issues.append(issue)
+            else:
+                warning_issues.append(issue)
+        
+        # Add date format issues as warnings
+        for issue in self.issues.get('date_format_issues', []):
+            if issue.get('status') == 'invalid':
+                critical_issues.append(issue)
+            else:
+                warning_issues.append(issue)
+        
+        # Add missing data as critical
+        for issue in self.issues.get('missing_data', []):
+            critical_issues.append(issue)
+        
+        # Add other issue types
+        for issue in self.issues.get('driver_conflicts', []):
+            critical_issues.append(issue)
+        
+        for issue in self.issues.get('phone_conflicts', []):
+            if issue.get('soft', False):
+                warning_issues.append(issue)
+            else:
+                critical_issues.append(issue)
+        
+        for issue in self.issues.get('duplicate_phones', []):
+            if issue.get('kind') == 'hard':
+                critical_issues.append(issue)
+            else:
+                warning_issues.append(issue)
+        
+        for issue in self.issues.get('time_conflicts', []):
+            warning_issues.append(issue)
+        
+        for issue in self.issues.get('shift_upgrades', []):
+            info_issues.append(issue)
+        
+        for issue in self.issues.get('expiry_alerts', []):
+            if issue.get('days', 0) < 0:  # Expired
+                critical_issues.append(issue)
+            else:
+                warning_issues.append(issue)
+        
+        return {
+            'success': True,
+            'summary': {
+                'file_name': os.path.basename(self.file_path) if self.file_path else 'unknown',
+                'total_rows': sum(len(sheet['records']) for sheet in self.sheets_data.values() if not sheet['skipped']),
+                'total_sheets': len([s for s in self.sheets_data.values() if not s['skipped']]),
+                'quality_score': self._compute_score(),
+                'upload_ready': self.upload_ready,
+                'issues': {
+                    'critical': len(critical_issues),
+                    'warning': len(warning_issues),
+                    'info': len(info_issues)
+                },
+                'breakdown': {
+                    'invalid_phones': len(self.issues.get('invalid_phones', [])),
+                    'date_format_issues': len(self.issues.get('date_format_issues', [])),
+                    'enum_violations': len(self.issues.get('enum_violations', [])),
+                    'missing_data': len(self.issues.get('missing_data', [])),
+                    'duplicate_phones': len(self.issues.get('duplicate_phones', [])),
+                    'time_conflicts': len(self.issues.get('time_conflicts', [])),
+                    'shift_upgrades': len(self.issues.get('shift_upgrades', [])),
+                    'shift_conflicts': 0,  # Placeholder
+                    'supplier_issues': 0,   # Placeholder
+                    'capacity_issues': 0,   # Placeholder
+                    'expiry_alerts': len(self.issues.get('expiry_alerts', [])),
+                    'phone_conflicts': len([p for p in self.issues.get('phone_conflicts', []) if not p.get('soft', False)]),
+                    'driver_conflicts': len(self.issues.get('driver_conflicts', []))
+                }
+            },
+            'issues': self._format_issues_for_api(critical_issues, warning_issues, info_issues),
+            'fixes_applied': [
+                {
+                    'sheet': fix['sheet'],
+                    'row': fix['row'],
+                    'column': fix['col'],
+                    'old': fix['old'],
+                    'new': fix['new'],
+                    'reason': fix['reason']
+                } for fix in self.fixes
+            ],
+            'column_profile': getattr(self, 'column_profiles', {}),
+            'red_flags': [
+                {
+                    'sheet': cell[0],
+                    'row': cell[1],
+                    'column': cell[2],
+                    'reason': cell[3]
+                } for cell in self.red_flag_cells
+            ] if hasattr(self, 'red_flag_cells') else []
+        }
+
+    def _format_issues_for_api(self, critical_issues, warning_issues, info_issues):
+        """
+        Format issues in a way that's suitable for API responses
+        """
+        formatted_issues = []
+        
+        # Format critical issues
+        for issue in critical_issues:
+            formatted_issues.append({
+                'severity': 'critical',
+                'category': issue.get('category', 'General'),
+                'sheet': issue.get('sheet', 'Unknown'),
+                'row': issue.get('row', 'N/A'),
+                'column': issue.get('col', 'Unknown') if 'col' in issue else issue.get('column', 'Unknown'),
+                'message': issue.get('reason', 'Critical issue detected'),
+                'value': issue.get('value', 'N/A')
+            })
+        
+        # Format warnings
+        for issue in warning_issues:
+            formatted_issues.append({
+                'severity': 'warning',
+                'category': issue.get('category', 'General'),
+                'sheet': issue.get('sheet', 'Unknown'),
+                'row': issue.get('row', 'N/A'),
+                'column': issue.get('col', 'Unknown') if 'col' in issue else issue.get('column', 'Unknown'),
+                'message': issue.get('reason', 'Warning issue detected'),
+                'value': issue.get('value', 'N/A')
+            })
+        
+        # Format info messages
+        for issue in info_issues:
+            formatted_issues.append({
+                'severity': 'info',
+                'category': issue.get('category', 'General'),
+                'sheet': issue.get('sheet', 'Unknown'),
+                'row': issue.get('row', 'N/A'),
+                'column': issue.get('col', 'Unknown') if 'col' in issue else issue.get('column', 'Unknown'),
+                'message': issue.get('reason', 'Information'),
+                'value': issue.get('value', 'N/A')
+            })
+        
+        return formatted_issues
 
 # ═══════════════════════════════ WHATSAPP MESSAGE ═════════════════════════════
 def _build_whatsapp_message(analyzer, file_name):
@@ -2308,7 +2568,6 @@ def _build_whatsapp_message(analyzer, file_name):
         "",
         "🌊━━━━━━━━━━━━━━━━━━━━━━━━🌊",
         "_Powered by CodefyERP v11.3.1_"])
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #                          UI HELPERS — v11.3.1
@@ -2363,7 +2622,6 @@ class Tooltip:
             try: self.tip.destroy()
             except Exception: pass
             self.tip = None
-
 
 class CollapsibleSection:
     """A collapsible group in the sidebar."""
@@ -2449,7 +2707,6 @@ class CollapsibleSection:
     def add_child(self, widget):
         widget.pack(fill='x', padx=10, pady=1)
 
-
 class Toast:
     """Non-blocking sliding notification in the top-right corner."""
     _active = []
@@ -2493,7 +2750,6 @@ class Toast:
             Toast._active.remove(self)
             self.top.destroy()
         except Exception: pass
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #                            🌊  MAIN APPLICATION  ·  v11.3.1
@@ -5309,7 +5565,6 @@ class App:
     def _on_close(self):
         self._running = False
         self.root.destroy()
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #                                   MAIN

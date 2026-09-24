@@ -40,44 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCollapsibleSidebar();
 });
 
-// Collapsible Sidebar Management System
-function initializeCollapsibleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const collapseToggle = document.getElementById('sidebar-collapse-toggle');
-    const collapseIcon = document.getElementById('collapse-icon');
-    
-    // Initialize sidebar collapsed state from localStorage
-    const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-    if (isSidebarCollapsed) {
-        sidebar.classList.add('sidebar-collapsed');
-        if (collapseIcon) {
-            collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
-        }
-    }
-
-    // Handle sidebar collapse/expand functionality
-    if (collapseToggle && sidebar) {
-        collapseToggle.addEventListener('click', function() {
-            const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
-            
-            if (isCollapsed) {
-                // Expand sidebar
-                sidebar.classList.remove('sidebar-collapsed');
-                localStorage.setItem('sidebarCollapsed', 'false');
-                if (collapseIcon) {
-                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />';
-                }
-            } else {
-                // Collapse sidebar
-                sidebar.classList.add('sidebar-collapsed');
-                localStorage.setItem('sidebarCollapsed', 'true');
-                if (collapseIcon) {
-                    collapseIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />';
-                }
-            }
-        });
-    }
-}
 
 // Theme Management System with unique function names to avoid conflicts
 function initializeCodefyThemeSystem() {
@@ -216,9 +178,6 @@ function initializeCodefyThemeSystem() {
 function initApp() {
     // Load saved progress from localStorage
     loadProgress();
-    
-    // Initialize Sidebar & Mobile Menu
-    initSidebar();
     
     // Initialize View Mode & Section Navigation
     initSectionMode();
@@ -444,6 +403,10 @@ function updateSectionStepper(sectionId) {
             if (currentSectionIndex > 0) {
                 currentSectionIndex--;
                 showCurrentSection(true);
+                // Ensure scroll to top happens after showing the section
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
             }
         });
     }
@@ -454,6 +417,10 @@ function updateSectionStepper(sectionId) {
             if (currentSectionIndex < SECTIONS.length - 1) {
                 currentSectionIndex++;
                 showCurrentSection(true);
+                // Ensure scroll to top happens after showing the section
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
             }
         });
     }
@@ -480,38 +447,11 @@ function initSectionMode() {
     const foundIndex = SECTIONS.findIndex(s => s.id === hash);
     currentSectionIndex = foundIndex !== -1 ? foundIndex : 0;
 
-    // Bind mode toggle buttons
-    const modeSingleBtns = document.querySelectorAll('.btn-mode-single');
-    const modeAllBtns = document.querySelectorAll('.btn-mode-all');
-
-    modeSingleBtns.forEach(btn => {
-        btn.addEventListener('click', () => setViewMode('single'));
-    });
-
-    modeAllBtns.forEach(btn => {
-        btn.addEventListener('click', () => setViewMode('all'));
-    });
 
     // Apply initial view mode
     applyViewMode();
     showCurrentSection(false);
 
-    // Attach click handlers to all navigation links
-    const navLinks = document.querySelectorAll('.nav-link[data-section]');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetSecId = this.getAttribute('data-section');
-            const targetIndex = SECTIONS.findIndex(s => s.id === targetSecId);
-            if (targetIndex !== -1) {
-                currentSectionIndex = targetIndex;
-                showCurrentSection(true);
-                if (window.innerWidth < 1024) {
-                    closeSidebar();
-                }
-            }
-        });
-    });
 
     // Hash change event listener
     window.addEventListener('hashchange', function() {
@@ -519,7 +459,11 @@ function initSectionMode() {
         const targetIndex = SECTIONS.findIndex(s => s.id === newHash);
         if (targetIndex !== -1 && targetIndex !== currentSectionIndex) {
             currentSectionIndex = targetIndex;
-            showCurrentSection(false);
+            showCurrentSection(true);
+            // Ensure scroll to top happens after showing the section
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 100);
         }
     });
 }
@@ -529,6 +473,11 @@ function setViewMode(mode) {
     viewMode = mode;
     applyViewMode();
     showCurrentSection(true);
+    
+    // Always scroll to top when changing view mode
+    setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
     
     if (mode === 'single') {
         showToast('تم تفعيل وضع التركيز (عرض قسم بقسم) 🎯', 'info');
@@ -633,84 +582,51 @@ function showCurrentSection(shouldScroll = true) {
 /**
  * Sidebar Navigation & Mobile Drawer
  */
-function initSidebar() {
+function initializeCollapsibleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    if (!sidebar || !mobileMenuBtn || !sidebarOverlay) return;
-    
-    // Toggle sidebar on mobile menu button click
-    mobileMenuBtn.addEventListener('click', function() {
-        openSidebar();
-    });
-    
-    // Close sidebar when clicking overlay
-    sidebarOverlay.addEventListener('click', function() {
-        closeSidebar();
-    });
-    
-    // Close sidebar when clicking outside
-    document.addEventListener('click', function(e) {
-        if (sidebar.classList.contains('translate-x-0') && 
-            !sidebar.contains(e.target) && 
-            e.target !== mobileMenuBtn &&
-            !mobileMenuBtn.contains(e.target)) {
-            closeSidebar();
-        }
-    });
-    
-    // Close sidebar on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('translate-x-0')) {
-            closeSidebar();
-        }
-    });
-    
-    // Initialize active section highlighting
-    updateActiveSection();
-}
 
-function openSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    if (!sidebar || !sidebarOverlay) return;
-    
-    sidebar.classList.remove('-translate-x-full');
-    sidebar.classList.add('translate-x-0');
-    sidebarOverlay.classList.remove('hidden');
-    
-    // Prevent body scroll
-    document.body.style.overflow = 'hidden';
+    if (!sidebar || !sidebarToggle || !sidebarOverlay) return;
+
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('open');
+    });
+
+    sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+    });
+
+    // Attach click handlers to all navigation links
+    const navLinks = document.querySelectorAll('.nav-link[data-section]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetSecId = this.getAttribute('data-section');
+            const targetIndex = SECTIONS.findIndex(s => s.id === targetSecId);
+            if (targetIndex !== -1) {
+                currentSectionIndex = targetIndex;
+                showCurrentSection(true);
+                // Ensure scroll to top happens after showing the section
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100); // Small delay to ensure section is rendered
+                if (window.innerWidth < 1024) {
+                    closeSidebar();
+                }
+            }
+        });
+    });
 }
 
 function closeSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    if (!sidebar || !sidebarOverlay) return;
-    
-    sidebar.classList.remove('translate-x-0');
-    sidebar.classList.add('-translate-x-full');
-    sidebarOverlay.classList.add('hidden');
-    
-    // Restore body scroll
-    document.body.style.overflow = '';
-}
 
-function updateActiveSection() {
-    const currentHash = window.location.hash.substring(1) || 'login';
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    navLinks.forEach(link => {
-        const sectionId = link.getAttribute('data-section');
-        if (sectionId === currentHash) {
-            link.classList.add('active');
-        } else {
-            link.classList.remove('active');
-        }
-    });
+    if (sidebar) sidebar.classList.remove('open');
+    if (sidebarOverlay) sidebarOverlay.classList.remove('open');
 }
 
 /**
@@ -967,37 +883,15 @@ function initFloatingHelp() {
  */
 function initKeyboardShortcuts() {
     document.addEventListener('keydown', function(e) {
-        // Ctrl + K for search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        // Arrow keys for navigation
+        if (e.key === 'ArrowLeft' && currentSectionIndex > 0) {
             e.preventDefault();
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                if (window.innerWidth < 1024) openSidebar();
-                searchInput.focus();
-            }
-        }
-        // Escape closes sidebar / lightbox
-        if (e.key === 'Escape') {
-            closeSidebar();
-            const lightbox = document.getElementById('lightbox');
-            if (lightbox && !lightbox.classList.contains('hidden')) {
-                lightbox.classList.add('opacity-0');
-                setTimeout(() => lightbox.classList.add('hidden'), 300);
-            }
-        }
-        // In single mode: ArrowLeft moves to next section in RTL
-        if (viewMode === 'single' && !['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) {
-            if (e.key === 'ArrowLeft') {
-                if (currentSectionIndex < SECTIONS.length - 1) {
-                    currentSectionIndex++;
-                    showCurrentSection(true);
-                }
-            } else if (e.key === 'ArrowRight') {
-                if (currentSectionIndex > 0) {
-                    currentSectionIndex--;
-                    showCurrentSection(true);
-                }
-            }
+            currentSectionIndex--;
+            showCurrentSection();
+        } else if (e.key === 'ArrowRight' && currentSectionIndex < SECTIONS.length - 1) {
+            e.preventDefault();
+            currentSectionIndex++;
+            showCurrentSection();
         }
     });
 }

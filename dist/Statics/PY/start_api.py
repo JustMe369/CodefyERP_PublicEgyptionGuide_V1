@@ -1,53 +1,44 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Startup script for CodefyERP Data Validation API Server
+Start script for the CodefyExcelAnalyzer API Server
 """
 
 import subprocess
 import sys
 import os
-
-def install_requirements():
-    """Install required packages from requirements.txt"""
-    requirements = [
-        'flask',
-        'pandas',
-        'openpyxl',
-        'flask-cors'
-    ]
-    
-    for package in requirements:
-        try:
-            __import__(package.replace('-', '_'))
-            print(f"✓ {package} is already installed")
-        except ImportError:
-            print(f"Installing {package}...")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-            print(f"✓ {package} installed successfully")
+import signal
+import time
 
 def main():
-    print("CodefyERP Data Validation API Server")
-    print("=====================================")
+    print("🚀 Starting CodefyExcelAnalyzer API Server...")
+    print("📁 Location: ./Statics/PY/api_server.py")
+    print("🔗 Running on: http://localhost:5000")
+    print("\nPress Ctrl+C to stop the server\n")
     
-    # Install requirements if not already installed
-    install_requirements()
-    
-    # Change to the script's directory
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(script_dir)
-    
-    print("\nStarting API server on http://localhost:5000")
-    print("Press Ctrl+C to stop the server\n")
-    
-    # Import and run the API server
     try:
-        from api_server import app
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        # Change to the PY directory
+        py_dir = os.path.dirname(os.path.abspath(__file__))
+        os.chdir(py_dir)
+        
+        # Run the API server
+        process = subprocess.Popen([
+            sys.executable, 'api_server.py'
+        ])
+        
+        # Wait for the process to finish
+        process.wait()
+        
     except KeyboardInterrupt:
-        print("\nServer stopped.")
+        print("\n🛑 Shutting down API server...")
+        try:
+            process.terminate()
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+        print("✅ API server stopped.")
     except Exception as e:
-        print(f"Error starting server: {e}")
+        print(f"❌ Error starting API server: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

@@ -22,61 +22,220 @@
         }, 3000);
     </script>
 
-    <noscript>
-        <style>
-            .reveal {
-                opacity: 1 !important;
-                transform: none !important;
-            }
-        </style>
-    </noscript>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
-                    colors: {
-                        primary: {
-                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
-                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
-                        },
-                        brand: {
-                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe',
-                            500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'base',
-            securityLevel: 'loose',
-            themeVariables: {
-                primaryColor: '#eff6ff',
-                primaryTextColor: '#1e3a8a',
-                primaryBorderColor: '#3b82f6',
-                lineColor: '#94a3b8',
-                fontFamily: 'Cairo, sans-serif'
-            }
-        });
-    </script>
-
     <!-- Styles come AFTER the scripts -->
     <link rel="stylesheet" href="../Statics/CSS/styles.css">
     <link rel="stylesheet" href="../Statics/CSS/navbar.css">
-    <link rel="stylesheet" href="../Statics/CSS/global-theme.css">
+
+    <!-- Custom properties for light theme background -->
+    <style>
+        /* Enhanced Light Theme Background with sunny colors */
+        :root {
+            --light-bg-primary: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+            --light-bg-secondary: linear-gradient(135deg, #e0f2fe 0%, #d1fae5 100%);
+            --light-bg-card: rgba(255, 255, 255, 0.9);
+            --light-bg-sidebar: rgba(255, 255, 255, 0.95);
+            --light-text-primary: #0f172a;
+            --light-text-secondary: #64748b;
+            --light-border-primary: rgba(203, 213, 225, 0.6);
+            --light-primary-50: #dbeafe;
+            --light-primary-100: #bfdbfe;
+            --light-primary-200: #93c5fd;
+            --light-primary-300: #60a5fa;
+            --light-primary-400: #3b82f6;
+            --light-primary-500: #2563eb;
+            --light-primary-600: #1d4ed8;
+            --light-primary-700: #1e40af;
+            --light-primary-800: #1e3a8a;
+            --light-primary-900: #1e3a8a;
+            
+            /* Sun-inspired accent colors */
+            --sunset-gold: #fbbf24;
+            --sunset-orange: #f97316;
+            --sunset-pink: #f472b6;
+            --sunset-yellow: #eab308;
+        }
+
+        /* Sunny light theme background */
+        [data-theme="sunny-light"] body {
+            background: var(--light-bg-primary);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            color: var(--light-text-primary);
+        }
+
+        /* Animated gradient for sunny theme */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Card styling for sunny theme */
+        [data-theme="sunny-light"] .card,
+        [data-theme="sunny-light"] .bg-white,
+        [data-theme="sunny-light"] .section-content,
+        [data-theme="sunny-light"] .callout {
+            background: var(--light-bg-card) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--light-border-primary) !important;
+            box-shadow: 0 8px 32px rgba(203, 213, 225, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        [data-theme="sunny-light"] .card:hover,
+        [data-theme="sunny-light"] .section-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(203, 213, 225, 0.4);
+            border-color: var(--light-primary-500) !important;
+        }
+
+        /* Enhanced sidebar for sunny theme */
+        [data-theme="sunny-light"] #sidebar {
+            background: var(--light-bg-sidebar) !important;
+            backdrop-filter: blur(15px);
+            border-right: 1px solid var(--light-border-primary);
+            border-right: 1px solid var(--light-border-primary);
+            box-shadow: 5px 0 25px rgba(203, 213, 225, 0.3);
+        }
+
+        /* Text styling for sunny theme */
+        [data-theme="sunny-light"] .text-slate-900 {
+            color: var(--light-text-primary) !important;
+        }
+
+        [data-theme="sunny-light"] .text-slate-500,
+        [data-theme="sunny-light"] .text-slate-600,
+        [data-theme="sunny-light"] .text-slate-700 {
+            color: var(--light-text-secondary) !important;
+        }
+
+        /* Button styling for sunny theme */
+        [data-theme="sunny-light"] .btn-primary {
+            background: linear-gradient(135deg, var(--light-primary-600) 0%, var(--light-primary-500) 100%) !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="sunny-light"] .btn-primary:hover {
+            background: linear-gradient(135deg, var(--light-primary-700) 0%, var(--light-primary-600) 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Input fields for sunny theme */
+        [data-theme="sunny-light"] input[type="text"],
+        [data-theme="sunny-light"] input[type="email"],
+        [data-theme="sunny-light"] input[type="password"],
+        [data-theme="sunny-light"] select,
+        [data-theme="sunny-light"] textarea {
+            background: var(--light-bg-card) !important;
+            border: 1px solid var(--light-border-primary) !important;
+            color: var(--light-text-primary) !important;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="sunny-light"] input[type="text"]:focus,
+        [data-theme="sunny-light"] input[type="email"]:focus,
+        [data-theme="sunny-light"] input[type="password"]:focus,
+        [data-theme="sunny-light"] select:focus,
+        [data-theme="sunny-light"] textarea:focus {
+            border-color: var(--light-primary-500) !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+            background: var(--light-bg-secondary) !important;
+        }
+
+        /* Theme toggle button for sunny theme */
+        [data-theme="sunny-light"] .theme-toggle {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid var(--light-primary-500) !important;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="sunny-light"] .theme-toggle:hover {
+            background: rgba(79, 70, 229, 0.2) !important;
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Sun-inspired elements */
+        [data-theme="sunny-light"] .sunny-accent {
+            position: relative;
+        }
+
+        [data-theme="sunny-light"] .sunny-accent::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--sunset-gold), var(--sunset-orange), var(--sunset-gold));
+            border-radius: 2px;
+        }
+
+        /* Animated hover effects for links */
+        [data-theme="sunny-light"] .nav-link:hover,
+        [data-theme="sunny-light"] a:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.2)) !important;
+            border-radius: 8px;
+            transform: translateX(5px);
+            transition: all 0.3s ease;
+        }
+
+        /* Callout boxes for sunny theme */
+        [data-theme="sunny-light"] .callout {
+            position: relative;
+            overflow: hidden;
+        }
+
+        [data-theme="sunny-light"] .callout::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--light-primary-500), var(--light-primary-300));
+            transition: all 0.4s ease;
+        }
+
+        [data-theme="sunny-light"] .callout:hover::before {
+            width: 100%;
+            opacity: 0.2;
+            background: linear-gradient(to bottom, var(--sunset-gold), var(--sunset-orange));
+        }
+
+        /* Progress bar for sunny theme */
+        [data-theme="sunny-light"] #progress-bar-fill {
+            background: linear-gradient(90deg, var(--light-primary-500), var(--sunset-gold), var(--light-primary-400)) !important;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Floating particles effect for sunny theme */
+        [data-theme="sunny-light"] body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.05) 0%, transparent 30%);
+            animation: floatParticles 20s linear infinite;
+        }
+
+        @keyframes floatParticles {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+    </style>
 </head>
 
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-primary-100 selection:text-primary-900">
@@ -147,9 +306,7 @@
                                 onerror="this.src='../Statics/img/login.png'">
                         </div>
                     </div>
-
-
-
+                    
                     <!-- Full brand shown when expanded -->
                     <div class="full-brand flex items-center gap-3 flex-1 min-w-0">
                         <div
@@ -158,33 +315,20 @@
                                 onerror="this.src='../Statics/img/login.png'">
                         </div>
                         <div class="overflow-hidden flex-1 min-w-0">
-                            <span
-                                class="brand-text text-xl font-black text-slate-900 tracking-tight truncate">كوديفاي<span
+                            <span class="brand-text text-xl font-black text-slate-900 tracking-tight truncate">كوديفاي<span
                                     class="text-primary-600">.</span></span>
-                            <span class="brand-subtitle block text-[11px] font-bold text-slate-400 truncate">دليل
-                                المستخدم</span>
+                            <span class="brand-subtitle block text-[11px] font-bold text-slate-400 truncate">دليل المستخدم</span>
                         </div>
                     </div>
                 </div>
-                <!-- Smart Theme Toggle Button - Next to Logo -->
-                <button id="smart-theme-toggle" type="button" aria-label="تبديل الثيم الذكي"
-                    class="smart-theme-toggle p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors flex-shrink-0">
-                    <svg id="smart-theme-icon" class="h-5 w-5 text-slate-600" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path id="smart-sun-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        <path id="smart-moon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                            class="hidden" />
-                    </svg>
-                </button>
-
+                
                 <!-- Collapse Toggle Button -->
                 <button id="sidebar-collapse-toggle" type="button" aria-label="طي الشريط الجانبي"
                     class="lg:flex hidden ml-2 p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
                     <svg id="collapse-icon" class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
             </div>
@@ -259,7 +403,7 @@
                 </div>
             </div>
 
-            <!-- <div class="view-mode-container px-4 mb-4">
+            <div class="view-mode-container px-4 mb-4">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">طريقة العرض المفضلة
                 </div>
                 <div
@@ -271,7 +415,7 @@
                         <span>📜</span> الكل متتابعاً
                     </button>
                 </div>
-            </div> -->
+            </div>
 
             <div class="px-3 flex-1">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">خطوات العمل في
@@ -283,11 +427,9 @@
                             <div class="collapsible-nav-content flex items-center gap-3">
                                 <span class="collapsible-nav-icon text-lg flex-shrink-0">🔐</span>
                                 <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        تسجيل
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">تسجيل
                                         الدخول</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">الخطوة الأولى بكلمة المرور
-                                    </div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">الخطوة الأولى بكلمة المرور</div>
                                 </div>
                             </div>
                             <span class="nav-badge section-check-badge" data-badge-section="login">○</span>
@@ -299,11 +441,9 @@
                             <div class="collapsible-nav-content flex items-center gap-3">
                                 <span class="collapsible-nav-icon text-lg flex-shrink-0">📦</span>
                                 <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        رفع
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">رفع
                                         المشاريع بالجملة</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">ملف الإكسل ينجز المهمة في ثوانٍ
-                                    </div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">ملف الإكسل ينجز المهمة في ثوانٍ</div>
                                 </div>
                             </div>
                             <span class="nav-badge section-check-badge" data-badge-section="bulk-import">○</span>
@@ -315,11 +455,9 @@
                             <div class="collapsible-nav-content flex items-center gap-3">
                                 <span class="collapsible-nav-icon text-lg flex-shrink-0">🤝</span>
                                 <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        المورد
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">المورد
                                         والمركبة والسائق</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">ربط المشاريع بالموردين
-                                        والمركبات</div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">ربط المشاريع بالموردين والمركبات</div>
                                 </div>
                             </div>
                             <span class="nav-badge section-check-badge" data-badge-section="relationships">○</span>
@@ -331,8 +469,7 @@
                             <div class="collapsible-nav-content flex items-center gap-3">
                                 <span class="collapsible-nav-icon text-lg flex-shrink-0">📋</span>
                                 <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        توزيع
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">توزيع
                                         المهام (الجداول)</div>
                                     <div class="nav-subtitle text-[11px] text-slate-400">تحديد المهام لكل سائق</div>
                                 </div>
@@ -346,11 +483,9 @@
                             <div class="collapsible-nav-content flex items-center gap-3">
                                 <span class="collapsible-nav-icon text-lg flex-shrink-0">💰</span>
                                 <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        حساب
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">حساب
                                         التسعير والهامش الربحي</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">معادلة بسيطة بين المورد والعميل
-                                    </div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">معادلة بسيطة بين المورد والعميل</div>
                                 </div>
                             </div>
                             <span class="nav-badge section-check-badge" data-badge-section="pricing">○</span>
@@ -362,11 +497,9 @@
                             <div class="collapsible-nav-content flex items-center gap-3">
                                 <span class="collapsible-nav-icon text-lg flex-shrink-0">✅</span>
                                 <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        مراجعة
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">مراجعة
                                         الجاهزية</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">التأكد من اكتمال جميع المتطلبات
-                                        قبل الانطلاق
+                                    <div class="nav-subtitle text-[11px] text-slate-400">التأكد من اكتمال جميع المتطلبات قبل الانطلاق
                                     </div>
                                 </div>
                             </div>
@@ -379,11 +512,9 @@
                             <div class="collapsible-nav-content flex items-center gap-3">
                                 <span class="collapsible-nav-icon text-lg flex-shrink-0">⚙️</span>
                                 <div>
-                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">
-                                        إعدادات
+                                    <div class="nav-text font-bold text-xs text-slate-900 group-hover:text-primary-600">إعدادات
                                         تحليل الإكسل</div>
-                                    <div class="nav-subtitle text-[11px] text-slate-400">تخصيص قواعد التحقق والمعالجة
-                                    </div>
+                                    <div class="nav-subtitle text-[11px] text-slate-400">تخصيص قواعد التحقق والمعالجة</div>
                                 </div>
                             </div>
                             <span class="nav-badge section-check-badge" data-badge-section="analysis-config">○</span>
@@ -1706,7 +1837,6 @@
         })();
     </script>
 
-    <script src="../Statics/JS/navbar.js"></script>
     <script src="../Statics/JS/scripts.js?v=20260923-3"></script>
 
     <style>
