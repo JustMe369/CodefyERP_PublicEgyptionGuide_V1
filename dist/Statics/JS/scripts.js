@@ -71,8 +71,8 @@ function initializeCodefyThemeSystem() {
             desktopSunPath.classList.add('hidden');
             desktopMoonPath.classList.remove('hidden');
         }
-    } else if (currentThemePref === 'sunny-light') {
-        document.documentElement.setAttribute('data-theme', 'sunny-light');
+    } else if (currentThemePref === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
         // Update mobile theme icon
         if (sunPathElement && moonPathElement) {
             sunPathElement.classList.remove('hidden');
@@ -122,8 +122,8 @@ function initializeCodefyThemeSystem() {
         }
     }
     
-    // Function to update theme display for sunny theme
-    function updateThemeDisplaySunny() {
+    // Function to update theme display for light theme
+    function updateThemeDisplayLight() {
         // Light theme active (same as regular light)
         if (sunPathElement && moonPathElement) {
             sunPathElement.classList.remove('hidden');
@@ -154,11 +154,11 @@ function initializeCodefyThemeSystem() {
         const currentThemeAttribute = document.documentElement.getAttribute('data-theme');
         
         if (currentThemeAttribute === 'dark-blue') {
-            // Switch to sunny light theme
-            document.documentElement.setAttribute('data-theme', 'sunny-light');
-            localStorage.setItem('theme', 'sunny-light');
-            updateThemeDisplaySunny();
-        } else if (currentThemeAttribute === 'sunny-light') {
+            // Switch to Regular light theme
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            updateThemeDisplayLight();
+        } else if (currentThemeAttribute === 'light') {
             // Switch to regular light theme
             document.documentElement.removeAttribute('data-theme');
             localStorage.setItem('theme', 'light');
