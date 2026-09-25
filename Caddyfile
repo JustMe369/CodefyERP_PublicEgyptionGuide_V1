@@ -1,5 +1,3 @@
 :{$PORT:80} {
-    root * /app
-    php_server
-    file_server
+    respond "hello-from-container"
 }
