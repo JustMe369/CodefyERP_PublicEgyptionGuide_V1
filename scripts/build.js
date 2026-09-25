@@ -1,7 +1,6 @@
 // scripts/build.js
 const fs = require('fs-extra');
 const path = require('path');
-const { execSync } = require('child_process');
 
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
@@ -38,8 +37,7 @@ for (const file of rootFiles) {
   fs.copySync(src, path.join(DIST, file));
 }
 
-// Bundle API serverless functions with ncc (zero dependencies on Vercel)
-log('Bundling API functions with ncc...');
+// API serverless functions (copied as-is, Vercel will install deps)
 const apiDir = path.join(ROOT, 'api');
 const distApiDir = path.join(DIST, 'api');
 fs.mkdirSync(distApiDir, { recursive: true });
@@ -58,19 +56,8 @@ for (const file of apiFiles) {
     warn(`Missing API file: api/${file} — skipping`);
     continue;
   }
-  const name = path.basename(file, '.js');
-  const outDir = path.join(distApiDir, name);
-  try {
-    log(`Bundling api/${file}...`);
-    execSync(`ncc build "${src}" -o "${outDir}"`, { stdio: 'inherit', cwd: ROOT });
-    
-    // Add minimal package.json to prevent Vercel auto-install
-    const pkgJson = path.join(outDir, 'package.json');
-    fs.writeFileSync(pkgJson, JSON.stringify({ private: true, dependencies: {} }, null, 2));
-  } catch (e) {
-    warn(`Failed to bundle api/${file}: ${e.message}`);
-    fs.copySync(src, path.join(distApiDir, file));
-  }
+  log(`Copying api/${file}...`);
+  fs.copySync(src, path.join(distApiDir, file));
 }
 
 log('Build completed successfully.');

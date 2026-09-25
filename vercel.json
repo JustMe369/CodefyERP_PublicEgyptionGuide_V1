@@ -1,9 +1,9 @@
 {
   "version": 2,
   "github": { "enabled": true, "autoJobCancellation": true },
-  "buildCommand": "echo 'Pre-built locally - skipping build'",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "echo 'Skipping install - using pre-bundled functions'",
+  "installCommand": "npm ci",
   "framework": null,
   "headers": [
     {
@@ -17,9 +17,11 @@
   ],
   "rewrites": [
     { "source": "/", "destination": "/Temp/index.html" },
-    { "source": "/api/validate", "destination": "/api/validate.js" },
-    { "source": "/api/download-cleaned", "destination": "/api/download-cleaned.js" },
-    { "source": "/api/excel-analyzer", "destination": "/api/excel-analyzer.js" },
     { "source": "/((?!api/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
+  ],
+  "routes": [
+    { "src": "/api/validate", "dest": "/api/validate.js" },
+    { "src": "/api/download-cleaned", "dest": "/api/download-cleaned.js" },
+    { "src": "/api/excel-analyzer", "dest": "/api/excel-analyzer.js" }
   ]
 }
