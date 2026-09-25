@@ -554,11 +554,19 @@ function showCurrentSection(shouldScroll = true) {
     }
 
     // Trigger Mermaid rerender if needed
-    if (window.mermaid) {
-        try {
-            mermaid.contentLoaded();
-        } catch (e) {}
-    }
+if (window.mermaid) {
+            try {
+                if (typeof mermaid.run === 'function') {
+                    mermaid.run({ querySelector: '#' + currentSec.id + ' .mermaid' });
+                } else if (typeof mermaid.init === 'function') {
+                    mermaid.init(undefined, document.querySelectorAll('#' + currentSec.id + ' .mermaid'));
+                } else if (typeof mermaid.contentLoaded === 'function') {
+                    mermaid.contentLoaded();
+                }
+            } catch (e) {
+                console.warn('Mermaid re-render failed:', e);
+            }
+        }
 }
 
 /**
@@ -1025,6 +1033,19 @@ function initTabs() {
 
             this.classList.add('active');
             document.querySelector(`.tab-content[data-content="${tabName}"]`).classList.remove('hidden');
+
+            // Re-render mermaid diagrams in the newly shown tab content
+            if (window.mermaid) {
+                try {
+                    if (typeof mermaid.run === 'function') {
+                        mermaid.run({ querySelector: '.tab-content[data-content="' + tabName + '"] .mermaid' });
+                    } else if (typeof mermaid.init === 'function') {
+                        mermaid.init(undefined, document.querySelectorAll('.tab-content[data-content="' + tabName + '"] .mermaid'));
+                    }
+                } catch (e) {
+                    console.warn('Mermaid re-render failed:', e);
+                }
+            }
         });
     });
 }
@@ -1053,6 +1074,19 @@ function initializeTabSwitching() {
             // Add active class to clicked button and corresponding content
             this.classList.add('active');
             document.querySelector(`#bulk-import .tab-content[data-content="${tabName}"]`).classList.remove('hidden');
+            
+            // Re-render mermaid diagrams in the newly shown tab content
+            if (window.mermaid) {
+                try {
+                    if (typeof mermaid.run === 'function') {
+                        mermaid.run({ querySelector: '#bulk-import .tab-content[data-content="' + tabName + '"] .mermaid' });
+                    } else if (typeof mermaid.init === 'function') {
+                        mermaid.init(undefined, document.querySelectorAll('#bulk-import .tab-content[data-content="' + tabName + '"] .mermaid'));
+                    }
+                } catch (e) {
+                    console.warn('Mermaid re-render failed:', e);
+                }
+            }
         });
     });
 }
