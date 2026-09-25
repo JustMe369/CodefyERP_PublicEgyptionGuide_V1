@@ -146,7 +146,7 @@ The system is pre-configured for Egyptian business operations. Customization opt
 
 ## Administration and PostgreSQL (PHP guide)
 
-The PHP guide includes a PostgreSQL-backed administration area at `/admin/`. It manages the site identity, all seven guide section titles/descriptions/icons/order/published state, administrator/editor roles, and an audit trail. Existing chapter body markup and diagrams remain in the PHP chapter files; they are not currently edited in the panel.
+The PHP guide includes a PostgreSQL-backed administration area at `/admin/`. Administrators can manage the site identity and home-page copy, create and order sections, edit their titles, descriptions, icons, accent colors and publication status, and build page bodies with a structured visual composer (headings, paragraphs, lists, steps, callouts, images, tables, code, Mermaid diagrams, links and dividers). Existing chapter pages retain their interactive PHP widgets in **Built-in template** mode; switching a page to **Visual editor** replaces that chapter body with its authored blocks and can be reversed in the section editor. New sections use the visual editor and receive a database-backed public URL. The admin area also manages administrator/editor accounts and keeps an audit trail.
 
 ### Local setup with XAMPP on Windows
 
@@ -182,7 +182,7 @@ The Supabase project already provides its `postgres` database; the setup below c
 .\scripts\setup-supabase.ps1
 ```
 
-The script securely prompts for the rotated database password, uses TLS with the supplied IPv4 transaction pooler, applies migrations in order, verifies the migration records, creates a non-superuser `codefy_app` login, and updates the ignored `.env` only after success. The app uses the pooler's transaction mode with emulated PDO prepares enabled. Create an administrator afterward with `.\scripts\create-admin.ps1`. Never put the database password in frontend JavaScript, a committed file, or a public environment variable.
+The script securely prompts for the rotated database password, uses TLS with the supplied IPv4 transaction pooler, applies migrations in order, verifies the migration records, creates a non-superuser `codefy_app` login, verifies it through Supavisor with the required `codefy_app.<project-ref>` username, and updates the ignored `.env` only after success. Supabase's transaction pooler does not support prepared statements, so the PHP app enables emulated PDO prepares. Create an administrator afterward with `.\scripts\create-admin.ps1`. Never put the database password in frontend JavaScript, a committed file, or a public environment variable.
 
 ## License
 

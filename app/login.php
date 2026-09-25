@@ -3,6 +3,7 @@ $page_title         = 'تسجيل الدخول';
 $page_description   = 'تسجيل الدخول إلى نظام كوديفاي — الخطوة الأولى للدخول بكلمة المرور';
 $page_needs_mermaid = true;
 require __DIR__ . '/includes/config.php';
+if (($SECTIONS[codefy_current_slug()]['content_mode'] ?? 'legacy') === 'builder') { require __DIR__ . '/includes/section-builder-page.php'; }
 require __DIR__ . '/includes/head.php';
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';

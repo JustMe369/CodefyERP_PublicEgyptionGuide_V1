@@ -28,17 +28,22 @@ try {
     $hostName = 'aws-1-eu-west-1.pooler.supabase.com'
     $port = '6543'
     $database = 'postgres'
-    $adminRole = 'postgres.mgdkjrbodyvjgkuaoocz'
+    $projectRef = 'mgdkjrbodyvjgkuaoocz'
+    $adminRole = "postgres.$projectRef"
+    $runtimePoolerUser = "codefy_app.$projectRef"
     $probe = & $psqlPath -X -w -h $hostName -p $port -U $adminRole -d $database -Atqc 'SELECT current_database()' 2>&1
     if ($LASTEXITCODE -ne 0) { throw "Supabase connection failed: $probe" }
     if ($probe -ne 'postgres') { throw 'Connected to an unexpected database; setup stopped.' }
 
     $roleSql = @'
 \getenv app_password CODEFY_NEW_APP_PASSWORD
-SELECT format('CREATE ROLE codefy_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS PASSWORD %L', :'app_password')
+-- Newly created PostgreSQL roles default to NOSUPERUSER, NOCREATEDB,
+-- NOCREATEROLE, and NOBYPASSRLS. Supabase's postgres role cannot ALTER ROLE
+-- with those attribute options, so leave the secure defaults implicit.
+SELECT format('CREATE ROLE codefy_app LOGIN PASSWORD %L', :'app_password')
 WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'codefy_app')
 \gexec
-SELECT format('ALTER ROLE codefy_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS PASSWORD %L', :'app_password')
+SELECT format('ALTER ROLE codefy_app LOGIN PASSWORD %L', :'app_password')
 \gexec
 GRANT CONNECT ON DATABASE postgres TO codefy_app;
 '@
@@ -52,8 +57,12 @@ GRANT CONNECT ON DATABASE postgres TO codefy_app;
         if ($LASTEXITCODE -ne 0) { throw "Migration $($migration.Name) failed. Fix the reported issue and rerun this script." }
     }
 
-    $verification = & $psqlPath -X -w -h $hostName -p $port -U $adminRole -d $database -Atqc "SELECT count(*) FROM codefy_schema_migrations WHERE version IN ('001_admin_foundation', '002_runtime_role_security')" 2>&1
-    if ($LASTEXITCODE -ne 0 -or $verification -ne '2') { throw "Migration verification failed: $verification" }
+    $verification = & $psqlPath -X -w -h $hostName -p $port -U $adminRole -d $database -Atqc "SELECT count(*) FROM codefy_schema_migrations WHERE version IN ('001_admin_foundation', '002_runtime_role_security', '003_visual_section_builder')" 2>&1
+    if ($LASTEXITCODE -ne 0 -or $verification -ne '3') { throw "Migration verification failed: $verification" }
+    $env:PGPASSWORD = $appPassword
+    $runtimeCheck = & $psqlPath -X -w -h $hostName -p $port -U $runtimePoolerUser -d $database -Atqc 'SELECT count(*) FROM codefy_guide_sections' 2>&1
+    if ($LASTEXITCODE -ne 0 -or $runtimeCheck -ne '7') { throw "Restricted application-role verification failed: $runtimeCheck" }
+    $env:PGPASSWORD = $adminPassword
 
     $preserved = @()
     if (Test-Path -LiteralPath $envFile) {
@@ -68,7 +77,7 @@ GRANT CONNECT ON DATABASE postgres TO codefy_app;
         "PGHOST=$hostName",
         "PGPORT=$port",
         "PGDATABASE=$database",
-        'PGUSER=codefy_app',
+        "PGUSER=$runtimePoolerUser",
         "PGPASSWORD=$appPassword",
         'PGSSLMODE=require',
         "CODEFY_DATABASE_DSN=pgsql:host=$hostName;port=$port;dbname=$database;sslmode=require",

@@ -60,8 +60,11 @@ ALTER DEFAULT PRIVILEGES FOR ROLE codefy_owner IN SCHEMA public GRANT USAGE, SEL
 
     $env:PGPASSWORD = $ownerPassword
     $env:PGCLIENTENCODING = 'UTF8'
-    & $psqlPath -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -U codefy_owner -d codefy_guide -f (Join-Path $repoRoot 'database\migrations\001_admin_foundation.sql')
-    if ($LASTEXITCODE -ne 0) { throw 'Database and credentials are ready, but the migration failed. Run .\scripts\migrate-postgres.ps1 to safely retry it.' }
+    $migrationFiles = Get-ChildItem -LiteralPath (Join-Path $repoRoot 'database\migrations') -Filter '*.sql' | Sort-Object Name
+    foreach ($migration in $migrationFiles) {
+        & $psqlPath -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -U codefy_owner -d codefy_guide -f $migration.FullName
+        if ($LASTEXITCODE -ne 0) { throw "Database and credentials are ready, but $($migration.Name) failed. Run .\scripts\migrate-postgres.ps1 to safely retry it." }
+    }
 
     Write-Host 'PostgreSQL database and application role are ready. Credentials were saved to the ignored .env file.' -ForegroundColor Green
     Write-Host 'Create the first admin with: .\scripts\create-admin.ps1'

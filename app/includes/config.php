@@ -11,6 +11,11 @@ $SITE = [
     'copyright'    => 'كوديفاي مصر © 2026 — جميع الحقوق محفوظة',
     'version'      => '3.0',
     'assets'       => 'Statics',
+    'home_eyebrow' => 'دليلك الشامل — الإصدار 3.0',
+    'home_title'   => 'فهرس دليل نظام كوديفاي',
+    'home_intro'   => 'اختر القسم الذي تريد استعراضه. تم تقسيم الدليل إلى صفحات مستقلة لسهولة التصفح والوصول السريع.',
+    'navigation_label' => 'دليلك',
+    'search_placeholder' => 'ابحث في الدليل... (Ctrl+K)',
 ];
 
 $SECTIONS = [
@@ -103,8 +108,22 @@ $SECTIONS = [
 require_once __DIR__ . '/admin-db.php';
 codefy_apply_database_content();
 
+/** Resolve a section to its original PHP page or the CMS renderer. */
+function codefy_section_url(string $slug): string {
+    global $SECTIONS;
+    if (!isset($SECTIONS[$slug])) return 'index.php';
+    if (($SECTIONS[$slug]['content_mode'] ?? 'legacy') === 'legacy' && is_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . $slug . '.php')) {
+        return rawurlencode($slug) . '.php';
+    }
+    return 'section.php?slug=' . rawurlencode($slug);
+}
+
 /** Return the current page slug (filename without .php) */
 function codefy_current_slug(): string {
+    if (basename($_SERVER['PHP_SELF'] ?? '') === 'section.php') {
+        $requested = (string)($_GET['slug'] ?? '');
+        if (preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $requested)) return $requested;
+    }
     return basename($_SERVER['PHP_SELF'] ?? 'index.php', '.php');
 }
 

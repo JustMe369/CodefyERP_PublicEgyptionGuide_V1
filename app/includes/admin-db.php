@@ -38,6 +38,19 @@ function codefy_bool($value): bool {
     return in_array(strtolower((string)$value), ['1', 't', 'true', 'yes', 'on'], true);
 }
 
+function codefy_accent_theme(string $accent): array {
+    $themes = [
+        'primary' => ['pill' => 'أولاً', 'pill_bg' => 'bg-primary-50', 'pill_text' => 'text-primary-700', 'gradient' => 'from-primary-500 to-primary-700', 'shadow' => 'shadow-primary-500/30', 'accent' => 'primary'],
+        'indigo' => ['pill' => 'القسم', 'pill_bg' => 'bg-indigo-50', 'pill_text' => 'text-indigo-700', 'gradient' => 'from-indigo-500 to-purple-600', 'shadow' => 'shadow-indigo-500/30', 'accent' => 'indigo'],
+        'emerald' => ['pill' => 'القسم', 'pill_bg' => 'bg-emerald-50', 'pill_text' => 'text-emerald-700', 'gradient' => 'from-emerald-500 to-teal-600', 'shadow' => 'shadow-emerald-500/30', 'accent' => 'emerald'],
+        'amber' => ['pill' => 'القسم', 'pill_bg' => 'bg-amber-50', 'pill_text' => 'text-amber-700', 'gradient' => 'from-amber-500 to-orange-600', 'shadow' => 'shadow-amber-500/30', 'accent' => 'amber'],
+        'violet' => ['pill' => 'القسم', 'pill_bg' => 'bg-violet-50', 'pill_text' => 'text-violet-700', 'gradient' => 'from-violet-500 to-fuchsia-600', 'shadow' => 'shadow-violet-500/30', 'accent' => 'violet'],
+        'rose' => ['pill' => 'القسم', 'pill_bg' => 'bg-rose-50', 'pill_text' => 'text-rose-700', 'gradient' => 'from-rose-500 to-red-600', 'shadow' => 'shadow-rose-500/30', 'accent' => 'rose'],
+        'cyan' => ['pill' => 'القسم', 'pill_bg' => 'bg-cyan-50', 'pill_text' => 'text-cyan-700', 'gradient' => 'from-cyan-500 to-teal-600', 'shadow' => 'shadow-cyan-500/30', 'accent' => 'cyan'],
+    ];
+    return $themes[$accent] ?? $themes['primary'];
+}
+
 function codefy_db(): PDO {
     static $pdo = null;
     if ($pdo instanceof PDO) return $pdo;
@@ -70,20 +83,35 @@ function codefy_apply_database_content(): void {
             if (array_key_exists($row['setting_key'], $SITE)) $SITE[$row['setting_key']] = $row['setting_value'];
         }
         $orderedSections = [];
-        foreach ($pdo->query('SELECT slug, title, subtitle, icon, is_published, sort_order FROM codefy_guide_sections ORDER BY sort_order, slug') as $row) {
-            if (!isset($SECTIONS[$row['slug']])) continue;
-            $SECTIONS[$row['slug']]['title'] = $row['title'];
-            $SECTIONS[$row['slug']]['subtitle'] = $row['subtitle'];
-            $SECTIONS[$row['slug']]['icon'] = $row['icon'];
-            $SECTIONS[$row['slug']]['published'] = codefy_bool($row['is_published']);
-            $SECTIONS[$row['slug']]['number'] = (int)$row['sort_order'];
-            if ($SECTIONS[$row['slug']]['published']) $orderedSections[$row['slug']] = $SECTIONS[$row['slug']];
+        foreach ($pdo->query('SELECT slug, title, subtitle, icon, accent, content_mode, is_published, sort_order FROM codefy_guide_sections ORDER BY sort_order, slug') as $row) {
+            $slug = $row['slug'];
+            $section = $SECTIONS[$slug] ?? codefy_accent_theme((string)$row['accent']);
+            $section['title'] = $row['title'];
+            $section['subtitle'] = $row['subtitle'];
+            $section['icon'] = $row['icon'];
+            $section['accent'] = $row['accent'];
+            $section['content_mode'] = $row['content_mode'];
+            $section['published'] = codefy_bool($row['is_published']);
+            $section['number'] = (int)$row['sort_order'];
+            if (!isset($SECTIONS[$slug])) $section['pill'] .= ' ' . (int)$row['sort_order'];
+            if (($SECTIONS[$slug]['accent'] ?? null) !== $row['accent']) {
+                $theme = codefy_accent_theme((string)$row['accent']);
+                foreach (['pill_bg', 'pill_text', 'gradient', 'shadow', 'accent'] as $key) $section[$key] = $theme[$key];
+            }
+            if ($section['published']) $orderedSections[$slug] = $section;
             elseif (codefy_current_slug() === $row['slug']) {
                 http_response_code(404);
                 exit('هذا القسم غير متاح حالياً.');
             }
         }
         if ($orderedSections) $SECTIONS = $orderedSections;
+
+        $currentSlug = codefy_current_slug();
+        if (isset($SECTIONS[$currentSlug]) && ($SECTIONS[$currentSlug]['content_mode'] ?? 'legacy') === 'builder') {
+            $mermaid = $pdo->prepare("SELECT EXISTS (SELECT 1 FROM codefy_section_blocks WHERE section_slug = :slug AND block_type = 'mermaid')");
+            $mermaid->execute(['slug' => $currentSlug]);
+            if (codefy_bool($mermaid->fetchColumn())) $GLOBALS['page_needs_mermaid'] = true;
+        }
     } catch (Throwable $error) {
         // Public guide pages stay available when the optional admin database is offline.
         error_log('Codefy content database unavailable: ' . $error->getMessage());

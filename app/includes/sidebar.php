@@ -37,7 +37,7 @@ $currentSlug = codefy_current_slug();
 
         <div class="search-container relative z-10 px-4 mb-5 transition-opacity duration-300">
             <div class="relative">
-                <input type="text" id="search-input" placeholder="ابحث في الدليل... (Ctrl+K)" autocomplete="off"
+                <input type="text" id="search-input" placeholder="<?= e($SITE['search_placeholder']) ?>" autocomplete="off"
                     class="w-full py-2.5 ps-10 pe-4 rounded-xl border border-white/[0.05] bg-white/[0.02] focus:bg-white/[0.05] focus:outline-none focus:ring-1 focus:ring-primary-500/40 focus:border-primary-500/20 text-xs font-medium text-white placeholder-slate-600 transition-all duration-300 backdrop-blur-xl">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-slate-600">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -49,11 +49,11 @@ $currentSlug = codefy_current_slug();
         </div>
 
         <div class="relative z-10 px-4 flex-1">
-            <div class="navigation-header text-[10px] font-black text-slate-600 uppercase tracking-[0.15em] mb-4 px-2 transition-opacity duration-300">دليلك</div>
+            <div class="navigation-header text-[10px] font-black text-slate-600 uppercase tracking-[0.15em] mb-4 px-2 transition-opacity duration-300"><?= e($SITE['navigation_label']) ?></div>
             <ul id="navigation-links" class="space-y-1.5">
                 <?php foreach ($SECTIONS as $slug => $s): ?>
                     <li>
-                        <a href="<?= e($slug) ?>.php" data-section="<?= e($slug) ?>"
+                        <a href="<?= e(codefy_section_url($slug)) ?>" data-section="<?= e($slug) ?>"
                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
                             <div class="collapsible-nav-content flex items-center gap-4">
                                 <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300"><?= e($s['icon']) ?></span>

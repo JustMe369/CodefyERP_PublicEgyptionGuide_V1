@@ -79,7 +79,7 @@ $page_needs_analyzer = $page_needs_analyzer ?? false;
 <?php endif; ?>
 <script>
 window.codefySections = <?= json_encode(array_map(static function ($slug, $section) {
-    return ['id' => $slug, 'title' => $section['title'], 'icon' => $section['icon'], 'subtitle' => $section['subtitle']];
+    return ['id' => $slug, 'title' => $section['title'], 'icon' => $section['icon'], 'subtitle' => $section['subtitle'], 'url' => codefy_section_url($slug)];
 }, array_keys($SECTIONS), array_values($SECTIONS)), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
 <script src="<?= $asset ?>/JS/scripts.js?v=20260925-2"></script>

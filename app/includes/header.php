@@ -12,10 +12,10 @@ $asset   = $SITE['assets'];
     <div id="mobile-header" class="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur-md lg:hidden">
         <div class="flex items-center gap-2.5">
             <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white shadow-md shadow-primary-600/20">
-                <img src="<?= $asset ?>/img/CodefyLogo.png" alt="كوديفاي" class="h-6 w-6 object-contain" onerror="this.src='<?= $asset ?>/img/login.png'">
+                <img src="<?= $asset ?>/img/CodefyLogo.png" alt="<?= e($SITE['name']) ?>" class="h-6 w-6 object-contain" onerror="this.src='<?= $asset ?>/img/login.png'">
             </div>
             <div>
-                <span class="text-lg font-black text-slate-900">كوديفاي<span class="text-primary-600">.</span></span>
+                <span class="text-lg font-black text-slate-900"><?= e($SITE['name']) ?><span class="text-primary-600"><?= e($SITE['brand_suffix']) ?></span></span>
                 <span id="mobile-current-section" class="block text-[11px] font-bold text-primary-600 truncate max-w-[170px]"><?= e($label) ?></span>
             </div>
         </div>

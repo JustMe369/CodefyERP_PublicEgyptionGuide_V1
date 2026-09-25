@@ -4,6 +4,7 @@ $page_description    = 'التحديثات الجماعية في نظام كود
 $page_needs_xlsx     = true;
 $page_needs_analyzer = true;
 require __DIR__ . '/includes/config.php';
+if (($SECTIONS[codefy_current_slug()]['content_mode'] ?? 'legacy') === 'builder') { require __DIR__ . '/includes/section-builder-page.php'; }
 require __DIR__ . '/includes/head.php';
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';

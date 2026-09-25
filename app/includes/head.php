@@ -55,4 +55,5 @@ $asset = $SITE['assets'];
     <link rel="stylesheet" href="<?= $asset ?>/CSS/global-theme.css">
     <link rel="stylesheet" href="<?= $asset ?>/CSS/mobile.css">
     <link rel="stylesheet" href="<?= $asset ?>/CSS/footer.css">
+    <link rel="stylesheet" href="<?= $asset ?>/CSS/cms-content.css">
 </head>

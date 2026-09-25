@@ -2,6 +2,7 @@
 $page_title       = 'توزيع المهام (تعيين الجداول)';
 $page_description = 'توزيع المهام وتعيين الجداول للسائقين والمركبات في نظام كوديفاي';
 require __DIR__ . '/includes/config.php';
+if (($SECTIONS[codefy_current_slug()]['content_mode'] ?? 'legacy') === 'builder') { require __DIR__ . '/includes/section-builder-page.php'; }
 require __DIR__ . '/includes/head.php';
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';

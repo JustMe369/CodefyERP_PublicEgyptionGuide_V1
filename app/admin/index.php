@@ -2,7 +2,7 @@
 require __DIR__ . '/_bootstrap.php';
 $user = admin_require_user();
 $pdo = codefy_db();
-$allowedSettings = ['name', 'brand_suffix', 'subtitle', 'copyright', 'version'];
+$allowedSettings = ['name', 'brand_suffix', 'subtitle', 'copyright', 'version', 'home_eyebrow', 'home_title', 'home_intro', 'navigation_label', 'search_placeholder'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     admin_require_csrf();
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'save_settings') {
             admin_require_role('admin');
             $posted = $_POST['settings'] ?? [];
-            $limits = ['name' => 100, 'brand_suffix' => 16, 'subtitle' => 180, 'copyright' => 220, 'version' => 32];
+            $limits = ['name' => 100, 'brand_suffix' => 16, 'subtitle' => 180, 'copyright' => 220, 'version' => 32, 'home_eyebrow' => 180, 'home_title' => 180, 'home_intro' => 1000, 'navigation_label' => 80, 'search_placeholder' => 120];
             $values = [];
             foreach ($allowedSettings as $key) {
                 $value = trim((string)($posted[$key] ?? ''));
@@ -145,6 +145,7 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
         <a class="admin-brand" href="index.php"><span class="brand-mark">ك</span><span><strong>كوديفاي</strong><small>لوحة الإدارة</small></span></a>
         <nav aria-label="أقسام الإدارة">
             <a class="side-link active" href="#overview">◈ <span>نظرة عامة</span></a>
+            <a class="side-link" href="sections.php">✎ <span>محرر الأقسام</span></a>
             <a class="side-link" href="#sections">▤ <span>إدارة الأقسام</span></a>
             <a class="side-link" href="#settings">⚙ <span>إعدادات الموقع</span></a>
             <?php if (($user['role'] ?? '') === 'admin'): ?><a class="side-link" href="#users">♙ <span>حسابات الإدارة</span></a><?php endif; ?>
@@ -164,7 +165,7 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
         <?php if ($flash): ?><div class="notice <?= admin_e($flash['type']) ?>" role="status"><?= admin_e($flash['message']) ?></div><?php endif; ?>
 
         <section id="overview" class="welcome-card">
-            <div><span class="eyebrow">مرحباً <?= admin_e($user['name']) ?></span><h2>إدارة دليل كوديفاي من مكان واحد</h2><p>تحكم في هوية الموقع وعناوين أقسام الدليل وترتيبها وحالة نشرها.</p></div>
+            <div><span class="eyebrow">مرحباً <?= admin_e($user['name']) ?></span><h2>إدارة دليل كوديفاي من مكان واحد</h2><p>تحكم في هوية الموقع، أنشئ أقساماً، وابنِ محتوى الصفحات من محرر الكتل المرئي.</p><a class="button light" href="sections.php">فتح محرر الأقسام</a></div>
             <div class="welcome-symbol" aria-hidden="true">✦</div>
         </section>
 
@@ -190,7 +191,7 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
                     </tr>
                 <?php endforeach; ?>
                 </tbody></table></div>
-                <div class="form-actions"><p class="muted">تحرير نصوص ومخططات صفحات الشرح التفصيلية سيضاف في مرحلة إدارة المحتوى.</p><button class="button primary" type="submit">حفظ الأقسام</button></div>
+                <div class="form-actions"><p class="muted">لتحرير محتوى أي صفحة تفصيلياً، افتح محرر الأقسام واختر القسم.</p><button class="button primary" type="submit">حفظ الأقسام</button></div>
             </form>
         </section>
 
@@ -204,6 +205,11 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
                 <label>الوصف التعريفي<input name="settings[subtitle]" maxlength="180" value="<?= admin_e($settings['subtitle'] ?? '') ?>" required></label>
                 <label>بيان حقوق النشر<input name="settings[copyright]" maxlength="220" value="<?= admin_e($settings['copyright'] ?? '') ?>" required></label>
                 <label>إصدار الدليل<input name="settings[version]" maxlength="32" value="<?= admin_e($settings['version'] ?? '') ?>" required></label>
+                <label>عبارة أعلى الصفحة الرئيسية<input name="settings[home_eyebrow]" maxlength="180" value="<?= admin_e($settings['home_eyebrow'] ?? '') ?>" required></label>
+                <label>عنوان الصفحة الرئيسية<input name="settings[home_title]" maxlength="180" value="<?= admin_e($settings['home_title'] ?? '') ?>" required></label>
+                <label class="field-wide">مقدمة الصفحة الرئيسية<textarea name="settings[home_intro]" maxlength="1000" rows="3" required><?= admin_e($settings['home_intro'] ?? '') ?></textarea></label>
+                <label>عنوان قائمة التنقل<input name="settings[navigation_label]" maxlength="80" value="<?= admin_e($settings['navigation_label'] ?? '') ?>" required></label>
+                <label>نص حقل البحث<input name="settings[search_placeholder]" maxlength="120" value="<?= admin_e($settings['search_placeholder'] ?? '') ?>" required></label>
                 <div class="form-actions"><span></span><button class="button primary" type="submit">حفظ الإعدادات</button></div>
             </form>
             <?php else: ?><div class="notice">يمكن لمدير النظام فقط تعديل إعدادات الموقع العامة.</div><?php endif; ?>

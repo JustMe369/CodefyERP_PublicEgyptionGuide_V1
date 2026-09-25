@@ -39,7 +39,8 @@ function revealAllPageSections() {
 function navigateToSection(sectionId) {
     if (!sectionId) return;
     if (isMultiPageGuide()) {
-        window.location.href = sectionId + '.php';
+        const section = SECTIONS.find(function (item) { return item.id === sectionId; });
+        window.location.href = (section && section.url) || (sectionId + '.php');
         return;
     }
     const sectionIndex = SECTIONS.findIndex(function (s) { return s.id === sectionId; });

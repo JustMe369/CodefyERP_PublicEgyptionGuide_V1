@@ -2,6 +2,7 @@
 $page_title       = 'إعدادات تحليل الإكسل';
 $page_description = 'تخصيص قواعد التحقق والمعالجة التلقائية لملفات الإكسل في نظام كوديفاي';
 require __DIR__ . '/includes/config.php';
+if (($SECTIONS[codefy_current_slug()]['content_mode'] ?? 'legacy') === 'builder') { require __DIR__ . '/includes/section-builder-page.php'; }
 require __DIR__ . '/includes/head.php';
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/includes/sidebar.php';

@@ -2,17 +2,18 @@ BEGIN;
 
 -- The PHP backend uses a restricted login role. Keep Supabase's exposed public
 -- schema inaccessible through anon/authenticated Data API roles.
-REVOKE ALL ON TABLE
-    codefy_admin_users,
-    codefy_site_settings,
-    codefy_guide_sections,
-    codefy_admin_audit_log,
-    codefy_admin_login_throttle
-FROM anon, authenticated;
-REVOKE ALL ON SEQUENCE
-    codefy_admin_users_id_seq,
-    codefy_admin_audit_log_id_seq
-FROM anon, authenticated;
+DO $migration$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+        REVOKE ALL ON TABLE codefy_admin_users, codefy_site_settings, codefy_guide_sections, codefy_admin_audit_log, codefy_admin_login_throttle FROM anon;
+        REVOKE ALL ON SEQUENCE codefy_admin_users_id_seq, codefy_admin_audit_log_id_seq FROM anon;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+        REVOKE ALL ON TABLE codefy_admin_users, codefy_site_settings, codefy_guide_sections, codefy_admin_audit_log, codefy_admin_login_throttle FROM authenticated;
+        REVOKE ALL ON SEQUENCE codefy_admin_users_id_seq, codefy_admin_audit_log_id_seq FROM authenticated;
+    END IF;
+END
+$migration$;
 
 GRANT SELECT, INSERT, UPDATE ON
     codefy_admin_users,
@@ -24,9 +25,9 @@ TO codefy_app;
 GRANT DELETE ON codefy_admin_login_throttle TO codefy_app;
 GRANT USAGE, SELECT ON SEQUENCE codefy_admin_users_id_seq, codefy_admin_audit_log_id_seq TO codefy_app;
 
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT SELECT, INSERT, UPDATE ON TABLES TO codefy_app;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT USAGE, SELECT ON SEQUENCES TO codefy_app;
 
 ALTER TABLE codefy_admin_users ENABLE ROW LEVEL SECURITY;
