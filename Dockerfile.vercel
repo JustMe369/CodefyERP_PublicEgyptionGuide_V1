@@ -1,0 +1,29 @@
+# Dockerfile.vercel
+
+# Stage 1: Install Composer dependencies
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-scripts
+
+# Stage 2: Build the final image
+FROM dunglas/frankenphp:latest
+WORKDIR /app
+
+# Copy dependencies from the vendor stage
+COPY --from=vendor /app/vendor ./vendor
+
+# Copy your application code
+COPY . .
+
+# Copy the Caddyfile configuration
+COPY Caddyfile /etc/caddy/Caddyfile
+
+# Set permissions
+RUN chown -R www-data:www-data /app
+
+# Use the non-root user
+USER www-data
+
+# FrankenPHP will listen on the port Vercel provides
+EXPOSE 80

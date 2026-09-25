@@ -50,22 +50,27 @@ html {
    ========================================================= */
 #main-content {
     box-sizing: border-box;
+    width: 100%;
+    max-width: none;
 }
 
-/* Inner centering wrapper — wraps all direct children */
+/* Direct children (sections, hero, breadcrumb) use full content width */
 #main-content > * {
     box-sizing: border-box;
     width: 100%;
-    max-width: 64rem; /* = max-w-5xl */
-    margin-inline: auto;
+    max-width: none;
+    margin-inline: 0;
 }
 
 @media (min-width: 1024px) {
-    /* Take exactly the remaining viewport beside the fixed sidebar */
     #main-content {
-        width: auto;
+        width: calc(100% - var(--sidebar-expanded-width));
         margin-inline-start: var(--sidebar-expanded-width);
         max-width: none;
+    }
+
+    body.sidebar-is-collapsed #main-content {
+        width: calc(100% - var(--sidebar-rail-width));
     }
 }
 
@@ -707,11 +712,6 @@ input:focus-visible {
     }
 }
 
-
-/* Ensure main content is never pushed off-screen */
-#main-content {
-    max-width: 72rem;
-}
 
 /* Ensure body always has a visible background */
 body {
@@ -1463,6 +1463,15 @@ body.single-section-mode main {
 /* All Sections Mode - Show all sections */
 body.all-sections-mode .section-content {
     display: block;
+}
+
+/* Multi-page PHP chapters: never hide the only section on the page */
+body[data-section]:not([data-section="index"]) .section-content {
+    display: block !important;
+}
+
+body[data-section]:not([data-section="index"]) .section-content.hidden {
+    display: block !important;
 }
 
 /* =========================================================

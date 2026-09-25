@@ -1,6 +1,29 @@
-.vercel
-.env*
-.kilo*
-.kilocode
-.unode
-node_modules
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor folders
+.vscode/
+.idea/
+.kilo/
+.kilocode/
+.unode/
+
+# Vendor (if using Composer later)
+/vendor/
+composer.lock
+
+# Temp files
+*.log
+*.tmp
+temp/*.xlsx
+temp/*.csv
+
+# Environment secrets — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# Node (if you ever add it)
+node_modules/

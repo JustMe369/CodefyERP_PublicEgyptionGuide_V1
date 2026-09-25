@@ -20,6 +20,63 @@ let currentSectionIndex = 0;
 let viewMode = 'single'; // 'single' (focused section only) or 'all' (continuous scroll)
 let completedSections = new Set();
 
+/** True when each guide chapter is its own PHP page (body data-section ≠ index). */
+function isMultiPageGuide() {
+    const slug = document.body && document.body.getAttribute('data-section');
+    return Boolean(slug && slug !== 'index');
+}
+
+function revealAllPageSections() {
+    document.body.classList.remove('single-section-mode');
+    document.body.classList.add('all-sections-mode');
+    document.querySelectorAll('.section-content').forEach(function (sec) {
+        sec.classList.remove('hidden');
+        sec.classList.add('active-section');
+        sec.style.display = '';
+    });
+}
+
+function navigateToSection(sectionId) {
+    if (!sectionId) return;
+    if (isMultiPageGuide()) {
+        window.location.href = sectionId + '.php';
+        return;
+    }
+    const sectionIndex = SECTIONS.findIndex(function (s) { return s.id === sectionId; });
+    if (sectionIndex === -1) return;
+    currentSectionIndex = sectionIndex;
+    showCurrentSection(true);
+}
+
+function initMultiPageGuide(pageSlug) {
+    viewMode = 'all';
+    revealAllPageSections();
+
+    const idx = SECTIONS.findIndex(function (s) { return s.id === pageSlug; });
+    if (idx !== -1) currentSectionIndex = idx;
+
+    // Old SPA hashes (e.g. #pricing on login.php) must not drive section hiding
+    if (window.location.hash && history.replaceState) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+
+    document.querySelectorAll('main .reveal').forEach(function (el) {
+        el.classList.add('is-visible');
+    });
+
+    if (window.mermaid) {
+        try {
+            if (typeof mermaid.run === 'function') {
+                mermaid.run({ querySelector: '.mermaid' });
+            } else if (typeof mermaid.contentLoaded === 'function') {
+                mermaid.contentLoaded();
+            }
+        } catch (e) {
+            console.warn('Mermaid render failed:', e);
+        }
+    }
+}
+
 // Prevent companion scripts from initializing the application twice.
 window.codefyAppLoaded = true;
 
@@ -29,13 +86,15 @@ if (window.__jsReadyTimer) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    initApp();
-    initializeValidationTool();  // This function is now in analyzer_import_sheets.js
-    initializeTabSwitching();
-    // Initialize theme functionality with unique names to avoid conflicts
+    // Theme & sidebar first — must run even when optional page modules are absent
     initializeCodefyThemeSystem();
-    // Initialize collapsible sidebar functionality
     initializeCollapsibleSidebar();
+
+    initApp();
+    if (typeof initializeValidationTool === 'function') {
+        initializeValidationTool();
+    }
+    initializeTabSwitching();
 });
 
 
@@ -87,8 +146,9 @@ function initializeCodefyThemeSystem() {
 }
 
 function initApp() {
-    // Initialize viewMode to single by default if not set
-    if (typeof viewMode === 'undefined' || !viewMode) {
+    if (isMultiPageGuide()) {
+        viewMode = 'all';
+    } else if (typeof viewMode === 'undefined' || !viewMode) {
         viewMode = 'single';
     }
     
@@ -123,8 +183,9 @@ function initApp() {
     // Initialize Scroll Reveal Animations
     initScrollReveal();
     
-    // Initialize Analysis Configuration (now in separate module)
-    initializeAnalysisConfig();  // This function is now in analyzer_import_sheets.js
+    if (typeof initializeAnalysisConfig === 'function') {
+        initializeAnalysisConfig();
+    }
     
     // Render initial progress
     updateProgressUI();
@@ -358,11 +419,7 @@ function updateSectionStepper(sectionId) {
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
             if (currentSectionIndex > 0) {
-                currentSectionIndex--;
-                showCurrentSection(true);
-                setTimeout(() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 100);
+                navigateToSection(SECTIONS[currentSectionIndex - 1].id);
             }
         });
     }
@@ -371,11 +428,7 @@ function updateSectionStepper(sectionId) {
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
             if (currentSectionIndex < SECTIONS.length - 1) {
-                currentSectionIndex++;
-                showCurrentSection(true);
-                setTimeout(() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 100);
+                navigateToSection(SECTIONS[currentSectionIndex + 1].id);
             }
         });
     }
@@ -397,7 +450,17 @@ function updateStepperCompletionButton(sectionId) {
  * Section Switching & Single Section Focused Mode
  */
 function initSectionMode() {
-    // Read URL hash on load
+    if (!document.querySelector('.section-content')) {
+        return;
+    }
+
+    const pageSlug = document.body.getAttribute('data-section') || '';
+    if (isMultiPageGuide()) {
+        initMultiPageGuide(pageSlug);
+        return;
+    }
+
+    // Read URL hash on load (legacy single-page guide with all sections on one HTML page)
     const hash = window.location.hash.replace('#', '');
     const foundIndex = SECTIONS.findIndex(s => s.id === hash);
     currentSectionIndex = foundIndex !== -1 ? foundIndex : 0;
@@ -427,6 +490,7 @@ function initSectionMode() {
 }
 
 function setViewMode(mode) {
+    if (isMultiPageGuide()) return;
     if (viewMode === mode) return;
     viewMode = mode;
     applyViewMode();
@@ -445,6 +509,11 @@ function setViewMode(mode) {
 }
 
 function applyViewMode() {
+    if (isMultiPageGuide()) {
+        revealAllPageSections();
+        return;
+    }
+
     const modeSingleBtns = document.querySelectorAll('.btn-mode-single');
     const modeAllBtns = document.querySelectorAll('.btn-mode-all');
 
@@ -476,6 +545,8 @@ function applyViewMode() {
 }
 
 function showCurrentSection(shouldScroll = true) {
+    if (isMultiPageGuide()) return;
+
     const currentSec = SECTIONS[currentSectionIndex];
     if (!currentSec) return;
 
@@ -898,17 +969,8 @@ function initSearch() {
                     <div class="text-xs text-slate-500 mt-1">القسم: ${SECTIONS.find(s => s.id === item.section)?.title || item.section}</div>
                 `;
                 li.addEventListener('click', function() {
-                    // Navigate to section
-                    if (viewMode === 'single') {
-                        const sectionIndex = SECTIONS.findIndex(s => s.id === item.section);
-                        if (sectionIndex !== -1) {
-                            currentSectionIndex = sectionIndex;
-                            showCurrentSection();
-                        }
-                    } else {
-                        window.location.hash = item.section;
-                    }
-                    
+                    navigateToSection(item.section);
+
                     // Clear search and hide results
                     searchInput.value = '';
                     searchResults.classList.add('hidden');
@@ -1172,12 +1234,10 @@ function initKeyboardShortcuts() {
         // Arrow keys for navigation
         if (e.key === 'ArrowLeft' && currentSectionIndex > 0) {
             e.preventDefault();
-            currentSectionIndex--;
-            showCurrentSection();
+            navigateToSection(SECTIONS[currentSectionIndex - 1].id);
         } else if (e.key === 'ArrowRight' && currentSectionIndex < SECTIONS.length - 1) {
             e.preventDefault();
-            currentSectionIndex++;
-            showCurrentSection();
+            navigateToSection(SECTIONS[currentSectionIndex + 1].id);
         }
     });
 }
