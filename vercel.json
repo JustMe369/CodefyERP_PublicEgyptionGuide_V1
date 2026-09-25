@@ -11,15 +11,15 @@
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
-        { "key": "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
     }
   ],
   "rewrites": [
     { "source": "/", "destination": "/Temp/index.html" },
-    { "source": "/api/validate", "destination": "/api-functions/validate/index.js" },
-    { "source": "/api/download-cleaned", "destination": "/api-functions/download-cleaned/index.js" },
-    { "source": "/api/excel-analyzer", "destination": "/api-functions/excel-analyzer/index.js" },
-    { "source": "/((?!api/|api-functions/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
+    { "source": "/api/validate", "destination": "/api/validate.js" },
+    { "source": "/api/download-cleaned", "destination": "/api/download-cleaned.js" },
+    { "source": "/api/excel-analyzer", "destination": "/api/excel-analyzer.js" },
+    { "source": "/((?!api/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
   ]
 }

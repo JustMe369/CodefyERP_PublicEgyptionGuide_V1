@@ -41,7 +41,7 @@ for (const file of rootFiles) {
 // Bundle API serverless functions with ncc (zero dependencies on Vercel)
 log('Bundling API functions with ncc...');
 const apiDir = path.join(ROOT, 'api');
-const distApiDir = path.join(DIST, 'api-functions');
+const distApiDir = path.join(DIST, 'api');
 fs.mkdirSync(distApiDir, { recursive: true });
 
 const apiFiles = [
@@ -63,9 +63,12 @@ for (const file of apiFiles) {
   try {
     log(`Bundling api/${file}...`);
     execSync(`ncc build "${src}" -o "${outDir}"`, { stdio: 'inherit', cwd: ROOT });
+    
+    // Add minimal package.json to prevent Vercel auto-install
+    const pkgJson = path.join(outDir, 'package.json');
+    fs.writeFileSync(pkgJson, JSON.stringify({ private: true, dependencies: {} }, null, 2));
   } catch (e) {
     warn(`Failed to bundle api/${file}: ${e.message}`);
-    // Fallback: copy source file (will need npm install on Vercel)
     fs.copySync(src, path.join(distApiDir, file));
   }
 }
