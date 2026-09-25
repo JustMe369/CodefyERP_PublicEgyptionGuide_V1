@@ -1,3 +1,6 @@
 :{$PORT:80} {
-    respond "hello-from-container"
+    root * /app
+    encode zstd gzip
+    php_server
+    file_server
 }
