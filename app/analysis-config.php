@@ -98,8 +98,6 @@ $s = $SECTIONS['analysis-config'];
             </div>
             <p class="text-xs text-slate-500 mt-3">شارك إعداداتك مع الزملاء أو انقلها بين الأجهزة</p>
         </div>
-
-        <?php require __DIR__ . '/includes/section-pager.php'; ?>
     </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

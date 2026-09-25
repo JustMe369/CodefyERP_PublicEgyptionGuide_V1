@@ -106,8 +106,6 @@ $s     = $SECTIONS['relationships'];
                 <figcaption class="p-4 bg-slate-50/50 text-xs text-slate-600 border-t border-slate-100">النماذج الثلاثة للتوظيف وملكية المركبات.</figcaption>
             </figure>
         </div>
-
-        <?php require __DIR__ . '/includes/section-pager.php'; ?>
     </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

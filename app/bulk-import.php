@@ -185,8 +185,6 @@ $s     = $SECTIONS['bulk-import'];
             <img src="<?= $asset ?>/img/BulkAll.png" alt="عملية رفع المشاريع" class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
             <figcaption class="p-4 bg-slate-50/50 text-sm text-slate-600 border-t border-slate-100">توضح الصورة كيفية رفع ملف CSV يحتوي على جميع البيانات دفعة واحدة.</figcaption>
         </figure>
-
-        <?php require __DIR__ . '/includes/section-pager.php'; ?>
     </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

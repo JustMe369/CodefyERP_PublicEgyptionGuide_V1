@@ -92,8 +92,6 @@ $s     = $SECTIONS['assignments'];
                 <img src="<?= $asset ?>/img/workflow1.jpg" alt="تعديل جزء 2" class="lightbox-trigger w-full h-auto max-h-[300px] object-contain" loading="lazy">
             </figure>
         </div>
-
-        <?php require __DIR__ . '/includes/section-pager.php'; ?>
     </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

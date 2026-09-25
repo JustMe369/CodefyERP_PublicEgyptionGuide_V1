@@ -29,3 +29,4 @@ temp/*.csv
 node_modules/
 .vercel
 .env*
+!.env.example

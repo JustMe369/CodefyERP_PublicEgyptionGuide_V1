@@ -93,8 +93,6 @@ $checks = [
                 <img src="<?= $asset ?>/Presentation/6.png" alt="العلاقة مع المسارات" class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
             </figure>
         </div>
-
-        <?php require __DIR__ . '/includes/section-pager.php'; ?>
     </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

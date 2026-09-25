@@ -100,6 +100,9 @@ $SECTIONS = [
     ],
 ];
 
+require_once __DIR__ . '/admin-db.php';
+codefy_apply_database_content();
+
 /** Return the current page slug (filename without .php) */
 function codefy_current_slug(): string {
     return basename($_SERVER['PHP_SELF'] ?? 'index.php', '.php');

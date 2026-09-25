@@ -5,7 +5,7 @@
  */
 
 // Section Definitions
-const SECTIONS = [
+let SECTIONS = window.codefySections || [
     { id: 'login', title: 'تسجيل الدخول', icon: '🔐', subtitle: 'الخطوة الأولى في النظام' },
     { id: 'bulk-import', title: 'رفع المشاريع بالجملة', icon: '📦', subtitle: 'ملف إكسيل واحد يخلصك' },
     { id: 'relationships', title: 'المورد والمركبة والسائق', icon: '🤝', subtitle: 'مين راكب إيه ومع مين' },
@@ -74,6 +74,10 @@ function initMultiPageGuide(pageSlug) {
         } catch (e) {
             console.warn('Mermaid render failed:', e);
         }
+    }
+
+    if (idx !== -1 && typeof updateSectionStepper === 'function') {
+        updateSectionStepper(SECTIONS[currentSectionIndex].id);
     }
 }
 
@@ -657,6 +661,11 @@ function initializeCollapsibleSidebar() {
     const navLinks = document.querySelectorAll('.nav-link[data-section]');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
+            // PHP guide pages are separate documents. Let their real links
+            // navigate instead of invoking the legacy single-page switcher.
+            const pageSlug = document.body.getAttribute('data-section');
+            if (pageSlug) return;
+
             e.preventDefault();
             const targetSecId = this.getAttribute('data-section');
             const targetIndex = SECTIONS.findIndex(s => s.id === targetSecId);

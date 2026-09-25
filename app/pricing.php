@@ -112,8 +112,6 @@ $s     = $SECTIONS['pricing'];
                 <img src="<?= $asset ?>/Presentation/4.png" alt="واجهة المبيعات" class="lightbox-trigger w-full h-auto max-h-[400px] object-contain" loading="lazy">
             </figure>
         </div>
-
-        <?php require __DIR__ . '/includes/section-pager.php'; ?>
     </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

@@ -1,24 +1,35 @@
-<?php $asset = $SITE['assets']; ?>
+<?php
+$asset = $SITE['assets'];
+$slug = codefy_current_slug();
+$currentSection = ($slug !== 'index' && isset($SECTIONS[$slug])) ? $SECTIONS[$slug] : null;
+$currentTitle = $currentSection ? ($currentSection['icon'] . ' ' . $currentSection['title']) : '🏠 الفهرس';
+$page_needs_mermaid = $page_needs_mermaid ?? false;
+$page_needs_analyzer = $page_needs_analyzer ?? false;
+?>
 </div><!-- /.flex -->
 
-<button id="float-help" type="button" aria-label="مساعدة"
-    class="fixed bottom-6 start-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-xl shadow-primary-600/40 hover:scale-110 transition-transform">
-    <span class="text-xl" aria-hidden="true">💬</span>
-</button>
+<!-- Floating Footer Dock -->
+<footer id="codefy-floating-footer" class="codefy-floating-footer">
+    <div class="water-ambient-bar" aria-hidden="true"></div>
+    <div class="footer-dock-inner">
 
-<button id="back-to-top" type="button" aria-label="العودة إلى الأعلى"
-    class="fixed bottom-6 end-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg shadow-primary-600/30 opacity-0 translate-y-3 pointer-events-none transition-all duration-300 hover:bg-primary-700 focus:outline-none">
-    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-    </svg>
-</button>
+        <!-- Quick Section Navigation — includes section-pager.php -->
+        <div id="footer-section-nav">
+            <?php require __DIR__ . '/section-pager.php'; ?>
+        </div>
 
+    </div>
+</footer>
+
+
+<!-- Image Lightbox Modal -->
 <div id="lightbox" role="dialog" aria-modal="true" aria-label="عرض الصورة بالحجم الكامل"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/95 backdrop-blur-md opacity-0 transition-all duration-300 ease-out">
     <button id="lightbox-close" type="button" aria-label="إغلاق"
         class="absolute top-6 start-6 text-white/80 hover:text-white focus:outline-none p-2 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-200 backdrop-blur-sm">
         <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M6 18L18 6M6 6l12 12" />
         </svg>
     </button>
     <div class="w-full h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -56,13 +67,21 @@
     .summary-item.info{background-color:#d1ecf1;border-left:4px solid #17a2b8;}
     .upload-btn{background:#4f46e5;color:white;padding:12px 24px;border:none;border-radius:4px;cursor:pointer;font-size:16px;margin:10px;}
     .upload-btn:hover{background:#4338ca;}
+
+    /* Match the dock pager to the in-page section pager. */
+    #footer-section-nav .section-pager { margin-top: 0; padding-top: 0; border-top: none; }
 </style>
 
 <script src="<?= $asset ?>/JS/navbar.js"></script>
-<script src="<?= $asset ?>/JS/footer.js"></script>
+<script src="<?= $asset ?>/JS/footer.js?v=20260925-1"></script>
 <?php if (!empty($page_needs_analyzer)): ?>
 <script src="<?= $asset ?>/JS/analyzer_import_sheets.js"></script>
 <?php endif; ?>
+<script>
+window.codefySections = <?= json_encode(array_map(static function ($slug, $section) {
+    return ['id' => $slug, 'title' => $section['title'], 'icon' => $section['icon'], 'subtitle' => $section['subtitle']];
+}, array_keys($SECTIONS), array_values($SECTIONS)), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
 <script src="<?= $asset ?>/JS/scripts.js?v=20260925-2"></script>
 <script src="<?= $asset ?>/JS/mobile.js"></script>
 </body>

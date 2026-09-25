@@ -106,8 +106,6 @@ $s     = $SECTIONS['login'];
                 </div>
             </div>
         </div>
-
-        <?php require __DIR__ . '/includes/section-pager.php'; ?>
     </section>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

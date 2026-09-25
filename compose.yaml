@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: codefy_guide
+      POSTGRES_USER: codefy_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:${PGPORT:-5432}:5432"
+    volumes:
+      - codefy_postgres_data:/var/lib/postgresql/data
+      - ./database:/database:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codefy_owner -d codefy_guide"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  database-setup:
+    image: postgres:17-alpine
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_APP_PASSWORD: ${PGPASSWORD:?Set PGPASSWORD in .env}
+    volumes:
+      - ./database/init/001_app_role.sh:/database/001_app_role.sh:ro
+    entrypoint: ["sh", "/database/001_app_role.sh"]
+
+volumes:
+  codefy_postgres_data:
