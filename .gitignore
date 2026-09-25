@@ -27,3 +27,5 @@ temp/*.csv
 
 # Node (if you ever add it)
 node_modules/
+.vercel
+.env*
