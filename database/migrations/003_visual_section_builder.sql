@@ -3,8 +3,7 @@ BEGIN;
 ALTER TABLE codefy_guide_sections
     DROP CONSTRAINT IF EXISTS codefy_guide_sections_slug_check;
 ALTER TABLE codefy_guide_sections
-    ADD CONSTRAINT codefy_guide_sections_slug_format_check
-    CHECK (char_length(slug) <= 80 AND slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$');
+    DROP CONSTRAINT IF EXISTS codefy_guide_sections_slug_format_check;
 
 ALTER TABLE codefy_guide_sections
     ADD COLUMN IF NOT EXISTS accent text;
@@ -31,8 +30,6 @@ ALTER TABLE codefy_guide_sections
 ALTER TABLE codefy_guide_sections
     ADD CONSTRAINT codefy_guide_sections_content_mode_check
     CHECK (content_mode IN ('legacy', 'builder'));
-ALTER TABLE codefy_guide_sections
-    DROP CONSTRAINT IF EXISTS codefy_guide_sections_slug_format_check;
 ALTER TABLE codefy_guide_sections
     ADD CONSTRAINT codefy_guide_sections_slug_format_check
     CHECK (char_length(slug) <= 80 AND slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$');

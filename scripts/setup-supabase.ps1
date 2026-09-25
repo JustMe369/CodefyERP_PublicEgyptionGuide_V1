@@ -60,7 +60,15 @@ GRANT CONNECT ON DATABASE postgres TO codefy_app;
     $verification = & $psqlPath -X -w -h $hostName -p $port -U $adminRole -d $database -Atqc "SELECT count(*) FROM codefy_schema_migrations WHERE version IN ('001_admin_foundation', '002_runtime_role_security', '003_visual_section_builder')" 2>&1
     if ($LASTEXITCODE -ne 0 -or $verification -ne '3') { throw "Migration verification failed: $verification" }
     $env:PGPASSWORD = $appPassword
-    $runtimeCheck = & $psqlPath -X -w -h $hostName -p $port -U $runtimePoolerUser -d $database -Atqc 'SELECT count(*) FROM codefy_guide_sections' 2>&1
+    $runtimeCheck = $null
+    for ($attempt = 1; $attempt -le 12; $attempt++) {
+        $runtimeCheck = & $psqlPath -X -w -h $hostName -p $port -U $runtimePoolerUser -d $database -Atqc 'SELECT count(*) FROM codefy_guide_sections' 2>&1
+        if ($LASTEXITCODE -eq 0 -and $runtimeCheck -eq '7') { break }
+        if ($attempt -lt 12) {
+            Write-Host "Supabase is refreshing the new role credentials; retrying verification ($attempt/12)..."
+            Start-Sleep -Seconds 5
+        }
+    }
     if ($LASTEXITCODE -ne 0 -or $runtimeCheck -ne '7') { throw "Restricted application-role verification failed: $runtimeCheck" }
     $env:PGPASSWORD = $adminPassword
 

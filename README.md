@@ -166,13 +166,14 @@ The PHP guide includes a PostgreSQL-backed administration area at `/admin/`. Adm
    .\scripts\create-admin.ps1
    ```
    The helper prompts for email, display name, role, and password using a secure password prompt. Use a unique password of at least 14 characters and no more than 72 UTF-8 bytes. Account creation requires the migration and `.env` connection. There is no public account-registration endpoint.
+   If the administrator email already exists and you need to set a new password, use `.\scripts\reset-admin.ps1`; it securely prompts for the password, updates only an active admin account, and revokes existing sessions.
 4. Open `http://localhost/CaodefyERPGuide/app/admin/` (adjust the URL to match your Apache setup).
 
 The repository also includes `compose.yaml` and `.env.example` for an isolated Docker database. In that setup, start `postgres`, run `database-setup`, then apply the migration from the mounted `/database` directory.
 
 ### Production database
 
-Set `CODEFY_DATABASE_DSN` (or `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWORD`) in the PHP runtime's secret environment. Use the application role named `codefy_app` with managed PostgreSQL/TLS, and run migrations as a separate owner account. If TLS terminates at a reverse proxy, set `CODEFY_SECURE_COOKIE=true`. Apply migration files in version order. Database credentials are never sent to browser JavaScript. If PostgreSQL is temporarily unavailable, public guide pages fall back to their PHP defaults; the admin panel requires the database.
+Set `DATABASE_URL`, `CODEFY_DATABASE_DSN` (with `PGUSER` and `PGPASSWORD`), or `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWORD` in the PHP runtime's secret environment. Use the restricted application role with managed PostgreSQL/TLS, and run migrations as a separate owner account. Supabase transaction-pooler URLs on port 6543 automatically use emulated PDO prepares. If TLS terminates at a reverse proxy, set `CODEFY_SECURE_COOKIE=true`. Apply migration files in version order. Database credentials are never sent to browser JavaScript. If PostgreSQL is temporarily unavailable, public guide pages fall back to their PHP defaults; the admin panel requires the database.
 
 ### Supabase setup
 

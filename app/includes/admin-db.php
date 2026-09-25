@@ -51,11 +51,50 @@ function codefy_accent_theme(string $accent): array {
     return $themes[$accent] ?? $themes['primary'];
 }
 
+function codefy_parse_database_url(string $url): array {
+    $parts = parse_url($url);
+    if (!is_array($parts) || !in_array(strtolower((string)($parts['scheme'] ?? '')), ['postgres', 'postgresql'], true)) {
+        throw new RuntimeException('DATABASE_URL must be a PostgreSQL connection URL.');
+    }
+    $host = (string)($parts['host'] ?? '');
+    $database = rawurldecode(ltrim((string)($parts['path'] ?? ''), '/'));
+    $port = (int)($parts['port'] ?? 5432);
+    $user = rawurldecode((string)($parts['user'] ?? ''));
+    $password = rawurldecode((string)($parts['pass'] ?? ''));
+    if ($host === '' || $database === '' || $user === '' || $password === '' || $port < 1 || $port > 65535
+        || (!preg_match('/^(?=.{1,253}$)[A-Za-z0-9.-]+$/D', $host) && filter_var($host, FILTER_VALIDATE_IP) === false)
+        || !preg_match('/^[A-Za-z0-9_.-]+$/D', $database)) {
+        throw new RuntimeException('DATABASE_URL is missing valid PostgreSQL connection details.');
+    }
+    $query = [];
+    parse_str((string)($parts['query'] ?? ''), $query);
+    $sslMode = (string)($query['sslmode'] ?? 'require');
+    if (!in_array($sslMode, ['disable', 'allow', 'prefer', 'require', 'verify-ca', 'verify-full'], true)) {
+        throw new RuntimeException('DATABASE_URL contains an unsupported sslmode.');
+    }
+    return [
+        'dsn' => 'pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $database . ';sslmode=' . $sslMode,
+        'user' => $user,
+        'password' => $password,
+        'emulate_prepares' => $port === 6543 && str_ends_with($host, '.pooler.supabase.com'),
+    ];
+}
+
 function codefy_db(): PDO {
     static $pdo = null;
     if ($pdo instanceof PDO) return $pdo;
 
     $dsn = codefy_env('CODEFY_DATABASE_DSN');
+    $connectionUser = codefy_env('PGUSER');
+    $connectionPassword = codefy_env('PGPASSWORD');
+    $emulatePreparesDefault = 'false';
+    if (!$dsn && codefy_env('DATABASE_URL')) {
+        $connection = codefy_parse_database_url((string)codefy_env('DATABASE_URL'));
+        $dsn = $connection['dsn'];
+        $connectionUser = $connection['user'];
+        $connectionPassword = $connection['password'];
+        $emulatePreparesDefault = $connection['emulate_prepares'] ? 'true' : 'false';
+    }
     if (!$dsn) {
         $host = codefy_env('PGHOST', '127.0.0.1');
         $port = codefy_env('PGPORT', '5432');
@@ -65,11 +104,11 @@ function codefy_db(): PDO {
         if ($sslMode) $dsn .= ';sslmode=' . $sslMode;
     }
 
-    $pdo = new PDO($dsn, codefy_env('PGUSER'), codefy_env('PGPASSWORD'), [
+    $pdo = new PDO($dsn, $connectionUser, $connectionPassword, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         // Supabase's transaction pooler does not retain named server-side prepares.
-        PDO::ATTR_EMULATE_PREPARES => codefy_bool(codefy_env('CODEFY_PDO_EMULATE_PREPARES', 'false')),
+        PDO::ATTR_EMULATE_PREPARES => codefy_bool(codefy_env('CODEFY_PDO_EMULATE_PREPARES', $emulatePreparesDefault)),
         PDO::ATTR_PERSISTENT => false,
     ]);
     return $pdo;
