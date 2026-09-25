@@ -1,9 +1,9 @@
 {
   "version": 2,
   "github": { "enabled": true, "autoJobCancellation": true },
-  "buildCommand": "npm run build",
+  "buildCommand": "echo 'Pre-built'",
   "outputDirectory": "dist",
-  "installCommand": "npm ci",
+  "installCommand": "echo 'Skipping'",
   "framework": null,
   "headers": [
     {

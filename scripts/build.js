@@ -12,7 +12,7 @@ log('Cleaning dist/...');
 fs.rmSync(DIST, { recursive: true, force: true });
 fs.mkdirSync(DIST, { recursive: true });
 
-// Required static directories
+// Required static directories ONLY (no api/ to avoid Vercel serverless function detection)
 const requiredDirs = ['Statics', 'Temp'];
 for (const dir of requiredDirs) {
   const src = path.join(ROOT, dir);
@@ -26,7 +26,7 @@ for (const dir of requiredDirs) {
 }
 
 // Optional root files
-const rootFiles = ['README.md', 'vercel.json'];
+const rootFiles = ['README.md'];
 for (const file of rootFiles) {
   const src = path.join(ROOT, file);
   if (!fs.existsSync(src)) {
@@ -37,27 +37,4 @@ for (const file of rootFiles) {
   fs.copySync(src, path.join(DIST, file));
 }
 
-// API serverless functions (copied as-is, Vercel will install deps)
-const apiDir = path.join(ROOT, 'api');
-const distApiDir = path.join(DIST, 'api');
-fs.mkdirSync(distApiDir, { recursive: true });
-
-const apiFiles = [
-  'validate.js',
-  'download-cleaned.js',
-  'excel-analyzer.js',
-  'serverless-api.js',
-  'excel-analyzer-express.js'
-];
-
-for (const file of apiFiles) {
-  const src = path.join(apiDir, file);
-  if (!fs.existsSync(src)) {
-    warn(`Missing API file: api/${file} — skipping`);
-    continue;
-  }
-  log(`Copying api/${file}...`);
-  fs.copySync(src, path.join(distApiDir, file));
-}
-
-log('Build completed successfully.');
+log('Build completed successfully - static only.');
