@@ -2,74 +2,26 @@
   "name": "codefyerp-data-validation",
   "version": "1.0.0",
   "description": "CodefyERP Data Validation System for Egyptian Business Operations",
-  "private": true,
-  "type": "commonjs",
-  "engines": {
-    "node": "24.x",
-    "npm": "10.x"
-  },
-  "packageManager": "npm@10.9.2",
+  "main": "index.html",
   "scripts": {
     "dev": "vercel dev",
-    "start": "vercel dev",
-    "api": "cd Statics/PY && python api_server.py",
-    "build:css": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=true tailwindcss -c tailwind.config.js -i ./Statics/CSS/tailwind.css -o ./Statics/CSS/tailwind.generated.css --minify",
-    "build": "npm run build:css && node scripts/build.js",
-    "vercel-build": "npm run build",
-    "lint": "eslint . --ext .js,.ts --ignore-path .gitignore",
-    "lint:fix": "eslint . --ext .js,.ts --ignore-path .gitignore --fix",
-    "format": "prettier --write \"**/*.{js,ts,json,css,md,html}\" --ignore-path .gitignore",
-    "format:check": "prettier --check \"**/*.{js,ts,json,css,md,html}\" --ignore-path .gitignore",
-    "test": "echo \"No tests configured yet\" && exit 0",
-    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\""
+    "build": "node -e \"require('fs').mkdirSync('dist', {recursive:true}); const fse = require('fs-extra'); fse.copySync('./Statics', './dist/Statics'); fse.copySync('./Temp', './dist/Temp'); fse.copySync('./api', './dist/api'); fse.copySync('./.vercel', './dist/.vercel'); fse.copySync('./README.md', './dist/README.md'); fse.copySync('./server.js', './dist/server.js'); fse.copySync('./vercel.json', './dist/vercel.json');\"",
+    "start": "node server.js",
+    "local-server": "node server.js",
+    "api": "cd Statics/PY && python api_server.py"
   },
   "dependencies": {
+    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "form-data": "^4.0.2",
-    "formidable": "^3.5.2",
-    "fs-extra": "^11.3.0"
+    "http-proxy-middleware": "^2.0.6",
+    "fs-extra": "^11.2.0"
   },
   "devDependencies": {
-    "@vercel/node": "^5.8.9",
-    "autoprefixer": "^10.4.21",
-    "cross-env": "^7.0.3",
-    "eslint": "^8.57.1",
-    "postcss": "^8.4.49",
-    "prettier": "^3.4.2",
-    "tailwindcss": "^3.4.17"
+    "@vercel/node": "^2.10.3"
   },
-  "allowScripts": {
-    "esbuild": true
+  "engines": {
+    "node": ">=14.0.0"
   },
-  "files": [
-    "api/",
-    "Statics/",
-    "Temp/",
-    "vercel.json",
-    "README.md"
-  ],
-  "directories": {
-    "lib": "api",
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/abahaas/CodefyERP-Help.git"
-  },
-  "bugs": {
-    "url": "https://github.com/abahaas/CodefyERP-Help/issues"
-  },
-  "homepage": "https://codefyag.vercel.app",
-  "keywords": [
-    "codefy",
-    "erp",
-    "data-validation",
-    "egypt",
-    "excel",
-    "transport",
-    "logistics"
-  ],
   "author": "CodefyERP Team",
   "license": "MIT"
 }
