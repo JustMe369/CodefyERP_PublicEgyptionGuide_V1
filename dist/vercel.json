@@ -1,9 +1,9 @@
 {
   "version": 2,
   "github": { "enabled": true, "autoJobCancellation": true },
-  "buildCommand": "echo 'Pre-built - skipping build'",
+  "buildCommand": "echo 'Pre-built locally - skipping build'",
   "outputDirectory": "dist",
-  "installCommand": "echo 'Skipping install'",
+  "installCommand": "echo 'Skipping install - using pre-bundled functions'",
   "framework": null,
   "headers": [
     {
@@ -11,17 +11,15 @@
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+        { "key": "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
     }
   ],
   "rewrites": [
     { "source": "/", "destination": "/Temp/index.html" },
-    { "source": "/((?!api/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
-  ],
-  "routes": [
-    { "src": "/api/validate", "dest": "/api/validate.js" },
-    { "src": "/api/download-cleaned", "dest": "/api/download-cleaned.js" },
-    { "src": "/api/excel-analyzer", "dest": "/api/excel-analyzer.js" }
+    { "source": "/api/validate", "destination": "/api-functions/validate/index.js" },
+    { "source": "/api/download-cleaned", "destination": "/api-functions/download-cleaned/index.js" },
+    { "source": "/api/excel-analyzer", "destination": "/api-functions/excel-analyzer/index.js" },
+    { "source": "/((?!api/|api-functions/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
   ]
 }

@@ -1770,7 +1770,7 @@
                     return;
                 }
 
-                fetch('footer.html')
+                fetch('/Temp/footer.html')
                     .then(function (res) {
                         if (!res.ok) throw new Error('Network error loading footer: ' + res.status);
                         return res.text();
