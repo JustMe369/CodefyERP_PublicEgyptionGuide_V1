@@ -7,7 +7,7 @@ if (!$s) return;
     <div class="flex items-center gap-2 text-xs sm:text-sm">
         <a href="index.php" class="text-slate-400 font-bold hover:text-primary-600 transition-colors">🏠 الفهرس</a>
         <span class="text-slate-300">/</span>
-        <span class="font-black text-primary-700 flex items-center gap-1.5"><?= $s['icon'] ?> <?= e($s['title']) ?></span>
+        <span class="font-black text-primary-700 flex items-center gap-1.5"><?= e($s['icon']) ?> <?= e($s['title']) ?></span>
         <span class="ms-2 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-black hidden sm:inline-block">
             القسم <?= (int)$s['number'] ?> من <?= count($SECTIONS) ?>
         </span>

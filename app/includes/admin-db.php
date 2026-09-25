@@ -55,7 +55,8 @@ function codefy_db(): PDO {
     $pdo = new PDO($dsn, codefy_env('PGUSER'), codefy_env('PGPASSWORD'), [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
+        // Supabase's transaction pooler does not retain named server-side prepares.
+        PDO::ATTR_EMULATE_PREPARES => codefy_bool(codefy_env('CODEFY_PDO_EMULATE_PREPARES', 'false')),
         PDO::ATTR_PERSISTENT => false,
     ]);
     return $pdo;

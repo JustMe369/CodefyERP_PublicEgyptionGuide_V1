@@ -56,7 +56,7 @@ $currentSlug = codefy_current_slug();
                         <a href="<?= e($slug) ?>.php" data-section="<?= e($slug) ?>"
                            class="collapsible-nav-item nav-link flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
                             <div class="collapsible-nav-content flex items-center gap-4">
-                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300"><?= $s['icon'] ?></span>
+                                <span class="collapsible-nav-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300"><?= e($s['icon']) ?></span>
                                 <div>
                                     <div class="nav-text font-bold text-sm text-slate-100 group-hover:text-primary-300 transition-opacity duration-300" style="opacity:1;"><?= e($s['title']) ?></div>
                                     <div class="nav-subtitle text-[11px] text-slate-500 group-hover:text-slate-400 transition-opacity duration-300" style="opacity:1;"><?= e($s['subtitle']) ?></div>

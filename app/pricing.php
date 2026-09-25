@@ -13,7 +13,7 @@ $s     = $SECTIONS['pricing'];
 
     <section id="pricing" class="mb-24 section-content reveal">
         <div class="flex items-start gap-4 mb-8">
-            <div class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br <?= e($s['gradient']) ?> text-white text-2xl shadow-lg <?= e($s['shadow']) ?>" aria-hidden="true"><?= $s['icon'] ?></div>
+            <div class="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br <?= e($s['gradient']) ?> text-white text-2xl shadow-lg <?= e($s['shadow']) ?>" aria-hidden="true"><?= e($s['icon']) ?></div>
             <div>
                 <div class="pill <?= e($s['pill_bg']) ?> <?= e($s['pill_text']) ?> mb-2"><?= e($s['pill']) ?></div>
                 <h2 class="text-3xl sm:text-4xl font-black text-slate-900 m-0 leading-tight">التسعير</h2>

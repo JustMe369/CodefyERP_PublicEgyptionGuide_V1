@@ -150,27 +150,39 @@ The PHP guide includes a PostgreSQL-backed administration area at `/admin/`. It 
 
 ### Local setup with XAMPP on Windows
 
-1. Copy `.env.example` to `.env` in the repository root. Set different strong passwords for `POSTGRES_PASSWORD` (database owner) and `PGPASSWORD` (limited application role). Keep `.env` private; the root `.htaccess` blocks web access to it and Git ignores it.
-2. Start PostgreSQL, then provision the limited `codefy_app` database role:
+1. Provision your existing local PostgreSQL service and create the database/schema:
    ```powershell
-   docker compose up -d postgres
-   docker compose run --rm database-setup
+   .\scripts\setup-postgres.ps1
    ```
-   PostgreSQL binds only to localhost and persists its data in the `codefy_postgres_data` volume.
-3. Apply the schema:
+   It securely prompts for the PostgreSQL `postgres` password, creates `codefy_guide` plus the restricted `codefy_app` role, applies the migration, and writes generated credentials to the ignored `.env` file. It stops if a Codefy database or role already exists.
+   If provisioning succeeded but migration application failed, the generated roles and `.env` are already in place. Resume safely with:
    ```powershell
-   docker compose exec postgres psql -U codefy_owner -d codefy_guide -f /database/migrations/001_admin_foundation.sql
+   .\scripts\migrate-postgres.ps1
    ```
-4. Enable PHP's `pdo_pgsql` extension in XAMPP's `php.ini`, restart Apache, then open `http://localhost/CaodefyERPGuide/app/admin/` (adjust the URL to match your Apache setup).
-5. Create the first administrator:
+   The migration runner forces UTF-8 client encoding for the Arabic seed data and can be rerun after a failed transaction.
+2. Restart Apache so XAMPP loads the enabled `pdo_pgsql` extension.
+3. Create the first administrator:
    ```powershell
    .\scripts\create-admin.ps1
    ```
-   The helper prompts for email, display name, role, and password using a secure password prompt. Use a unique password of at least 14 characters and no more than 72 UTF-8 bytes. Account creation requires the database migration and `.env` connection to be available. There is no public account-registration endpoint.
+   The helper prompts for email, display name, role, and password using a secure password prompt. Use a unique password of at least 14 characters and no more than 72 UTF-8 bytes. Account creation requires the migration and `.env` connection. There is no public account-registration endpoint.
+4. Open `http://localhost/CaodefyERPGuide/app/admin/` (adjust the URL to match your Apache setup).
+
+The repository also includes `compose.yaml` and `.env.example` for an isolated Docker database. In that setup, start `postgres`, run `database-setup`, then apply the migration from the mounted `/database` directory.
 
 ### Production database
 
 Set `CODEFY_DATABASE_DSN` (or `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWORD`) in the PHP runtime's secret environment. Use the application role named `codefy_app` with managed PostgreSQL/TLS, and run migrations as a separate owner account. If TLS terminates at a reverse proxy, set `CODEFY_SECURE_COOKIE=true`. Apply migration files in version order. Database credentials are never sent to browser JavaScript. If PostgreSQL is temporarily unavailable, public guide pages fall back to their PHP defaults; the admin panel requires the database.
+
+### Supabase setup
+
+The Supabase project already provides its `postgres` database; the setup below creates the Codefy schema and restricted runtime role inside it. Rotate any database password shared in chat before connecting. From PowerShell, run:
+
+```powershell
+.\scripts\setup-supabase.ps1
+```
+
+The script securely prompts for the rotated database password, uses TLS with the supplied IPv4 transaction pooler, applies migrations in order, verifies the migration records, creates a non-superuser `codefy_app` login, and updates the ignored `.env` only after success. The app uses the pooler's transaction mode with emulated PDO prepares enabled. Create an administrator afterward with `.\scripts\create-admin.ps1`. Never put the database password in frontend JavaScript, a committed file, or a public environment variable.
 
 ## License
 
