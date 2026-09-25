@@ -1,0 +1,17 @@
+/
+├── index.php                  ← Landing / index page
+├── login.php                  ← Section 1
+├── bulk-import.php            ← Section 2 (loads XLSX + analyzer)
+├── relationships.php          ← Section 3
+├── assignments.php            ← Section 4
+├── pricing.php                ← Section 5
+├── readiness.php              ← Section 6
+├── analysis-config.php        ← Section 7
+└── includes/
+    ├── config.php             ← Site config + sections registry
+    ├── head.php               ← <head> tag (title, metas, styles)
+    ├── header.php             ← Skip link + progress bar + mobile header
+    ├── sidebar.php            ← Sidebar nav (auto-generated from $SECTIONS)
+    ├── breadcrumb.php         ← Sticky breadcrumb bar
+    ├── section-pager.php      ← Prev / next pager
+    └── footer.php             ← Floating buttons, lightbox, scripts
