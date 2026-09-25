@@ -18,10 +18,5 @@
   "rewrites": [
     { "source": "/", "destination": "/Temp/index.html" },
     { "source": "/((?!api/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
-  ],
-  "routes": [
-    { "src": "/api/validate", "dest": "/api/validate.js" },
-    { "src": "/api/download-cleaned", "dest": "/api/download-cleaned.js" },
-    { "src": "/api/excel-analyzer", "dest": "/api/excel-analyzer.js" }
   ]
 }
