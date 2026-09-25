@@ -1,9 +1,9 @@
 {
   "version": 2,
   "github": { "enabled": true, "autoJobCancellation": true },
-  "buildCommand": "npm run build",
+  "buildCommand": "echo 'Pre-built - skipping build'",
   "outputDirectory": "dist",
-  "installCommand": "NPM_CONFIG_DEDUPE_PEER_DEPENDENCIES=false npm install --legacy-peer-deps --no-audit --no-fund",
+  "installCommand": "echo 'Skipping install'",
   "framework": null,
   "headers": [
     {
