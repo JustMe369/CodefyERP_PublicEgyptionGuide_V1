@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "github": { "enabled": true, "autoJobCancellation": true },
+  "buildCommand": "echo 'Pre-built'",
+  "outputDirectory": "dist",
+  "installCommand": "echo 'Skipping'",
+  "framework": null,
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/Temp/index.html" },
+    { "source": "/((?!api/|Statics/|Temp/).*)", "destination": "/Temp/index.html" }
+  ]
+}
