@@ -105,6 +105,14 @@ $validateBlocks = static function ($raw) use ($blockTypes, $requiredText): array
                 $safe=[];
                 break;
         }
+        $layout=$data['layout']??[];
+        if(!is_array($layout)) throw new InvalidArgumentException('إعدادات موضع الكتلة غير صالحة.');
+        $width=$layout['width']??'full';
+        $align=$layout['align']??'start';
+        if(!in_array($width,['full','wide','half','third'],true)||!in_array($align,['start','center','end'],true)) {
+            throw new InvalidArgumentException('اختر حجماً وموضعاً صالحين للكتلة.');
+        }
+        $safe['layout']=['width'=>$width,'align'=>$align];
         $blocks[]=['type'=>$type,'data'=>$safe];
     }
     return $blocks;
@@ -149,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $order=filter_var($_POST['sort_order']??null,FILTER_VALIDATE_INT);
         if(!in_array($accent,$accentOptions,true)||!in_array($mode,['legacy','builder'],true)||$order===false) throw new InvalidArgumentException('راجع لون القسم وطريقة المحتوى وترتيبه.');
         if(!$isEdit&&$mode==='legacy') throw new InvalidArgumentException('الأقسام الجديدة تستخدم المحرر المرئي.');
-        $blocks=$validateBlocks($_POST['blocks_json']??'[]');
+        $blocks=$mode==='builder'?$validateBlocks($_POST['blocks_json']??'[]'):[];
         if($published&&$mode==='builder'&&!$blocks) throw new InvalidArgumentException('أضف كتلة واحدة على الأقل قبل نشر صفحة المحرر المرئي.');
         $existingSlugs=$pdo->query('SELECT slug FROM codefy_guide_sections ORDER BY sort_order,slug')->fetchAll(PDO::FETCH_COLUMN);
         if($isEdit&&!in_array($originalSlug,$existingSlugs,true)) throw new InvalidArgumentException('القسم المطلوب غير موجود.');
@@ -169,18 +177,20 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $pdo->query('SELECT pg_advisory_xact_lock(840713249)');
         if($existingSlugs) $pdo->exec('UPDATE codefy_guide_sections SET sort_order=sort_order+10000');
         if($isEdit){
-            $stmt=$pdo->prepare('UPDATE codefy_guide_sections SET slug=:slug,title=:title,subtitle=:subtitle,icon=:icon,accent=:accent,content_mode=:mode,is_published=:published,sort_order=20000,updated_at=now(),updated_by=:admin_id WHERE slug=:original_slug');
-            $stmt->execute(['slug'=>$slug,'title'=>$title,'subtitle'=>$subtitle,'icon'=>$icon,'accent'=>$accent,'mode'=>$mode,'published'=>$published,'admin_id'=>$user['id'],'original_slug'=>$originalSlug]);
+            $stmt=$pdo->prepare('UPDATE codefy_guide_sections SET slug=:slug,title=:title,subtitle=:subtitle,icon=:icon,accent=:accent,content_mode=:mode,is_published=CAST(:published AS boolean),sort_order=20000,updated_at=now(),updated_by=:admin_id WHERE slug=:original_slug');
+            $stmt->execute(['slug'=>$slug,'title'=>$title,'subtitle'=>$subtitle,'icon'=>$icon,'accent'=>$accent,'mode'=>$mode,'published'=>$published?'true':'false','admin_id'=>$user['id'],'original_slug'=>$originalSlug]);
         }else{
-            $stmt=$pdo->prepare('INSERT INTO codefy_guide_sections(slug,title,subtitle,icon,accent,content_mode,is_published,sort_order,updated_by) VALUES(:slug,:title,:subtitle,:icon,:accent,:mode,:published,20000,:admin_id)');
-            $stmt->execute(['slug'=>$slug,'title'=>$title,'subtitle'=>$subtitle,'icon'=>$icon,'accent'=>$accent,'mode'=>$mode,'published'=>$published,'admin_id'=>$user['id']]);
+            $stmt=$pdo->prepare('INSERT INTO codefy_guide_sections(slug,title,subtitle,icon,accent,content_mode,is_published,sort_order,updated_by) VALUES(:slug,:title,:subtitle,:icon,:accent,:mode,CAST(:published AS boolean),20000,:admin_id)');
+            $stmt->execute(['slug'=>$slug,'title'=>$title,'subtitle'=>$subtitle,'icon'=>$icon,'accent'=>$accent,'mode'=>$mode,'published'=>$published?'true':'false','admin_id'=>$user['id']]);
         }
         $renumber=$pdo->prepare('UPDATE codefy_guide_sections SET sort_order=:order WHERE slug=:slug');
         foreach($ordered as $index=>$orderedSlug) $renumber->execute(['order'=>$index+1,'slug'=>$orderedSlug]);
-        $pdo->prepare('DELETE FROM codefy_section_blocks WHERE section_slug=:slug')->execute(['slug'=>$slug]);
-        $insert=$pdo->prepare('INSERT INTO codefy_section_blocks(section_slug,block_type,payload,sort_order) VALUES(:slug,:type,CAST(:payload AS jsonb),:order)');
-        foreach($blocks as $index=>$block) $insert->execute(['slug'=>$slug,'type'=>$block['type'],'payload'=>json_encode($block['data'],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),'order'=>$index+1]);
-        codefy_admin_audit($pdo,(int)$user['id'],$isEdit?'update':'create','guide_section',$slug,['title'=>$title,'blocks'=>count($blocks),'published'=>$published,'content_mode'=>$mode]);
+        if($mode==='builder'){
+            $pdo->prepare('DELETE FROM codefy_section_blocks WHERE section_slug=:slug')->execute(['slug'=>$slug]);
+            $insert=$pdo->prepare('INSERT INTO codefy_section_blocks(section_slug,block_type,payload,sort_order) VALUES(:slug,:type,CAST(:payload AS jsonb),:order)');
+            foreach($blocks as $index=>$block) $insert->execute(['slug'=>$slug,'type'=>$block['type'],'payload'=>json_encode($block['data'],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),'order'=>$index+1]);
+        }
+        codefy_admin_audit($pdo,(int)$user['id'],$isEdit?'update':'create','guide_section',$slug,['title'=>$title,'blocks_saved'=>$mode==='builder'?count($blocks):null,'blocks_preserved'=>$mode==='legacy','published'=>$published,'content_mode'=>$mode]);
         $pdo->commit();
         admin_flash('success',$isEdit?'تم حفظ القسم ومحتواه.':'تم إنشاء القسم ومحتواه.');
         header('Location: sections.php?edit='.rawurlencode($slug)); exit;
@@ -201,13 +211,15 @@ foreach ($sections as $section) {
     $sectionStats[!empty($section['is_published']) ? 'published' : 'drafts']++;
     $sectionStats['blocks'] += (int)($section['block_count'] ?? 0);
 }
-$editingSection=null; $blocks=[];
+$editingSection=null; $blocks=[]; $isLegacyTemplate=false; $hasLegacyTemplate=false;
 $editSlug=trim((string)($_GET['edit']??''));
 if($editSlug!==''){
     $find=$pdo->prepare('SELECT slug,title,subtitle,icon,accent,content_mode,sort_order,is_published FROM codefy_guide_sections WHERE slug=:slug');
     $find->execute(['slug'=>$editSlug]); $editingSection=$find->fetch()?:null;
     if(!$editingSection){http_response_code(404);exit('القسم المطلوب غير موجود.');}
-    $editingSection['public_url']='../'.codefy_section_url($editingSection['slug']);
+    $hasLegacyTemplate=is_file(dirname(__DIR__).DIRECTORY_SEPARATOR.$editingSection['slug'].'.php');
+    $isLegacyTemplate=$editingSection['content_mode']==='legacy'&&$hasLegacyTemplate;
+    $editingSection['public_url']=$hasLegacyTemplate?'../'.rawurlencode($editingSection['slug']).'.php':'../'.codefy_section_url($editingSection['slug']);
     $query=$pdo->prepare('SELECT block_type AS type,payload AS data FROM codefy_section_blocks WHERE section_slug=:slug ORDER BY sort_order,id');
     $query->execute(['slug'=>$editSlug]);
     foreach($query as $block){$data=$block['data'];if(is_string($data))$data=json_decode($data,true);$blocks[]=['type'=>$block['type'],'data'=>is_array($data)?$data:[]];}

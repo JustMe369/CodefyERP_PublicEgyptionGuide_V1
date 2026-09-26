@@ -6,10 +6,26 @@ $availableMediaAssets = is_array($mediaAssets ?? null) ? $mediaAssets : [];
 $currentBlocks = is_array($blocks ?? null) ? $blocks : [];
 $token = (string)($csrf ?? '');
 $isNew = $editing === null;
+$isLegacyTemplate = (bool)($isLegacyTemplate ?? ($editing && ($editing['content_mode'] ?? '') === 'legacy'));
+$hasLegacyTemplate = (bool)($hasLegacyTemplate ?? ($editing && ($editing['content_mode'] ?? '') === 'legacy'));
 $status = $editing && !empty($editing['is_published']);
-$publicPreview = $editing
-    ? (string)($editing['public_url'] ?? ('../section.php?slug=' . rawurlencode((string)$editing['slug'])))
-    : '../index.php';
+$fallbackPreview = $editing ? '../section.php?slug=' . rawurlencode((string)($editing['slug'] ?? '')) : '../index.php';
+$previewCandidate = trim((string)($publicPreview ?? $fallbackPreview));
+$previewParts = parse_url($previewCandidate);
+$previewIsSameOrigin = is_array($previewParts) && !isset($previewParts['user'], $previewParts['pass'])
+    && !str_contains($previewCandidate, '\\');
+if ($previewIsSameOrigin && isset($previewParts['host'])) {
+    $requestHost = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    $candidateHost = strtolower((string)$previewParts['host'] . (isset($previewParts['port']) ? ':' . $previewParts['port'] : ''));
+    $requestScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $previewIsSameOrigin = $candidateHost === $requestHost
+        && (!isset($previewParts['scheme']) || strtolower((string)$previewParts['scheme']) === $requestScheme);
+} elseif ($previewIsSameOrigin && isset($previewParts['scheme'])) {
+    $previewIsSameOrigin = false;
+} elseif ($previewIsSameOrigin && str_starts_with($previewCandidate, '//')) {
+    $previewIsSameOrigin = false;
+}
+$publicPreview = $previewIsSameOrigin && $previewCandidate !== '' ? $previewCandidate : $fallbackPreview;
 $blockJson = json_encode(array_values($currentBlocks), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
 if (!is_string($blockJson)) $blockJson = '[]';
 $accentNames = ['primary'=>'أزرق أساسي','indigo'=>'نيلي','emerald'=>'زمردي','amber'=>'كهرماني','violet'=>'بنفسجي','rose'=>'وردي','cyan'=>'سماوي'];
@@ -24,7 +40,7 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
     <link rel="stylesheet" href="admin.css"><link rel="stylesheet" href="sections.css">
     <script src="sections.js" defer></script>
 </head>
-<body>
+<body class="sections-admin-page">
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <a class="admin-brand" href="index.php"><span class="brand-mark">ك</span><span><strong>كوديفاي</strong><small>لوحة الإدارة</small></span></a>
@@ -80,6 +96,16 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
                 <div class="editor-heading"><div><span class="eyebrow"><?= $isNew ? 'مسودة جديدة' : 'تحرير القسم' ?></span><h2 id="editor-title"><?= $isNew ? 'إنشاء قسم جديد' : 'تفاصيل القسم' ?></h2></div>
                     <?php if ($editing): ?><a class="preview-link" href="<?= admin_e($publicPreview) ?>" target="_blank" rel="noopener">معاينة الصفحة <span aria-hidden="true">↗</span></a><?php endif; ?>
                 </div>
+                <?php if ($editing && $hasLegacyTemplate): ?>
+                <section class="legacy-source" aria-labelledby="legacy-source-title" data-source-panel="legacy" <?= !$isLegacyTemplate ? 'hidden' : '' ?>>
+                    <header class="legacy-source-heading"><span class="legacy-source-icon" aria-hidden="true">▣</span><div><span class="legacy-status">قالب الصفحة الحالي</span><h3 id="legacy-source-title">المحتوى محفوظ في ملف الصفحة الأصلي</h3><p>يعرض هذا القسم محتوى قالب PHP الحالي كما يظهر للزوار. تعديل الكتل المرئية لا يغيّر القالب حتى تختار «المحرر المرئي» من مصدر المحتوى.</p></div></header>
+                    <div class="legacy-preview-toolbar"><span><span class="source-live-dot" aria-hidden="true"></span> معاينة آمنة للصفحة المنشورة</span><a class="preview-link" href="<?= admin_e($publicPreview) ?>" target="_blank" rel="noopener">فتح الصفحة العامة <span aria-hidden="true">↗</span></a></div>
+                    <div class="legacy-frame-wrap"><iframe class="legacy-frame" src="<?= admin_e($publicPreview) ?>" title="معاينة الصفحة العامة للقسم <?= admin_e((string)($editing['title'] ?? '')) ?>" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-same-origin"></iframe></div>
+                    <p class="legacy-frame-note">المعاينة معزولة داخل إطار بلا صلاحية تشغيل JavaScript أو إرسال النماذج. استخدم رابط الصفحة العامة للتفاعل الكامل.</p>
+                </section>
+                <?php elseif ($editing): ?>
+                <div class="builder-source-status" role="status" aria-live="polite" data-source-panel="builder" <?= $isLegacyTemplate ? 'hidden' : '' ?>><span aria-hidden="true">✦</span><div><strong>مصدر المحتوى: المحرر المرئي</strong><small>الكتل أدناه هي مصدر محتوى هذه الصفحة.</small></div></div>
+                <?php endif; ?>
                 <form method="post" class="section-form" id="section-form" data-section-form>
                     <input type="hidden" name="_csrf" value="<?= admin_e($token) ?>"><input type="hidden" name="action" value="save_section">
                     <input type="hidden" name="original_slug" value="<?= admin_e((string)($editing['slug'] ?? '')) ?>">
@@ -98,13 +124,13 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
                     </section>
 
                     <section class="composer" aria-labelledby="composer-title" data-composer>
-                        <div class="subsection-heading"><span class="step-index">2</span><div><h3 id="composer-title">محتوى الصفحة</h3><p>أضف الكتل ورتّبها لبناء شرح متكامل.</p></div><span class="block-count" data-block-count>0 كتل</span></div>
+                        <div class="subsection-heading"><span class="step-index">2</span><div><h3 id="composer-title">محتوى الصفحة</h3><p>أضف الكتل، اسحبها لترتيبها، واضبط عرضها ومكانها.</p></div><span class="block-count" data-block-count>0 كتل</span></div>
                         <div class="composer-toolbar"><span class="toolbar-label">إضافة كتلة</span><div class="block-tools" role="group" aria-label="أنواع كتل المحتوى">
                             <button type="button" data-add="heading"><b>H</b> عنوان</button><button type="button" data-add="paragraph"><b>¶</b> فقرة</button><button type="button" data-add="list"><b>☷</b> قائمة</button><button type="button" data-add="steps"><b>↗</b> خطوات</button><button type="button" data-add="callout"><b>✦</b> تنبيه</button><button type="button" data-add="image"><b>▧</b> صورة</button><button type="button" data-add="table"><b>▦</b> جدول</button><button type="button" data-add="code"><b>&lt;/&gt;</b> كود</button><button type="button" data-add="mermaid"><b>◇</b> مخطط</button><button type="button" data-add="link"><b>↗</b> رابط</button><button type="button" data-add="divider"><b>—</b> فاصل</button>
                         </div></div>
                         <div class="composer-workspace"><div class="block-stack" data-block-stack aria-live="polite"></div>
                             <div class="composer-empty" data-empty-state><span class="empty-glyph" aria-hidden="true">＋</span><h4>ابدأ ببناء الصفحة</h4><p>اختر نوع كتلة من الشريط أعلاه. يمكنك نقل كل كتلة أو تكرارها أو حذفها.</p></div>
-                            <aside class="live-preview" aria-label="معاينة تقريبية للمحتوى"><div class="preview-head"><span class="preview-light"></span><span class="preview-light"></span><span class="preview-light"></span><b>معاينة سريعة</b></div><div class="preview-body" data-preview><span class="preview-placeholder">ستظهر هنا لمحة عن ترتيب المحتوى.</span></div></aside>
+                            <aside class="live-preview" aria-label="معاينة تخطيط المحتوى"><div class="preview-head"><span class="preview-light"></span><span class="preview-light"></span><span class="preview-light"></span><b>لوحة التخطيط</b></div><div class="preview-body preview-canvas" data-preview><span class="preview-placeholder">ستظهر هنا لمحة عن ترتيب المحتوى.</span></div><p class="canvas-guidance">تتبع اللوحة ترتيب الكتل وعرضها. على الشاشات الصغيرة تتراص الكتل بعرض كامل.</p></aside>
                         </div>
                     </section>
                     <footer class="save-dock"><div class="save-state"><span class="save-indicator" data-save-indicator></span><span data-save-label>كل التعديلات محفوظة في النموذج</span></div><div class="save-actions">

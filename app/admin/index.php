@@ -101,11 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (count(array_filter($values, static fn($row) => $row['is_published'])) === 0) throw new InvalidArgumentException('يجب إبقاء قسم واحد على الأقل منشوراً.');
             $pdo->beginTransaction();
             $pdo->exec('UPDATE codefy_guide_sections SET sort_order = sort_order + 100');
-            $statement = $pdo->prepare('UPDATE codefy_guide_sections SET title = :title, subtitle = :subtitle, icon = :icon, sort_order = :sort_order, is_published = :published, updated_at = now(), updated_by = :admin_id WHERE slug = :slug');
+            $statement = $pdo->prepare('UPDATE codefy_guide_sections SET title = :title, subtitle = :subtitle, icon = :icon, sort_order = :sort_order, is_published = CAST(:published AS boolean), updated_at = now(), updated_by = :admin_id WHERE slug = :slug');
             foreach ($values as $slug => $row) {
                 $statement->execute([
                     'title' => $row['title'], 'subtitle' => $row['subtitle'], 'icon' => $row['icon'],
-                    'sort_order' => $row['sort_order'], 'published' => $row['is_published'],
+                    'sort_order' => $row['sort_order'], 'published' => $row['is_published'] ? 'true' : 'false',
                     'admin_id' => $user['id'], 'slug' => $slug,
                 ]);
             }

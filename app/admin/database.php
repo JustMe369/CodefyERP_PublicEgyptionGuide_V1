@@ -47,7 +47,7 @@ function codefy_db_ops_runtime_backup_connection(): array {
     $sslMode = (string)codefy_env('PGSSLMODE', 'require');
     if ($dsn !== '') {
         foreach (['host', 'port', 'dbname', 'sslmode'] as $field) {
-            if (preg_match('/(?:^|;)' . $field . '=([^;]+)/i', $dsn, $match)) {
+            if (preg_match('/(?:^|[;:])' . $field . '=([^;]+)/i', $dsn, $match)) {
                 if ($field === 'host') $host = $match[1];
                 elseif ($field === 'port') $port = (int)$match[1];
                 elseif ($field === 'dbname') $database = $match[1];
@@ -85,7 +85,7 @@ function codefy_db_ops_same_target(PDO $pdo, array $connection): bool {
     $runtimeUrl = codefy_env('DATABASE_URL');
     $runtimeHost = '';
     $runtimeDsn = codefy_env('CODEFY_DATABASE_DSN');
-    if ($runtimeDsn && preg_match('/(?:^|;)host=([^;]+)/i', $runtimeDsn, $match)) {
+    if ($runtimeDsn && preg_match('/(?:^|[;:])host=([^;]+)/i', $runtimeDsn, $match)) {
         $runtimeHost = strtolower($match[1]);
     } elseif ($runtimeUrl) {
         $runtimeParts = parse_url($runtimeUrl);
@@ -314,12 +314,11 @@ try {
         'provider' => 'PostgreSQL مستضاف', 'checked_at' => gmdate('Y-m-d H:i:s') . ' UTC',
     ];
     $adminUrl = codefy_env('CODEFY_BACKUP_DATABASE_URL') ?: codefy_env('DATABASE_URL') ?: '';
-    if ($adminUrl !== '') {
-        $parts = parse_url($adminUrl);
-        $host = strtolower((string)($parts['host'] ?? ''));
-        if (str_ends_with($host, '.supabase.com') || str_ends_with($host, '.pooler.supabase.com')) $databaseMetrics['provider'] = 'Supabase';
-    }
-    $tables = $pdo->query("SELECT schemaname AS schema, relname AS table, GREATEST(reltuples, 0)::bigint AS estimated_rows, pg_total_relation_size(relid)::bigint AS approximate_bytes FROM pg_stat_user_tables ORDER BY pg_total_relation_size(relid) DESC, schemaname, relname LIMIT 300")->fetchAll();
+    $host = '';
+    if ($adminUrl !== '') { $parts = parse_url($adminUrl); $host = strtolower((string)($parts['host'] ?? '')); }
+    if ($host === '') $host = strtolower((string)codefy_env('PGHOST', ''));
+    if (str_ends_with($host, '.supabase.com') || str_ends_with($host, '.supabase.co')) $databaseMetrics['provider'] = 'Supabase';
+    $tables = $pdo->query("SELECT st.schemaname AS schema, st.relname AS table, GREATEST(c.reltuples, 0)::bigint AS estimated_rows, pg_total_relation_size(st.relid)::bigint AS approximate_bytes FROM pg_stat_user_tables st JOIN pg_class c ON c.oid=st.relid ORDER BY pg_total_relation_size(st.relid) DESC, st.schemaname, st.relname LIMIT 300")->fetchAll();
     $databaseMetrics['table_count'] = count($tables);
 } catch (Throwable $error) {
     error_log('Codefy database operations inventory unavailable: ' . $error->getMessage());

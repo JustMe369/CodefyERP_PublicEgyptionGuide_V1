@@ -36,6 +36,8 @@
     const names = {heading:'عنوان',paragraph:'فقرة',list:'قائمة',steps:'خطوات',callout:'تنبيه أو معلومة',image:'صورة',table:'جدول',code:'كتلة برمجية',mermaid:'مخطط Mermaid',link:'رابط',divider:'فاصل'};
     const marks = {heading:'H',paragraph:'¶',list:'☷',steps:'↗',callout:'✦',image:'▧',table:'▦',code:'</>',mermaid:'◇',link:'↗',divider:'—'};
     const allowed = Object.keys(names);
+    const allowedWidths = ['full','wide','half','third'];
+    const allowedAlignments = ['start','center','end'];
     const esc = value => String(value ?? '');
     const lines = value => Array.isArray(value) ? value.join('\n') : esc(value);
     const blocks = (() => {
@@ -91,6 +93,10 @@
     function readCard(card){
         const type=card.dataset.type; const data={};
         card.querySelectorAll('[data-key]').forEach(el=>{data[el.dataset.key]=el.value;});
+        const layoutWidth = data.layout_width;
+        const layoutAlign = data.layout_align;
+        delete data.layout_width; delete data.layout_align;
+        data.layout={width:allowedWidths.includes(layoutWidth)?layoutWidth:'full',align:allowedAlignments.includes(layoutAlign)?layoutAlign:'start'};
         if(type==='heading')data.level=Number(data.level)||2;
         if(type==='list'){data.items=esc(data.items).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);data.ordered=data.ordered==='ordered';}
         if(type==='steps')data.items=esc(data.items).split(/\r?\n/).map(line=>{const i=line.indexOf('|');return {title:(i<0?line:line.slice(0,i)).trim(),text:(i<0?'':line.slice(i+1)).trim()};}).filter(x=>x.title||x.text);
@@ -102,19 +108,26 @@
         preview.replaceChildren();
         const valid=blocks.map((b,i)=>{const card=stack.children[i];return card?readCard(card):b;});
         if(!valid.length){const span=document.createElement('span');span.className='preview-placeholder';span.textContent='ستظهر هنا لمحة عن ترتيب المحتوى.';preview.append(span);return;}
-        valid.slice(0,7).forEach(({type,data})=>{
-            if(type==='heading')preview.append(textPreview(data.text||'عنوان جديد',Number(data.level)>2?'h4':'h3'));
-            else if(type==='paragraph')preview.append(textPreview(data.text||'نص الفقرة'));
-            else if(type==='list'){const list=document.createElement(data.ordered?'ol':'ul');(data.items||[]).slice(0,3).forEach(item=>list.append(textPreview(item,'li')));preview.append(list);}
-            else if(type==='steps')preview.append(textPreview(`${(data.items||[]).length} خطوات إرشادية`));
-            else if(type==='callout'){const box=textPreview(data.title||data.text||'تنبيه');box.className='preview-chip';preview.append(box);}
-            else if(type==='image'){preview.append(textPreview(data.caption||data.alt||'صورة توضيحية'));}
-            else if(type==='table'){const table=document.createElement('table');table.className='preview-table';(data.rows||[]).slice(0,2).forEach(row=>{const tr=document.createElement('tr');row.forEach(cell=>tr.append(textPreview(cell,'td')));table.append(tr);});preview.append(table);}
-            else if(type==='code'||type==='mermaid')preview.append(textPreview(type==='code'?'كتلة كود':'مخطط توضيحي'));
-            else if(type==='link'){const link=textPreview(data.label||'رابط','span');link.className='preview-link-chip';preview.append(link);}
-            else if(type==='divider'){const hr=document.createElement('div');hr.className='preview-rule';preview.append(hr);}
+        valid.forEach(({type,data},index)=>{
+            const layout=data.layout&&typeof data.layout==='object'?data.layout:{};
+            const width=allowedWidths.includes(layout.width)?layout.width:'full';
+            const align=allowedAlignments.includes(layout.align)?layout.align:'start';
+            const card=document.createElement('article');card.className=`canvas-block canvas-width-${width} canvas-align-${align}`;
+            const order=document.createElement('span');order.className='canvas-order';order.textContent=String(index+1).padStart(2,'0');card.append(order);
+            let content;
+            if(type==='heading')content=textPreview(data.text||'عنوان جديد',Number(data.level)>2?'h4':'h3');
+            else if(type==='paragraph')content=textPreview(data.text||'نص الفقرة');
+            else if(type==='list'){content=document.createElement(data.ordered?'ol':'ul');(data.items||[]).slice(0,4).forEach(item=>content.append(textPreview(item,'li')));}
+            else if(type==='steps')content=textPreview(`${(data.items||[]).length} خطوات إرشادية`);
+            else if(type==='callout'){content=textPreview(data.title||data.text||'تنبيه');content.className='preview-chip';}
+            else if(type==='image')content=textPreview(data.caption||data.alt||'صورة توضيحية');
+            else if(type==='table'){content=document.createElement('table');content.className='preview-table';(data.rows||[]).slice(0,2).forEach(row=>{const tr=document.createElement('tr');row.forEach(cell=>tr.append(textPreview(cell,'td')));content.append(tr);});}
+            else if(type==='code'||type==='mermaid')content=textPreview(type==='code'?'كتلة كود':'مخطط توضيحي');
+            else if(type==='link'){content=textPreview(data.label||'رابط','span');content.className='preview-link-chip';}
+            else if(type==='divider'){content=document.createElement('div');content.className='preview-rule';}
+            if(content)card.append(content);
+            preview.append(card);
         });
-        if(valid.length>7){const more=document.createElement('small');more.textContent=`و ${valid.length-7} كتل أخرى`;preview.append(more);}
     }
     function updateCount(){count.textContent=`${blocks.length} ${blocks.length===1?'كتلة':'كتل'}`;workspace.classList.toggle('has-blocks',blocks.length>0);}
     function sync(){
@@ -123,16 +136,22 @@
     function createCard(block,index){
         const type=block.type; const card=document.createElement('article');card.className='block-card';card.dataset.type=type;
         const top=document.createElement('header');top.className='block-top';
+        const grip=document.createElement('span');grip.className='drag-grip';grip.textContent='⠿';grip.setAttribute('aria-hidden','true');grip.draggable=mode.value==='builder';top.append(grip);
         const label=document.createElement('span');label.className='block-kind';const icon=document.createElement('i');icon.textContent=marks[type];const name=document.createElement('span');name.textContent=names[type];label.append(icon,name);
         const position=document.createElement('span');position.className='block-position';position.textContent=`${String(index+1).padStart(2,'0')}`;position.dataset.position='';top.append(label,position);
         const addControl=(glyph,aria,action,extra='')=>{const btn=document.createElement('button');btn.type='button';btn.className=`block-control ${extra}`;btn.textContent=glyph;btn.setAttribute('aria-label',aria);btn.dataset.action=action;top.append(btn);};
         addControl('↑','نقل الكتلة إلى الأعلى','up');addControl('↓','نقل الكتلة إلى الأسفل','down');addControl('⧉','تكرار الكتلة','duplicate');addControl('×','حذف الكتلة','remove','remove');
-        const fields=document.createElement('div');fields.className='block-fields';for(const item of controlsFor(type,block.data||{}))fields.append(item);
+        const data=block.data||{};const layout=data.layout&&typeof data.layout==='object'?data.layout:{};
+        const fields=document.createElement('div');fields.className='block-fields';for(const item of controlsFor(type,data))fields.append(item);
+        const layoutFields=document.createElement('div');layoutFields.className='block-layout-fields';
+        layoutFields.append(field('عرض الكتلة','layout_width',allowedWidths.includes(layout.width)?layout.width:'full',{options:[['full','كامل'],['wide','واسع · ⅔'],['half','نصف'],['third','ثلث']]}));
+        layoutFields.append(field('المحاذاة الأفقية','layout_align',allowedAlignments.includes(layout.align)?layout.align:'start',{options:[['start','البداية'],['center','الوسط'],['end','النهاية']]}));
+        fields.append(layoutFields);
         card.append(top,fields);return card;
     }
     function redraw(){
         stack.replaceChildren();blocks.forEach((block,index)=>stack.append(createCard(block,index)));
-        Array.from(stack.querySelectorAll('.block-card')).forEach((card,index)=>{card.querySelector('[data-action="up"]').disabled=index===0;card.querySelector('[data-action="down"]').disabled=index===blocks.length-1;});
+        Array.from(stack.querySelectorAll('.block-card')).forEach((card,index)=>{card.querySelector('[data-action="up"]').disabled=index===0;card.querySelector('[data-action="down"]').disabled=index===blocks.length-1;card.draggable=false;const grip=card.querySelector('.drag-grip');if(grip)grip.draggable=mode.value==='builder';});
         updateCount();paintPreview();
     }
     function markDirty(){status.classList.add('is-dirty');statusLabel.textContent='توجد تغييرات غير محفوظة';}
@@ -142,16 +161,42 @@
     }));
     stack.addEventListener('click',event=>{
         const btn=event.target.closest('[data-action]');if(!btn)return;const card=btn.closest('.block-card');const index=Array.from(stack.children).indexOf(card);if(index<0)return;
+        let movedTo=null;let preferredMove=null;
         if(btn.dataset.action==='remove')blocks.splice(index,1);
         if(btn.dataset.action==='duplicate')blocks.splice(index+1,0,JSON.parse(JSON.stringify(readCard(card))));
-        if(btn.dataset.action==='up'&&index>0)[blocks[index-1],blocks[index]]=[blocks[index],blocks[index-1]];
-        if(btn.dataset.action==='down'&&index<blocks.length-1)[blocks[index+1],blocks[index]]=[blocks[index],blocks[index+1]];
+        if(btn.dataset.action==='up'&&index>0){[blocks[index-1],blocks[index]]=[blocks[index],blocks[index-1]];movedTo=index-1;preferredMove='up';}
+        if(btn.dataset.action==='down'&&index<blocks.length-1){[blocks[index+1],blocks[index]]=[blocks[index],blocks[index+1]];movedTo=index+1;preferredMove='down';}
         redraw();markDirty();
+        if(movedTo!==null){const movedCard=stack.children[movedTo];const preferred=movedCard?.querySelector(`[data-action="${preferredMove}"]`);const fallbackMove=preferredMove==='up'?'down':'up';const fallback=movedCard?.querySelector(`[data-action="${fallbackMove}"]`);(preferred&&!preferred.disabled?preferred:fallback&&!fallback.disabled?fallback:null)?.focus();}
     });
+    let dragSource=null;
+    stack.addEventListener('dragstart',event=>{
+        const grip=event.target.closest?.('.drag-grip');const card=grip?.closest('.block-card');
+        if(mode.value!=='builder'||!grip||!card){event.preventDefault();return;}
+        dragSource=card;card.classList.add('is-dragging');
+        if(event.dataTransfer){event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',String(Array.from(stack.children).indexOf(card)));}
+    });
+    stack.addEventListener('dragover',event=>{
+        const target=event.target.closest('.block-card');
+        if(mode.value!=='builder'||!dragSource||!target||target===dragSource)return;
+        event.preventDefault();stack.querySelectorAll('.drag-over').forEach(item=>item.classList.remove('drag-over'));target.classList.add('drag-over');
+        if(event.dataTransfer)event.dataTransfer.dropEffect='move';
+    });
+    stack.addEventListener('drop',event=>{
+        const target=event.target.closest('.block-card');
+        if(mode.value!=='builder'||!dragSource||!target||target===dragSource)return;
+        event.preventDefault();
+        const cards=Array.from(stack.children);const from=cards.indexOf(dragSource);const targetIndex=cards.indexOf(target);
+        if(from<0||targetIndex<0)return;
+        const after=event.clientY>target.getBoundingClientRect().top+target.getBoundingClientRect().height/2;
+        const current=cards.map(readCard);const [moved]=current.splice(from,1);let insertAt=targetIndex+(after?1:0);if(from<insertAt)insertAt--;current.splice(Math.max(0,insertAt),0,moved);
+        blocks.splice(0,blocks.length,...current);dragSource=null;redraw();markDirty();
+    });
+    stack.addEventListener('dragend',()=>{dragSource=null;stack.querySelectorAll('.is-dragging,.drag-over').forEach(item=>item.classList.remove('is-dragging','drag-over'));});
     stack.addEventListener('input',()=>{sync();markDirty();});stack.addEventListener('change',()=>{sync();markDirty();});
     form.querySelectorAll('input:not([type=hidden]),select').forEach(el=>el.addEventListener('input',markDirty));
     const legacyNote=document.createElement('p');legacyNote.className='mode-note';legacyNote.textContent='هذا القسم يستخدم قالب الصفحة الحالي. اختر المحرر المرئي لتعديل كتل المحتوى.';legacyNote.hidden=true;composer.insertBefore(legacyNote,composer.querySelector('.composer-toolbar'));
-    function updateMode(){const visual=mode.value==='builder';composer.classList.toggle('mode-disabled',!visual);composer.setAttribute('aria-disabled',String(!visual));legacyNote.hidden=visual;composer.querySelectorAll('[data-add],.block-control,.block-fields input,.block-fields textarea,.block-fields select').forEach(control=>{control.disabled=!visual;});}
+    function updateMode(){const visual=mode.value==='builder';composer.classList.toggle('mode-disabled',!visual);composer.setAttribute('aria-disabled',String(!visual));legacyNote.hidden=visual;document.querySelector('[data-source-panel="legacy"]')?.toggleAttribute('hidden',visual);document.querySelector('[data-source-panel="builder"]')?.toggleAttribute('hidden',!visual);composer.querySelectorAll('[data-add],.block-control,.block-fields input,.block-fields textarea,.block-fields select').forEach(control=>{control.disabled=!visual;});stack.querySelectorAll('.drag-grip').forEach(grip=>{grip.draggable=visual;});}
     mode.addEventListener('change',()=>{updateMode();markDirty();});
     document.querySelector('#delete-section-form')?.addEventListener('submit',event=>{if(!window.confirm('سيُحذف هذا القسم ومحتواه نهائياً. هل تريد المتابعة؟'))event.preventDefault();});
     form.addEventListener('submit',()=>{sync();statusLabel.textContent='جارٍ إرسال التغييرات…';});

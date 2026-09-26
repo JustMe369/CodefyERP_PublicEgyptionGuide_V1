@@ -100,7 +100,7 @@ $token = (string)($csrf ?? '');
                     <?php if (!empty($restoreNotice)): ?><div class="operation-notice <?= !empty($restoreEnabled) ? 'notice-risk' : 'notice-muted' ?>" role="status"><?= admin_e((string)$restoreNotice) ?></div><?php endif; ?>
                     <form method="post" action="database.php" enctype="multipart/form-data" class="operation-form restore-form">
                         <input type="hidden" name="_csrf" value="<?= admin_e($token) ?>"><input type="hidden" name="action" value="restore_backup">
-                        <label class="file-field">ملف النسخة الاحتياطية<input type="file" name="backup_file" accept=".sql,.dump,.backup,.gz,application/sql,application/octet-stream,application/gzip" required <?= empty($restoreEnabled) || !$isConnected ? 'disabled' : '' ?>></label>
+                        <label class="file-field">حزمة Codefy بصيغة .tar.gz<input type="file" name="backup_file" accept=".tar.gz,application/gzip,application/x-gzip" required <?= empty($restoreEnabled) || !$isConnected ? 'disabled' : '' ?>></label>
                         <label class="confirmation-field">للتأكيد، اكتب العبارة التالية كما هي <span dir="ltr">RESTORE DATABASE</span><input type="text" name="confirmation" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="RESTORE DATABASE" pattern="RESTORE DATABASE" required <?= empty($restoreEnabled) || !$isConnected ? 'disabled' : '' ?>></label>
                         <button class="button restore-button" type="submit" <?= empty($restoreEnabled) || !$isConnected ? 'disabled' : '' ?>>استعادة قاعدة البيانات</button>
                         <?php if (empty($restoreEnabled)): ?><small class="form-hint">الاستعادة غير متاحة حالياً.</small><?php endif; ?>

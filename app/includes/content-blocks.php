@@ -17,6 +17,10 @@ function codefy_content_url($value, bool $image = false): ?string {
 function codefy_render_content_block(array $block): void {
     $data = is_array($block['data'] ?? null) ? $block['data'] : [];
     $type = (string)($block['type'] ?? '');
+    $layout = is_array($data['layout'] ?? null) ? $data['layout'] : [];
+    $width = in_array(($layout['width'] ?? 'full'), ['full', 'wide', 'half', 'third'], true) ? ($layout['width'] ?? 'full') : 'full';
+    $align = in_array(($layout['align'] ?? 'start'), ['start', 'center', 'end'], true) ? ($layout['align'] ?? 'start') : 'start';
+    echo '<div class="cms-block cms-block--' . $width . ' cms-block--align-' . $align . '">';
     switch ($type) {
         case 'heading':
             $level = (int)($data['level'] ?? 2);
@@ -95,6 +99,7 @@ function codefy_render_content_block(array $block): void {
             echo '<hr class="cms-block-divider">';
             break;
     }
+    echo '</div>';
 }
 
 function codefy_render_section_content(string $slug): void {
