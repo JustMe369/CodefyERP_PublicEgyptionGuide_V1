@@ -31,6 +31,7 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
         <nav aria-label="أقسام الإدارة">
             <a class="side-link" href="index.php">◈ <span>نظرة عامة</span></a>
             <a class="side-link active" href="sections.php" aria-current="page">▤ <span>محرر الأقسام</span></a>
+            <a class="side-link" href="database.php">▣ <span>قاعدة البيانات</span></a>
             <a class="side-link" href="index.php#settings">⚙ <span>إعدادات الموقع</span></a>
             <a class="side-link" href="index.php#users">♙ <span>حسابات الإدارة</span></a>
             <a class="side-link" href="index.php#activity">◷ <span>سجل النشاط</span></a>

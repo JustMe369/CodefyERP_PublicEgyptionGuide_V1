@@ -146,6 +146,7 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
         <nav aria-label="أقسام الإدارة">
             <a class="side-link active" href="#overview">◈ <span>نظرة عامة</span></a>
             <a class="side-link" href="sections.php">✎ <span>محرر الأقسام</span></a>
+            <?php if (($user['role'] ?? '') === 'admin'): ?><a class="side-link" href="database.php">▣ <span>قاعدة البيانات</span></a><?php endif; ?>
             <a class="side-link" href="#sections">▤ <span>إدارة الأقسام</span></a>
             <a class="side-link" href="#settings">⚙ <span>إعدادات الموقع</span></a>
             <?php if (($user['role'] ?? '') === 'admin'): ?><a class="side-link" href="#users">♙ <span>حسابات الإدارة</span></a><?php endif; ?>

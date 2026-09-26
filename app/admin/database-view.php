@@ -59,7 +59,7 @@ $token = (string)($csrf ?? '');
         <?php if ($dbFlash): ?><div class="notice <?= admin_e((string)($dbFlash['type'] ?? '')) ?>" role="status" aria-live="polite"><?= admin_e((string)($dbFlash['message'] ?? '')) ?></div><?php endif; ?>
 
         <section class="db-intro" aria-labelledby="db-title">
-            <div class="db-intro-copy"><span class="eyebrow">لوحة تشغيل آمنة</span><h2 id="db-title">حالة قاعدة بيانات الدليل</h2><p>راقب اتصال PostgreSQL، واستعرض الجداول، وأنشئ نسخة احتياطية أو استعد قاعدة البيانات.</p>
+            <div class="db-intro-copy"><span class="eyebrow">لوحة تشغيل آمنة</span><h2 id="db-title">حالة قاعدة بيانات الدليل</h2><p>راقب اتصال PostgreSQL، واستعرض الجداول، وأنشئ نسخة موقعة لجداول تطبيق Codefy أو استعدها.</p>
                 <p class="credentials-note"><span aria-hidden="true">⌑</span> بيانات الاتصال مضبوطة على الخادم ولا تُعرض في هذه الصفحة.</p>
             </div>
             <div class="connection-stamp<?= $isConnected ? ' is-online' : ' is-offline' ?>"><span class="connection-pulse" aria-hidden="true"></span><span><strong><?= $isConnected ? 'الاتصال سليم' : 'تعذر الاتصال' ?></strong><small><?= admin_e((string)($dbStatus['message'] ?? ($isConnected ? 'تم الوصول إلى قاعدة البيانات' : 'تحقق من اتصال الخادم')) ) ?></small></span></div>
@@ -87,7 +87,7 @@ $token = (string)($csrf ?? '');
             <div class="operations-heading"><div><span class="eyebrow">نسخ واستعادة</span><h2 id="operations-title">عمليات قاعدة البيانات</h2><p>اختر إجراءً واضحاً على الهدف المضبوط حالياً على الخادم.</p></div><span class="ops-lock" aria-label="عمليات محمية">⌑ آمن</span></div>
             <div class="operations-grid">
                 <article class="operation-card backup-card">
-                    <div class="operation-icon backup-icon" aria-hidden="true">↓</div><div class="operation-copy"><span class="operation-kicker">نسخة قابلة للتنزيل</span><h3>إنشاء نسخة احتياطية</h3><p>أنشئ تصديراً كاملاً لقاعدة البيانات الحالية واحفظه على جهازك.</p></div>
+                    <div class="operation-icon backup-icon" aria-hidden="true">↓</div><div class="operation-copy"><span class="operation-kicker">نسخة قابلة للتنزيل</span><h3>نسخ جداول Codefy</h3><p>نزّل ملفاً موقّعاً لجداول التطبيق في مخطط public، مع فحص سلامة المحتوى قبل أي استعادة.</p></div>
                     <?php if (!empty($backupNotice)): ?><div class="operation-notice <?= !empty($backupEnabled) ? '' : 'notice-muted' ?>" role="status"><?= admin_e((string)$backupNotice) ?></div><?php endif; ?>
                     <form method="post" action="database.php" class="operation-form"><input type="hidden" name="_csrf" value="<?= admin_e($token) ?>"><input type="hidden" name="action" value="create_backup">
                         <button class="button primary" type="submit" <?= empty($backupEnabled) || !$isConnected ? 'disabled' : '' ?>>إنشاء وتنزيل النسخة <span aria-hidden="true">↓</span></button>
@@ -95,8 +95,8 @@ $token = (string)($csrf ?? '');
                     </form>
                 </article>
                 <article class="operation-card restore-card">
-                    <div class="restore-risk"><span aria-hidden="true">!</span> إجراء يستبدل البيانات الحالية</div>
-                    <div class="operation-icon restore-icon" aria-hidden="true">↑</div><div class="operation-copy"><span class="operation-kicker">استعادة من ملف</span><h3>استعادة قاعدة البيانات</h3><p>سيتم استبدال محتوى الهدف الحالي بمحتوى ملف النسخة المختار. لا يمكن التراجع عن ذلك من هنا.</p></div>
+                    <div class="restore-risk"><span aria-hidden="true">!</span> إجراء يستبدل بيانات التطبيق الحالية</div>
+                    <div class="operation-icon restore-icon" aria-hidden="true">↑</div><div class="operation-copy"><span class="operation-kicker">استعادة من ملف موثوق</span><h3>استعادة جداول Codefy</h3><p>سيتم استبدال جداول Codefy في قاعدة التطبيق من ملف موقّع صادر عن هذه الصفحة. لا يمكن التراجع عن ذلك من هنا.</p></div>
                     <?php if (!empty($restoreNotice)): ?><div class="operation-notice <?= !empty($restoreEnabled) ? 'notice-risk' : 'notice-muted' ?>" role="status"><?= admin_e((string)$restoreNotice) ?></div><?php endif; ?>
                     <form method="post" action="database.php" enctype="multipart/form-data" class="operation-form restore-form">
                         <input type="hidden" name="_csrf" value="<?= admin_e($token) ?>"><input type="hidden" name="action" value="restore_backup">
@@ -109,7 +109,7 @@ $token = (string)($csrf ?? '');
             </div>
         </section>
 
-        <aside class="provider-note" aria-labelledby="provider-note-title"><span class="provider-note-icon" aria-hidden="true">i</span><div><h2 id="provider-note-title">إدارة Supabase وخيارات الاستعادة الزمنية</h2><p>إنشاء مشروع أو قاعدة Supabase جديدة، وإدارة اللقطات والاستعادة إلى نقطة زمنية، تتم من لوحة تحكم Supabase. هذه الصفحة تنفّذ العمليات المتاحة على هدف PostgreSQL الذي أعدّه الخادم فقط.</p></div><a href="https://supabase.com/dashboard" target="_blank" rel="noopener">لوحة Supabase ↗</a></aside>
+        <aside class="provider-note" aria-labelledby="provider-note-title"><span class="provider-note-icon" aria-hidden="true">i</span><div><h2 id="provider-note-title">الاتصال السحابي وإدارة Supabase</h2><p>لربط مزوّد PostgreSQL أو مشروع آخر، حدّث أسرار الاتصال في إعدادات بيئة Vercel ثم أعد النشر؛ لا نخزن كلمات المرور داخل لوحة الإدارة. إنشاء مشروع Supabase جديد واللقطات والاستعادة الزمنية تتم من لوحة Supabase. هذه الصفحة تعمل على هدف التطبيق المهيأ فقط.</p></div><div class="provider-links"><a href="https://supabase.com/dashboard" target="_blank" rel="noopener">لوحة Supabase ↗</a><a href="https://vercel.com/dashboard" target="_blank" rel="noopener">إعدادات Vercel ↗</a></div></aside>
         <footer class="admin-footer">كوديفاي · عمليات قاعدة البيانات</footer>
     </main>
 </div>
