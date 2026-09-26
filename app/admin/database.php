@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/_bootstrap.php';
-$user = admin_require_role('admin');
+$user = admin_require_permission('database.view');
 $pdo = codefy_db();
 
 const CODEFY_DB_BACKUP_MAX_BYTES = 104857600;
@@ -12,9 +12,10 @@ function codefy_db_ops_connection(string $envName): array {
     $parts = parse_url($url);
     if (!is_array($parts)) throw new RuntimeException('Database operation connection is invalid.');
     $parsed = codefy_parse_database_url($url);
-    $port = (int)($parts['port'] ?? 5432);
-    if ($port === 6543) throw new RuntimeException('Use the Supabase direct connection or session pooler on port 5432 for backup and restore operations.');
     $host = (string)($parts['host'] ?? '');
+    $port = (int)($parts['port'] ?? 5432);
+    if ($port === 6543 && str_ends_with(strtolower($host), '.pooler.supabase.com')) $port = 5432;
+    if ($port === 6543) throw new RuntimeException('استخدم اتصال Supabase المباشر أو session pooler على المنفذ 5432 لعمليات النسخ والاستعادة.');
     $database = rawurldecode(ltrim((string)($parts['path'] ?? ''), '/'));
     $query = [];
     parse_str((string)($parts['query'] ?? ''), $query);
@@ -193,8 +194,12 @@ function codefy_db_ops_backup(PDO $pdo, array $user): never {
             '--table=public.codefy_*', '--file=' . $dumpPath,
         ], $connection['env'], $workDir);
         if ($result['exit_code'] !== 0 || !is_file($dumpPath) || filesize($dumpPath) < 1) {
-            error_log('Codefy database backup failed: ' . trim($result['stderr']));
-            throw new RuntimeException('The database backup could not be created. Check the backup connection role and server logs.');
+            $stderr = trim($result['stderr']);
+            error_log('Codefy database backup failed (pg_dump): ' . $stderr);
+            if (preg_match('/permission denied/i', $stderr)) throw new RuntimeException('حساب النسخ الاحتياطي لا يملك صلاحية قراءة كل جداول Codefy. امنحه SELECT على public.codefy_* أو اضبط CODEFY_BACKUP_DATABASE_URL على اتصال مناسب بصلاحية القراءة.');
+            if (preg_match('/password authentication failed|no password supplied/i', $stderr)) throw new RuntimeException('فشل التحقق من كلمة مرور اتصال النسخ الاحتياطي. حدّث CODEFY_BACKUP_DATABASE_URL ببيانات Supabase الصحيحة على الخادم.');
+            if (preg_match('/timeout expired|could not connect|connection refused|could not translate host name|name or service not known|SSL error/i', $stderr)) throw new RuntimeException('تعذر اتصال pg_dump بقاعدة البيانات. استخدم اتصال Supabase المباشر أو session pooler على المنفذ 5432 وتحقق من إعدادات الشبكة.');
+            throw new RuntimeException('تعذر إنشاء النسخة باستخدام pg_dump. راجع سجل الخادم لمعرفة فئة الخطأ المسجلة.');
         }
         if (filesize($dumpPath) > CODEFY_DB_BACKUP_MAX_BYTES) throw new RuntimeException('This backup is larger than the 100 MB download limit for the admin page.');
         $manifest = [
@@ -207,7 +212,10 @@ function codefy_db_ops_backup(PDO $pdo, array $user): never {
         file_put_contents($workDir . DIRECTORY_SEPARATOR . 'manifest.json', codefy_db_ops_signed_manifest($manifest, $key), LOCK_EX);
         $archivePath = $workDir . DIRECTORY_SEPARATOR . 'codefy-backup.tar.gz';
         $packed = codefy_db_ops_run([codefy_db_ops_tool('tar'), '-czf', $archivePath, '-C', $workDir, 'database.dump', 'manifest.json'], $connection['env'], $workDir);
-        if ($packed['exit_code'] !== 0 || !is_file($archivePath)) throw new RuntimeException('The signed backup package could not be assembled.');
+        if ($packed['exit_code'] !== 0 || !is_file($archivePath)) {
+            error_log('Codefy database backup archive failed: ' . trim($packed['stderr']));
+            throw new RuntimeException('تعذر تجميع الحزمة الموقعة. تحقق من المساحة المؤقتة وأدوات الأرشفة على الخادم.');
+        }
         codefy_admin_audit($pdo, (int)$user['id'], 'backup', 'database', $connection['database'], ['scope' => 'public.codefy_*', 'sha256' => $manifest['sha256'], 'bytes' => filesize($archivePath)]);
         header('Content-Type: application/gzip');
         header('Content-Length: ' . filesize($archivePath));
@@ -289,8 +297,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     admin_require_csrf();
     try {
         $action = (string)($_POST['action'] ?? '');
-        if ($action === 'create_backup') codefy_db_ops_backup($pdo, $user);
+        if ($action === 'create_backup') { admin_require_permission('database.backup'); codefy_db_ops_backup($pdo, $user); }
         if ($action === 'restore_backup') {
+            admin_require_permission('database.restore');
             codefy_db_ops_restore($pdo, $user);
             codefy_db_ops_flash_redirect('success', 'تمت استعادة نسخة Codefy والتحقق من تكامل المعاملة.');
         }

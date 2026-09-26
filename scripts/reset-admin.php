@@ -16,12 +16,12 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !codefy_password_is_valid($pas
 try {
     $pdo = codefy_db();
     $pdo->beginTransaction();
-    $statement = $pdo->prepare("UPDATE codefy_admin_users SET password_hash = :password_hash, session_version = session_version + 1, updated_at = now() WHERE lower(email) = lower(:email) AND role = 'admin' AND is_active = true RETURNING id, email");
+    $statement = $pdo->prepare("UPDATE codefy_admin_users SET password_hash = :password_hash, session_version = session_version + 1, updated_at = now() WHERE lower(email) = lower(:email) AND role IN ('admin','superuser') AND is_active = true RETURNING id, email");
     $statement->execute(['password_hash' => password_hash($password, PASSWORD_DEFAULT), 'email' => $email]);
     $account = $statement->fetch();
     if (!$account) {
         $pdo->rollBack();
-        throw new RuntimeException('No active administrator account matched that email. Password was not changed.');
+        throw new RuntimeException('No active administrator or superuser account matched that email. Password was not changed.');
     }
     codefy_admin_audit($pdo, null, 'password_reset', 'admin_user', (string)$account['id'], ['email' => $account['email'], 'source' => 'cli']);
     $pdo->commit();

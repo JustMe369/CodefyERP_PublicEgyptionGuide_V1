@@ -8,7 +8,8 @@ $connectionValue = $dbStatus['connected'] ?? $dbStatus['healthy'] ?? $dbStatus['
 $isConnected = is_bool($connectionValue)
     ? $connectionValue
     : in_array(strtolower(trim((string)$connectionValue)), ['1','true','connected','healthy','online','ok','متصل','سليم'], true);
-$isAdmin = ($user['role'] ?? '') === 'admin';
+$canBackup = admin_can('database.backup', $user);
+$canRestore = admin_can('database.restore', $user);
 $adminName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير النظام');
 $fmtBytes = static function ($value): string {
     if (!is_numeric($value) || (float)$value < 0) return '—';
@@ -39,20 +40,13 @@ $token = (string)($csrf ?? '');
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <a class="admin-brand" href="index.php"><span class="brand-mark">ك</span><span><strong>كوديفاي</strong><small>لوحة الإدارة</small></span></a>
-        <nav aria-label="أقسام الإدارة">
-            <a class="side-link" href="index.php">◈ <span>نظرة عامة</span></a>
-            <a class="side-link" href="sections.php">▤ <span>محرر الأقسام</span></a>
-            <a class="side-link" href="index.php#settings">⚙ <span>إعدادات الموقع</span></a>
-            <?php if ($isAdmin): ?><a class="side-link" href="index.php#users">♙ <span>حسابات الإدارة</span></a><?php endif; ?>
-            <a class="side-link active" href="database.php" aria-current="page">▣ <span>قاعدة البيانات</span></a>
-            <a class="side-link" href="index.php#activity">◷ <span>سجل النشاط</span></a>
-        </nav>
+        <?php $activeNav = 'database'; require __DIR__ . '/_navigation.php'; ?>
         <a class="public-link" href="../index.php">↗ عرض الدليل العام</a>
     </aside>
     <main class="admin-main db-main">
         <header class="topbar">
             <div><span class="eyebrow">مساحة العمل / البنية التحتية</span><h1>عمليات قاعدة البيانات</h1></div>
-            <div class="account-box"><span class="avatar" aria-hidden="true">ك</span><span><strong><?= admin_e($adminName) ?></strong><small><?= $isAdmin ? 'مدير النظام' : 'محرر' ?></small></span>
+            <div class="account-box"><span class="avatar" aria-hidden="true">ك</span><span><strong><?= admin_e($adminName) ?></strong><small><?= admin_e(admin_role_name((string)($user['role'] ?? ''))) ?></small></span>
                 <form method="post" action="index.php"><input type="hidden" name="_csrf" value="<?= admin_e($token) ?>"><input type="hidden" name="action" value="logout"><button class="button light" type="submit">خروج</button></form>
             </div>
         </header>
@@ -90,7 +84,7 @@ $token = (string)($csrf ?? '');
                     <div class="operation-icon backup-icon" aria-hidden="true">↓</div><div class="operation-copy"><span class="operation-kicker">نسخة قابلة للتنزيل</span><h3>نسخ جداول Codefy</h3><p>نزّل ملفاً موقّعاً لجداول التطبيق في مخطط public، مع فحص سلامة المحتوى قبل أي استعادة.</p></div>
                     <?php if (!empty($backupNotice)): ?><div class="operation-notice <?= !empty($backupEnabled) ? '' : 'notice-muted' ?>" role="status"><?= admin_e((string)$backupNotice) ?></div><?php endif; ?>
                     <form method="post" action="database.php" class="operation-form"><input type="hidden" name="_csrf" value="<?= admin_e($token) ?>"><input type="hidden" name="action" value="create_backup">
-                        <button class="button primary" type="submit" <?= empty($backupEnabled) || !$isConnected ? 'disabled' : '' ?>>إنشاء وتنزيل النسخة <span aria-hidden="true">↓</span></button>
+                        <button class="button primary" type="submit" <?= empty($backupEnabled) || !$isConnected || !$canBackup ? 'disabled' : '' ?>>إنشاء وتنزيل النسخة <span aria-hidden="true">↓</span></button>
                         <?php if (empty($backupEnabled)): ?><small class="form-hint">إنشاء النسخ الاحتياطية غير متاح حالياً.</small><?php endif; ?>
                     </form>
                 </article>
@@ -100,9 +94,9 @@ $token = (string)($csrf ?? '');
                     <?php if (!empty($restoreNotice)): ?><div class="operation-notice <?= !empty($restoreEnabled) ? 'notice-risk' : 'notice-muted' ?>" role="status"><?= admin_e((string)$restoreNotice) ?></div><?php endif; ?>
                     <form method="post" action="database.php" enctype="multipart/form-data" class="operation-form restore-form">
                         <input type="hidden" name="_csrf" value="<?= admin_e($token) ?>"><input type="hidden" name="action" value="restore_backup">
-                        <label class="file-field">حزمة Codefy بصيغة .tar.gz<input type="file" name="backup_file" accept=".tar.gz,application/gzip,application/x-gzip" required <?= empty($restoreEnabled) || !$isConnected ? 'disabled' : '' ?>></label>
-                        <label class="confirmation-field">للتأكيد، اكتب العبارة التالية كما هي <span dir="ltr">RESTORE DATABASE</span><input type="text" name="confirmation" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="RESTORE DATABASE" pattern="RESTORE DATABASE" required <?= empty($restoreEnabled) || !$isConnected ? 'disabled' : '' ?>></label>
-                        <button class="button restore-button" type="submit" <?= empty($restoreEnabled) || !$isConnected ? 'disabled' : '' ?>>استعادة قاعدة البيانات</button>
+                        <label class="file-field">حزمة Codefy بصيغة .tar.gz<input type="file" name="backup_file" accept=".tar.gz,application/gzip,application/x-gzip" required <?= empty($restoreEnabled) || !$isConnected || !$canRestore ? 'disabled' : '' ?>></label>
+                        <label class="confirmation-field">للتأكيد، اكتب العبارة التالية كما هي <span dir="ltr">RESTORE DATABASE</span><input type="text" name="confirmation" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="RESTORE DATABASE" pattern="RESTORE DATABASE" required <?= empty($restoreEnabled) || !$isConnected || !$canRestore ? 'disabled' : '' ?>></label>
+                        <button class="button restore-button" type="submit" <?= empty($restoreEnabled) || !$isConnected || !$canRestore ? 'disabled' : '' ?>>استعادة قاعدة البيانات</button>
                         <?php if (empty($restoreEnabled)): ?><small class="form-hint">الاستعادة غير متاحة حالياً.</small><?php endif; ?>
                     </form>
                 </article>

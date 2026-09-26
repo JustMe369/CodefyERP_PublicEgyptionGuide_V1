@@ -57,19 +57,19 @@ GRANT CONNECT ON DATABASE postgres TO codefy_app;
         if ($LASTEXITCODE -ne 0) { throw "Migration $($migration.Name) failed. Fix the reported issue and rerun this script." }
     }
 
-    $verification = & $psqlPath -X -w -h $hostName -p $port -U $adminRole -d $database -Atqc "SELECT count(*) FROM codefy_schema_migrations WHERE version IN ('001_admin_foundation', '002_runtime_role_security', '003_visual_section_builder')" 2>&1
-    if ($LASTEXITCODE -ne 0 -or $verification -ne '3') { throw "Migration verification failed: $verification" }
+    $verification = & $psqlPath -X -w -h $hostName -p $port -U $adminRole -d $database -Atqc "SELECT (SELECT count(*) FROM codefy_schema_migrations WHERE version IN ('001_admin_foundation', '002_runtime_role_security', '003_visual_section_builder', '004_admin_roles_and_draft_sections')) || '|' || (SELECT count(*) FROM codefy_admin_roles) || '|' || (SELECT count(*) FROM codefy_admin_permissions) || '|' || has_table_privilege('codefy_app', 'public.codefy_schema_migrations', 'SELECT')" 2>&1
+    if ($LASTEXITCODE -ne 0 -or $verification -ne '4|4|18|t') { throw "Migration verification failed: $verification" }
     $env:PGPASSWORD = $appPassword
     $runtimeCheck = $null
     for ($attempt = 1; $attempt -le 12; $attempt++) {
-        $runtimeCheck = & $psqlPath -X -w -h $hostName -p $port -U $runtimePoolerUser -d $database -Atqc 'SELECT count(*) FROM codefy_guide_sections' 2>&1
-        if ($LASTEXITCODE -eq 0 -and $runtimeCheck -eq '7') { break }
+        $runtimeCheck = & $psqlPath -X -w -h $hostName -p $port -U $runtimePoolerUser -d $database -Atqc "SELECT (SELECT count(*) FROM codefy_guide_sections WHERE slug IN ('login','bulk-import','relationships','assignments','pricing','readiness','analysis-config')) || '|' || (SELECT count(*) FROM codefy_admin_roles) || '|' || (SELECT count(*) FROM codefy_admin_permissions) || '|' || has_table_privilege(current_user, 'public.codefy_schema_migrations', 'SELECT')" 2>&1
+        if ($LASTEXITCODE -eq 0 -and $runtimeCheck -eq '7|4|18|t') { break }
         if ($attempt -lt 12) {
             Write-Host "Supabase is refreshing the new role credentials; retrying verification ($attempt/12)..."
             Start-Sleep -Seconds 5
         }
     }
-    if ($LASTEXITCODE -ne 0 -or $runtimeCheck -ne '7') { throw "Restricted application-role verification failed: $runtimeCheck" }
+    if ($LASTEXITCODE -ne 0 -or $runtimeCheck -ne '7|4|18|t') { throw "Restricted application-role verification failed: $runtimeCheck" }
     $env:PGPASSWORD = $adminPassword
 
     $preserved = @()

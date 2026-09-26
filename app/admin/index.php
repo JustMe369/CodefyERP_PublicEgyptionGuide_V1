@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: login.php'); exit;
         }
         if ($action === 'save_settings') {
-            admin_require_role('admin');
+            admin_require_permission('settings.manage');
             $posted = $_POST['settings'] ?? [];
             $limits = ['name' => 100, 'brand_suffix' => 16, 'subtitle' => 180, 'copyright' => 220, 'version' => 32, 'home_eyebrow' => 180, 'home_title' => 180, 'home_intro' => 1000, 'navigation_label' => 80, 'search_placeholder' => 120];
             $values = [];
@@ -30,55 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             codefy_admin_audit($pdo, (int)$user['id'], 'update', 'site_settings', null, ['keys' => array_keys($values)]);
             $pdo->commit();
             admin_flash('success', 'تم حفظ إعدادات الموقع.');
-        } elseif ($action === 'create_user') {
-            admin_require_role('admin');
-            $email = strtolower(trim((string)($_POST['email'] ?? '')));
-            $displayName = trim((string)($_POST['display_name'] ?? ''));
-            $password = (string)($_POST['password'] ?? '');
-            $role = (string)($_POST['role'] ?? 'editor');
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 254 || $displayName === '' || strlen($displayName) > 120 || !codefy_password_is_valid($password) || !in_array($role, ['admin', 'editor'], true)) {
-                throw new InvalidArgumentException('أدخل بريداً صحيحاً واسماً صالحاً وكلمة مرور من 14 حرفاً على الأقل وبحد 72 بايت.');
-            }
-            $pdo->beginTransaction();
-            $statement = $pdo->prepare('INSERT INTO codefy_admin_users (email, password_hash, display_name, role) VALUES (:email, :password_hash, :display_name, :role) RETURNING id');
-            $statement->execute(['email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT), 'display_name' => $displayName, 'role' => $role]);
-            $newId = (string)$statement->fetchColumn();
-            codefy_admin_audit($pdo, (int)$user['id'], 'create', 'admin_user', $newId, ['email' => $email, 'role' => $role]);
-            $pdo->commit();
-            admin_flash('success', 'تم إنشاء حساب لوحة الإدارة.');
-        } elseif ($action === 'update_user') {
-            admin_require_role('admin');
-            $targetId = filter_var($_POST['user_id'] ?? null, FILTER_VALIDATE_INT);
-            $displayName = trim((string)($_POST['display_name'] ?? ''));
-            $role = (string)($_POST['role'] ?? 'editor');
-            $isActive = ($_POST['is_active'] ?? '0') === '1';
-            $newPassword = (string)($_POST['new_password'] ?? '');
-            if (!$targetId || $displayName === '' || strlen($displayName) > 120 || !in_array($role, ['admin', 'editor'], true) || ($newPassword !== '' && !codefy_password_is_valid($newPassword))) {
-                throw new InvalidArgumentException('راجع اسم الحساب والدور. كلمة المرور الجديدة من 14 حرفاً على الأقل وبحد 72 بايت.');
-            }
-            if ((int)$targetId === (int)$user['id'] && !$isActive) throw new InvalidArgumentException('لا يمكنك إيقاف حسابك الحالي.');
-            $targetStatement = $pdo->prepare('SELECT id, role, is_active FROM codefy_admin_users WHERE id = :id FOR UPDATE');
-            $pdo->beginTransaction();
-            $pdo->query('SELECT pg_advisory_xact_lock(840713249)');
-            $targetStatement->execute(['id' => $targetId]);
-            $target = $targetStatement->fetch();
-            if (!$target) throw new InvalidArgumentException('الحساب المطلوب غير موجود.');
-            $losesAdmin = $target['role'] === 'admin' && codefy_bool($target['is_active']) && ($role !== 'admin' || !$isActive);
-            if ($losesAdmin && (int)$pdo->query("SELECT count(*) FROM codefy_admin_users WHERE role = 'admin' AND is_active = true")->fetchColumn() <= 1) {
-                throw new InvalidArgumentException('يجب إبقاء حساب مدير نشط واحد على الأقل.');
-            }
-            $revokeSessions = ($newPassword !== '' || $target['role'] !== $role || codefy_bool($target['is_active']) !== $isActive) ? 1 : 0;
-            if ($newPassword !== '') {
-                $statement = $pdo->prepare('UPDATE codefy_admin_users SET display_name = :name, role = :role, is_active = :active, password_hash = :password_hash, session_version = session_version + :revoke_sessions, updated_at = now() WHERE id = :id');
-                $statement->execute(['name' => $displayName, 'role' => $role, 'active' => $isActive, 'password_hash' => password_hash($newPassword, PASSWORD_DEFAULT), 'revoke_sessions' => $revokeSessions, 'id' => $targetId]);
-            } else {
-                $statement = $pdo->prepare('UPDATE codefy_admin_users SET display_name = :name, role = :role, is_active = :active, session_version = session_version + :revoke_sessions, updated_at = now() WHERE id = :id');
-                $statement->execute(['name' => $displayName, 'role' => $role, 'active' => $isActive, 'revoke_sessions' => $revokeSessions, 'id' => $targetId]);
-            }
-            codefy_admin_audit($pdo, (int)$user['id'], 'update', 'admin_user', (string)$targetId, ['role' => $role, 'is_active' => $isActive, 'password_reset' => $newPassword !== '']);
-            $pdo->commit();
-            admin_flash('success', 'تم تحديث حساب لوحة الإدارة.');
         } elseif ($action === 'save_sections') {
+            admin_require_permission('sections.edit');
+            admin_require_permission('sections.publish');
             $posted = $_POST['sections'] ?? [];
             $current = $pdo->query('SELECT slug FROM codefy_guide_sections ORDER BY sort_order')->fetchAll(PDO::FETCH_COLUMN);
             if (count($posted) !== count($current)) throw new InvalidArgumentException('لم تصل بيانات جميع الأقسام. أعد تحميل الصفحة وحاول مرة أخرى.');
@@ -123,13 +77,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: index.php'); exit;
 }
 
+admin_require_permission('dashboard.view');
+
 $settings = [];
-foreach ($pdo->query('SELECT setting_key, setting_value FROM codefy_site_settings') as $row) $settings[$row['setting_key']] = $row['setting_value'];
-$sections = $pdo->query('SELECT slug, title, subtitle, icon, sort_order, is_published FROM codefy_guide_sections ORDER BY sort_order')->fetchAll();
-$adminUsers = $pdo->query('SELECT id, email, display_name, role, is_active, last_login_at FROM codefy_admin_users ORDER BY created_at')->fetchAll();
-$audit = $pdo->query('SELECT a.action, a.entity_type, a.created_at, u.display_name FROM codefy_admin_audit_log a LEFT JOIN codefy_admin_users u ON u.id = a.admin_id ORDER BY a.created_at DESC LIMIT 8')->fetchAll();
+if (admin_can('settings.manage')) foreach ($pdo->query('SELECT setting_key, setting_value FROM codefy_site_settings') as $row) $settings[$row['setting_key']] = $row['setting_value'];
+$sections = admin_can('sections.view') ? $pdo->query('SELECT slug, title, subtitle, icon, sort_order, is_published FROM codefy_guide_sections ORDER BY sort_order')->fetchAll() : [];
+$audit = admin_can('audit.view') ? $pdo->query('SELECT a.action, a.entity_type, a.created_at, u.display_name FROM codefy_admin_audit_log a LEFT JOIN codefy_admin_users u ON u.id = a.admin_id ORDER BY a.created_at DESC LIMIT 8')->fetchAll() : [];
 $flash = admin_take_flash();
-$roleLabels = ['admin' => 'مدير النظام', 'editor' => 'محرر'];
+$roleDisplay = admin_role_name((string)($user['role'] ?? ''));
 $userInitial = 'م';
 if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $initialMatch[0];
 ?>
@@ -143,22 +98,14 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <a class="admin-brand" href="index.php"><span class="brand-mark">ك</span><span><strong>كوديفاي</strong><small>لوحة الإدارة</small></span></a>
-        <nav aria-label="أقسام الإدارة">
-            <a class="side-link active" href="#overview">◈ <span>نظرة عامة</span></a>
-            <a class="side-link" href="sections.php">✎ <span>محرر الأقسام</span></a>
-            <?php if (($user['role'] ?? '') === 'admin'): ?><a class="side-link" href="database.php">▣ <span>قاعدة البيانات</span></a><?php endif; ?>
-            <a class="side-link" href="#sections">▤ <span>إدارة الأقسام</span></a>
-            <a class="side-link" href="#settings">⚙ <span>إعدادات الموقع</span></a>
-            <?php if (($user['role'] ?? '') === 'admin'): ?><a class="side-link" href="#users">♙ <span>حسابات الإدارة</span></a><?php endif; ?>
-            <a class="side-link" href="#activity">◷ <span>سجل النشاط</span></a>
-        </nav>
+        <?php $activeNav = 'dashboard'; require __DIR__ . '/_navigation.php'; ?>
         <a class="public-link" href="../index.php">↗ عرض الدليل العام</a>
     </aside>
 
     <main class="admin-main">
         <header class="topbar">
             <div><span class="eyebrow">مساحة العمل / الإدارة</span><h1>لوحة التحكم</h1></div>
-            <div class="account-box"><span class="avatar"><?= admin_e($userInitial) ?></span><span><strong><?= admin_e($user['name']) ?></strong><small><?= admin_e($roleLabels[$user['role']] ?? $user['role']) ?></small></span>
+            <div class="account-box"><span class="avatar"><?= admin_e($userInitial) ?></span><span><strong><?= admin_e($user['name']) ?></strong><small><?= admin_e($roleDisplay) ?></small></span>
                 <form method="post"><input type="hidden" name="_csrf" value="<?= admin_e(admin_csrf_token()) ?>"><input type="hidden" name="action" value="logout"><button class="button light" type="submit">خروج</button></form>
             </div>
         </header>
@@ -166,19 +113,19 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
         <?php if ($flash): ?><div class="notice <?= admin_e($flash['type']) ?>" role="status"><?= admin_e($flash['message']) ?></div><?php endif; ?>
 
         <section id="overview" class="welcome-card">
-            <div><span class="eyebrow">مرحباً <?= admin_e($user['name']) ?></span><h2>إدارة دليل كوديفاي من مكان واحد</h2><p>تحكم في هوية الموقع، أنشئ أقساماً، وابنِ محتوى الصفحات من محرر الكتل المرئي.</p><a class="button light" href="sections.php">فتح محرر الأقسام</a></div>
+            <div><span class="eyebrow">مرحباً <?= admin_e($user['name']) ?></span><h2>إدارة دليل كوديفاي من مكان واحد</h2><p>تحكم في هوية الموقع، أنشئ أقساماً، وابنِ محتوى الصفحات من محرر الكتل المرئي.</p><?php if (admin_can('sections.view')): ?><a class="button light" href="sections.php">فتح محرر الأقسام</a><?php endif; ?></div>
             <div class="welcome-symbol" aria-hidden="true">✦</div>
         </section>
 
         <section class="stat-grid" aria-label="ملخص المشروع">
             <article class="stat-card"><span class="stat-icon blue">▤</span><div><span class="stat-label">إجمالي الأقسام</span><strong><?= count($sections) ?></strong></div></article>
             <article class="stat-card"><span class="stat-icon green">●</span><div><span class="stat-label">أقسام منشورة</span><strong><?= count(array_filter($sections, static fn($s) => codefy_bool($s['is_published']))) ?></strong></div></article>
-            <article class="stat-card"><span class="stat-icon violet">♙</span><div><span class="stat-label">حالة الحساب</span><strong class="small-value"><?= admin_e($roleLabels[$user['role']] ?? $user['role']) ?></strong></div></article>
+            <article class="stat-card"><span class="stat-icon violet">♙</span><div><span class="stat-label">حالة الحساب</span><strong class="small-value"><?= admin_e($roleDisplay) ?></strong></div></article>
         </section>
 
         <section id="sections" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">المحتوى المنشور</span><h2>إدارة أقسام الدليل</h2><p>عدّل العناوين والوصف والأيقونة وترتيب العرض، أو أوقف نشر قسم مؤقتاً.</p></div><span class="panel-count"><?= count($sections) ?> أقسام</span></div>
-            <form method="post">
+            <?php if (admin_can('sections.edit') && admin_can('sections.publish')): ?><form method="post">
                 <input type="hidden" name="_csrf" value="<?= admin_e(admin_csrf_token()) ?>"><input type="hidden" name="action" value="save_sections">
                 <div class="table-wrap"><table><thead><tr><th>الترتيب</th><th>القسم</th><th>العنوان</th><th>الوصف المختصر</th><th>الرمز</th><th>النشر</th></tr></thead><tbody>
                 <?php foreach ($sections as $section): $slug = $section['slug']; ?>
@@ -193,12 +140,12 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
                 <?php endforeach; ?>
                 </tbody></table></div>
                 <div class="form-actions"><p class="muted">لتحرير محتوى أي صفحة تفصيلياً، افتح محرر الأقسام واختر القسم.</p><button class="button primary" type="submit">حفظ الأقسام</button></div>
-            </form>
+            </form><?php else: ?><div class="table-wrap"><table><thead><tr><th>الترتيب</th><th>المعرّف</th><th>القسم</th><th>الوصف</th><th>الحالة</th></tr></thead><tbody><?php foreach ($sections as $section): ?><tr><td><?= (int)$section['sort_order'] ?></td><td><span class="slug-label"><?= admin_e($section['slug']) ?></span></td><td><?= admin_e($section['title']) ?></td><td><?= admin_e($section['subtitle']) ?></td><td><?= codefy_bool($section['is_published']) ? 'منشور' : 'مسودة' ?></td></tr><?php endforeach; ?></tbody></table></div><?php endif; ?>
         </section>
 
         <section id="settings" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">هوية الدليل</span><h2>إعدادات الموقع</h2><p>هذه القيم تظهر في ترويسة الموقع وعنوان الصفحة وتذييلها.</p></div></div>
-            <?php if (($user['role'] ?? '') === 'admin'): ?>
+            <?php if (admin_can('settings.manage')): ?>
             <form method="post" class="settings-form">
                 <input type="hidden" name="_csrf" value="<?= admin_e(admin_csrf_token()) ?>"><input type="hidden" name="action" value="save_settings">
                 <label>اسم الموقع<input name="settings[name]" maxlength="100" value="<?= admin_e($settings['name'] ?? '') ?>" required></label>
@@ -216,7 +163,7 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
             <?php else: ?><div class="notice">يمكن لمدير النظام فقط تعديل إعدادات الموقع العامة.</div><?php endif; ?>
         </section>
 
-        <?php if (($user['role'] ?? '') === 'admin'): ?>
+        <?php if (false): ?>
         <section id="users" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">الصلاحيات والدخول</span><h2>حسابات لوحة الإدارة</h2><p>أنشئ حسابات مدير أو محرر، وغيّر صلاحياتها أو أوقفها. تُحفظ كلمات المرور بعد تشفيرها.</p></div></div>
             <form method="post" class="user-create-form">
@@ -244,14 +191,14 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
         </section>
         <?php endif; ?>
 
-        <section id="activity" class="panel">
+        <?php if (admin_can('audit.view')): ?><section id="activity" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">المتابعة والأمان</span><h2>آخر النشاطات</h2><p>سجل تغييرات لوحة الإدارة وتوقيت تنفيذها.</p></div></div>
             <?php if ($audit): ?><div class="activity-list">
                 <?php foreach ($audit as $event): ?>
                 <div class="activity-row"><span class="activity-dot"></span><div><strong><?= admin_e($event['display_name'] ?? 'حساب محذوف') ?></strong><span><?= admin_e($event['action']) ?> · <?= admin_e($event['entity_type']) ?></span></div><time><?= admin_e(date('Y-m-d H:i', strtotime($event['created_at']))) ?></time></div>
                 <?php endforeach; ?>
             </div><?php else: ?><p class="muted">لا توجد نشاطات مسجلة حتى الآن.</p><?php endif; ?>
-        </section>
+        </section><?php endif; ?>
         <footer class="admin-footer">كوديفاي · لوحة الإدارة</footer>
     </main>
 </div>

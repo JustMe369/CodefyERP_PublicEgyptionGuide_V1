@@ -1,6 +1,6 @@
 <?php
 require __DIR__ . '/_bootstrap.php';
-$user = admin_require_role('admin');
+$user = admin_require_permission('sections.view');
 $pdo = codefy_db();
 // This controller uses the same section registry and URL resolver as the public guide.
 require_once __DIR__ . '/../includes/config.php';
@@ -123,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     try {
         $action=(string)($_POST['action']??'');
         if($action==='delete_section'){
+            admin_require_permission('sections.delete');
             $slug=$scalarText($_POST,'original_slug');
             if(!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/',$slug)||in_array($slug,$coreSlugs,true)) throw new InvalidArgumentException('لا يمكن حذف هذا القسم الأساسي.');
             $pdo->beginTransaction();
@@ -143,6 +144,21 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $originalSlug=trim($scalarText($_POST,'original_slug'));
         $isEdit=$originalSlug!=='';
         if($isEdit&&!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/',$originalSlug)) throw new InvalidArgumentException('معرّف القسم الحالي غير صالح.');
+        $editingRecord = null;
+        if ($isEdit) {
+            $recordQuery = $pdo->prepare('SELECT slug, created_by, is_published, content_mode FROM codefy_guide_sections WHERE slug = :slug');
+            $recordQuery->execute(['slug' => $originalSlug]);
+            $editingRecord = $recordQuery->fetch();
+            if (!$editingRecord) throw new InvalidArgumentException('القسم المطلوب غير موجود.');
+            if (!admin_can('sections.edit')) {
+                $ownsDraft = admin_can('sections.edit_own_draft')
+                    && (int)($editingRecord['created_by'] ?? 0) === (int)$user['id']
+                    && !codefy_bool($editingRecord['is_published']);
+                if (!$ownsDraft) throw new RuntimeException('ليست لديك صلاحية تعديل هذا القسم.');
+            }
+        } elseif (!admin_can('sections.create')) {
+            throw new RuntimeException('ليست لديك صلاحية إنشاء الأقسام.');
+        }
         $slug=strtolower(trim($scalarText($_POST,'slug')));
         if(!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/',$slug)||strlen($slug)>80) throw new InvalidArgumentException('استخدم أحرفاً إنجليزية صغيرة وأرقاماً وواصلات فقط لمعرّف الرابط.');
         $reserved=['index','section','admin','includes','statics','api'];
@@ -153,7 +169,9 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $icon=$requiredText($_POST,'icon',32);
         $accent=$scalarText($_POST,'accent','primary');
         $mode=$scalarText($_POST,'content_mode',$isEdit?'legacy':'builder');
-        $published=isset($_POST['is_published'])&&$_POST['is_published']==='1';
+        $canPublish = admin_can('sections.publish');
+        if (!$canPublish) $mode = 'builder';
+        $published=$canPublish && isset($_POST['is_published'])&&$_POST['is_published']==='1';
         $order=filter_var($_POST['sort_order']??null,FILTER_VALIDATE_INT);
         if(!in_array($accent,$accentOptions,true)||!in_array($mode,['legacy','builder'],true)||$order===false) throw new InvalidArgumentException('راجع لون القسم وطريقة المحتوى وترتيبه.');
         if(!$isEdit&&$mode==='legacy') throw new InvalidArgumentException('الأقسام الجديدة تستخدم المحرر المرئي.');
@@ -180,8 +198,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             $stmt=$pdo->prepare('UPDATE codefy_guide_sections SET slug=:slug,title=:title,subtitle=:subtitle,icon=:icon,accent=:accent,content_mode=:mode,is_published=CAST(:published AS boolean),sort_order=20000,updated_at=now(),updated_by=:admin_id WHERE slug=:original_slug');
             $stmt->execute(['slug'=>$slug,'title'=>$title,'subtitle'=>$subtitle,'icon'=>$icon,'accent'=>$accent,'mode'=>$mode,'published'=>$published?'true':'false','admin_id'=>$user['id'],'original_slug'=>$originalSlug]);
         }else{
-            $stmt=$pdo->prepare('INSERT INTO codefy_guide_sections(slug,title,subtitle,icon,accent,content_mode,is_published,sort_order,updated_by) VALUES(:slug,:title,:subtitle,:icon,:accent,:mode,CAST(:published AS boolean),20000,:admin_id)');
-            $stmt->execute(['slug'=>$slug,'title'=>$title,'subtitle'=>$subtitle,'icon'=>$icon,'accent'=>$accent,'mode'=>$mode,'published'=>$published?'true':'false','admin_id'=>$user['id']]);
+            $stmt=$pdo->prepare('INSERT INTO codefy_guide_sections(slug,title,subtitle,icon,accent,content_mode,is_published,sort_order,updated_by,created_by) VALUES(:slug,:title,:subtitle,:icon,:accent,:mode,CAST(:published AS boolean),20000,:admin_id,:created_by)');
+            $stmt->execute(['slug'=>$slug,'title'=>$title,'subtitle'=>$subtitle,'icon'=>$icon,'accent'=>$accent,'mode'=>$mode,'published'=>$published?'true':'false','admin_id'=>$user['id'],'created_by'=>$user['id']]);
         }
         $renumber=$pdo->prepare('UPDATE codefy_guide_sections SET sort_order=:order WHERE slug=:slug');
         foreach($ordered as $index=>$orderedSlug) $renumber->execute(['order'=>$index+1,'slug'=>$orderedSlug]);
@@ -214,7 +232,7 @@ foreach ($sections as $section) {
 $editingSection=null; $blocks=[]; $isLegacyTemplate=false; $hasLegacyTemplate=false;
 $editSlug=trim((string)($_GET['edit']??''));
 if($editSlug!==''){
-    $find=$pdo->prepare('SELECT slug,title,subtitle,icon,accent,content_mode,sort_order,is_published FROM codefy_guide_sections WHERE slug=:slug');
+    $find=$pdo->prepare('SELECT slug,title,subtitle,icon,accent,content_mode,sort_order,is_published,created_by FROM codefy_guide_sections WHERE slug=:slug');
     $find->execute(['slug'=>$editSlug]); $editingSection=$find->fetch()?:null;
     if(!$editingSection){http_response_code(404);exit('القسم المطلوب غير موجود.');}
     $hasLegacyTemplate=is_file(dirname(__DIR__).DIRECTORY_SEPARATOR.$editingSection['slug'].'.php');
@@ -224,6 +242,12 @@ if($editSlug!==''){
     $query->execute(['slug'=>$editSlug]);
     foreach($query as $block){$data=$block['data'];if(is_string($data))$data=json_decode($data,true);$blocks[]=['type'=>$block['type'],'data'=>is_array($data)?$data:[]];}
 }
+$canCreateSection=admin_can('sections.create',$user);
+$canPublishSections=admin_can('sections.publish',$user);
+$canDeleteSections=admin_can('sections.delete',$user);
+$canEditCurrent=$editingSection
+    ? admin_can('sections.edit',$user) || (admin_can('sections.edit_own_draft',$user) && (int)($editingSection['created_by']??0)===(int)$user['id'] && !codefy_bool($editingSection['is_published']))
+    : $canCreateSection;
 $csrf=admin_csrf_token(); $flash=admin_take_flash();
 $mediaAssets=[];
 $mediaDir=dirname(__DIR__).DIRECTORY_SEPARATOR.'Statics'.DIRECTORY_SEPARATOR.'img';

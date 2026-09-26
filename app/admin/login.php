@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (codefy_bool($limit->fetchColumn())) {
             $error = 'محاولات كثيرة. انتظر 15 دقيقة ثم حاول مرة أخرى.';
         } else {
-            $statement = $pdo->prepare('SELECT id, email, display_name, role, password_hash, session_version FROM codefy_admin_users WHERE lower(email) = lower(:email) AND is_active = true LIMIT 1');
+            $statement = $pdo->prepare('SELECT u.id, u.email, u.display_name, u.role, u.password_hash, u.session_version FROM codefy_admin_users u JOIN codefy_admin_roles r ON r.role_key=u.role AND r.is_active WHERE lower(u.email) = lower(:email) AND u.is_active = true LIMIT 1');
             $statement->execute(['email' => trim((string)($_POST['email'] ?? ''))]);
             $account = $statement->fetch();
             if ($account && password_verify((string)($_POST['password'] ?? ''), $account['password_hash'])) {

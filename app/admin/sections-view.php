@@ -44,32 +44,25 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <a class="admin-brand" href="index.php"><span class="brand-mark">ك</span><span><strong>كوديفاي</strong><small>لوحة الإدارة</small></span></a>
-        <nav aria-label="أقسام الإدارة">
-            <a class="side-link" href="index.php">◈ <span>نظرة عامة</span></a>
-            <a class="side-link active" href="sections.php" aria-current="page">▤ <span>محرر الأقسام</span></a>
-            <a class="side-link" href="database.php">▣ <span>قاعدة البيانات</span></a>
-            <a class="side-link" href="index.php#settings">⚙ <span>إعدادات الموقع</span></a>
-            <a class="side-link" href="index.php#users">♙ <span>حسابات الإدارة</span></a>
-            <a class="side-link" href="index.php#activity">◷ <span>سجل النشاط</span></a>
-        </nav>
+        <?php $activeNav = 'sections'; require __DIR__ . '/_navigation.php'; ?>
         <a class="public-link" href="../index.php">↗ عرض الدليل العام</a>
     </aside>
     <main class="admin-main cms-main">
         <header class="topbar">
             <div><span class="eyebrow">مساحة العمل / المحتوى</span><h1>محرر أقسام الدليل</h1></div>
-            <div class="account-box"><span class="avatar" aria-hidden="true">ك</span><span><strong><?= admin_e($userName) ?></strong><small>إدارة المحتوى</small></span><a class="button light" href="index.php">لوحة التحكم</a></div>
+            <div class="account-box"><span class="avatar" aria-hidden="true">ك</span><span><strong><?= admin_e($userName) ?></strong><small><?= admin_e(admin_role_name((string)($user['role'] ?? ''))) ?></small></span><a class="button light" href="index.php">لوحة التحكم</a></div>
         </header>
         <?php if (!empty($flash) && is_array($flash)): ?><div class="notice <?= admin_e((string)($flash['type'] ?? '')) ?>" role="status" aria-live="polite"><?= admin_e((string)($flash['message'] ?? '')) ?></div><?php endif; ?>
 
         <section class="cms-intro" aria-labelledby="cms-title">
             <div><span class="eyebrow">استوديو النشر</span><h2 id="cms-title">كل فكرة تبدأ بقسم</h2><p>رتّب محتوى الدليل بكتل واضحة، وعاين النتيجة قبل حفظها.</p></div>
-            <a class="button primary" href="sections.php">＋ قسم جديد</a>
+            <?php if ($canCreateSection): ?><a class="button primary" href="sections.php">＋ قسم جديد</a><?php endif; ?>
             <div class="intro-mark" aria-hidden="true">01<span>—</span>∞</div>
         </section>
 
         <div class="cms-layout">
             <aside class="section-rail" aria-label="أقسام الدليل">
-                <div class="rail-heading"><div><span class="eyebrow">مكتبة المحتوى</span><h2>الأقسام <span><?= count($allSections) ?></span></h2></div><a href="sections.php" class="rail-add" aria-label="إنشاء قسم جديد">＋</a></div>
+                <div class="rail-heading"><div><span class="eyebrow">مكتبة المحتوى</span><h2>الأقسام <span><?= count($allSections) ?></span></h2></div><?php if ($canCreateSection): ?><a href="sections.php" class="rail-add" aria-label="إنشاء قسم جديد">＋</a><?php endif; ?></div>
                 <div class="rail-stats" aria-label="ملخص الأقسام">
                     <span><strong><?= (int)($sectionStats['published'] ?? 0) ?></strong><small>منشور</small></span>
                     <span><strong><?= (int)($sectionStats['drafts'] ?? 0) ?></strong><small>مسودة</small></span>
@@ -96,6 +89,7 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
                 <div class="editor-heading"><div><span class="eyebrow"><?= $isNew ? 'مسودة جديدة' : 'تحرير القسم' ?></span><h2 id="editor-title"><?= $isNew ? 'إنشاء قسم جديد' : 'تفاصيل القسم' ?></h2></div>
                     <?php if ($editing): ?><a class="preview-link" href="<?= admin_e($publicPreview) ?>" target="_blank" rel="noopener">معاينة الصفحة <span aria-hidden="true">↗</span></a><?php endif; ?>
                 </div>
+                <?php if (!$canEditCurrent): ?><div class="rail-empty"><span aria-hidden="true">⌑</span><strong>وضع الاستعراض فقط</strong><p>يمكنك مشاهدة القسم ومعاينته. التعديل والنشر متاحان للأدوار المخوّلة.</p></div><?php if ($editing): ?><div class="legacy-frame-wrap"><iframe class="legacy-frame" src="<?= admin_e($publicPreview) ?>" title="معاينة القسم <?= admin_e((string)($editing['title'] ?? '')) ?>" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-same-origin"></iframe></div><?php endif; ?><?php else: ?>
                 <?php if ($editing && $hasLegacyTemplate): ?>
                 <section class="legacy-source" aria-labelledby="legacy-source-title" data-source-panel="legacy" <?= !$isLegacyTemplate ? 'hidden' : '' ?>>
                     <header class="legacy-source-heading"><span class="legacy-source-icon" aria-hidden="true">▣</span><div><span class="legacy-status">قالب الصفحة الحالي</span><h3 id="legacy-source-title">المحتوى محفوظ في ملف الصفحة الأصلي</h3><p>يعرض هذا القسم محتوى قالب PHP الحالي كما يظهر للزوار. تعديل الكتل المرئية لا يغيّر القالب حتى تختار «المحرر المرئي» من مصدر المحتوى.</p></div></header>
@@ -120,7 +114,7 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
                             <label class="field">ترتيب العرض<input name="sort_order" type="number" min="1" step="1" value="<?= (int)($editing['sort_order'] ?? (count($allSections) + 1)) ?>" required></label>
                             <label class="field">مصدر المحتوى<select name="content_mode"><option value="builder" <?= ($editing['content_mode'] ?? 'builder') === 'builder' ? 'selected' : '' ?>>المحرر المرئي</option><option value="legacy" <?= ($editing['content_mode'] ?? '') === 'legacy' ? 'selected' : '' ?>>قالب الصفحة الحالي</option></select><small>القالب الحالي يحافظ على صفحة الشرح الموجودة.</small></label>
                         </div>
-                        <label class="publish-control"><input type="checkbox" name="is_published" value="1" <?= $status ? 'checked' : '' ?>><span class="toggle-track" aria-hidden="true"></span><span><strong>نشر القسم</strong><small>سيظهر القسم للزوار في الدليل العام.</small></span></label>
+                        <?php if ($canPublishSections): ?><label class="publish-control"><input type="checkbox" name="is_published" value="1" <?= $status ? 'checked' : '' ?>><span class="toggle-track" aria-hidden="true"></span><span><strong>نشر القسم</strong><small>سيظهر القسم للزوار في الدليل العام.</small></span></label><?php else: ?><p class="muted">سيظل هذا القسم مسودة حتى يراجعه مستخدم يملك صلاحية النشر.</p><?php endif; ?>
                     </section>
 
                     <section class="composer" aria-labelledby="composer-title" data-composer>
@@ -134,7 +128,7 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
                         </div>
                     </section>
                     <footer class="save-dock"><div class="save-state"><span class="save-indicator" data-save-indicator></span><span data-save-label>كل التعديلات محفوظة في النموذج</span></div><div class="save-actions">
-                        <?php $coreSlugs = ['login','bulk-import','relationships','assignments','pricing','readiness','analysis-config']; $canDelete = $editing && !in_array((string)$editing['slug'], $coreSlugs, true); ?>
+                        <?php $coreSlugs = ['login','bulk-import','relationships','assignments','pricing','readiness','analysis-config']; $canDelete = $canDeleteSections && $editing && !in_array((string)$editing['slug'], $coreSlugs, true); ?>
                         <?php if ($canDelete): ?><button class="button danger" type="submit" form="delete-section-form">حذف القسم</button><?php endif; ?>
                         <a class="button light" href="sections.php">إلغاء</a><button class="button primary" type="submit"><span aria-hidden="true">✓</span> <?= $status ? 'حفظ التغييرات' : 'حفظ القسم' ?></button></div></footer>
                 </form>
@@ -142,6 +136,7 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
                 <datalist id="cms-media-assets">
                     <?php foreach ($availableMediaAssets as $asset): if (!is_string($asset)) continue; ?><option value="<?= admin_e($asset) ?>"></option><?php endforeach; ?>
                 </datalist>
+                <?php endif; ?>
             </section>
         </div>
         <footer class="admin-footer">كوديفاي · مساحة تحرير الدليل</footer>

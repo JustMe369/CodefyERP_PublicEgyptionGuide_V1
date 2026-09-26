@@ -36,7 +36,7 @@ function admin_require_user(): array {
         header('Location: login.php');
         exit;
     }
-    $statement = codefy_db()->prepare('SELECT id, email, display_name, role, session_version FROM codefy_admin_users WHERE id = :id AND is_active = true');
+    $statement = codefy_db()->prepare("SELECT u.id, u.email, u.display_name, u.role, u.session_version FROM codefy_admin_users u JOIN codefy_admin_roles r ON r.role_key = u.role AND r.is_active WHERE u.id = :id AND u.is_active = true");
     $statement->execute(['id' => $user['id']]);
     $current = $statement->fetch();
     if (!$current || (int)($user['session_version'] ?? 0) !== (int)$current['session_version']) {
@@ -56,11 +56,57 @@ function admin_require_user(): array {
 
 function admin_require_role(string $role): array {
     $user = admin_require_user();
-    if ($role === 'admin' && ($user['role'] ?? '') !== 'admin') {
+    if ($role === 'admin' && !in_array(($user['role'] ?? ''), ['admin', 'superuser'], true)) {
         http_response_code(403);
         exit('ليست لديك صلاحية لتنفيذ هذا الإجراء.');
     }
     return $user;
+}
+
+function admin_user_permissions(?array $user = null): array {
+    static $cache = [];
+    $user ??= admin_current_user();
+    if (!$user || !isset($user['role'])) return [];
+    $role = (string)$user['role'];
+    if (!array_key_exists($role, $cache)) {
+        $statement = codefy_db()->prepare('SELECT rp.permission_key FROM codefy_admin_role_permissions rp JOIN codefy_admin_roles r ON r.role_key = rp.role_key AND r.is_active WHERE rp.role_key = :role ORDER BY rp.permission_key');
+        $statement->execute(['role' => $role]);
+        $cache[$role] = array_fill_keys($statement->fetchAll(PDO::FETCH_COLUMN), true);
+    }
+    return $cache[$role];
+}
+
+function admin_can(string $permission, ?array $user = null): bool {
+    return isset(admin_user_permissions($user)[$permission]);
+}
+
+function admin_require_permission(string $permission): array {
+    $user = admin_require_user();
+    if (!admin_can($permission, $user)) {
+        http_response_code(403);
+        exit('ليست لديك صلاحية لتنفيذ هذا الإجراء.');
+    }
+    return $user;
+}
+
+function admin_require_any_permission(array $permissions): array {
+    $user = admin_require_user();
+    foreach ($permissions as $permission) {
+        if (is_string($permission) && admin_can($permission, $user)) return $user;
+    }
+    http_response_code(403);
+    exit('ليست لديك صلاحية لتنفيذ هذا الإجراء.');
+}
+
+function admin_role_name(?string $role): string {
+    static $cache = [];
+    $role = (string)$role;
+    if (!array_key_exists($role, $cache)) {
+        $statement = codefy_db()->prepare('SELECT name FROM codefy_admin_roles WHERE role_key=:role');
+        $statement->execute(['role'=>$role]);
+        $cache[$role] = (string)($statement->fetchColumn() ?: $role);
+    }
+    return $cache[$role];
 }
 
 function admin_flash(string $type, string $message): void {

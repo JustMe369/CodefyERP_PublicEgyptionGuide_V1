@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $email = Read-Host 'Administrator email'
 $displayName = Read-Host 'Display name'
-$role = Read-Host 'Role (admin/editor, default admin)'
-if ([string]::IsNullOrWhiteSpace($role)) { $role = 'admin' }
-if ($role -notin @('admin', 'editor')) { throw 'Role must be admin or editor.' }
+$role = Read-Host 'Role (superuser/admin/section_author/viewer, default superuser)'
+if ([string]::IsNullOrWhiteSpace($role)) { $role = 'superuser' }
+if ($role -notin @('superuser', 'admin', 'section_author', 'viewer')) { throw 'Role must be superuser, admin, section_author, or viewer.' }
 $securePassword = Read-Host 'Password (14+ characters)' -AsSecureString
 $passwordPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword)
 
