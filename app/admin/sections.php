@@ -222,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 }
 
 $sections=$pdo->query("SELECT s.slug,s.title,s.subtitle,s.icon,s.accent,s.content_mode,s.sort_order,s.is_published,(SELECT count(*) FROM codefy_section_blocks b WHERE b.section_slug=s.slug) AS block_count FROM codefy_guide_sections s ORDER BY s.sort_order,s.slug")->fetchAll();
-foreach($sections as &$row) $row['public_url']='../'.codefy_section_url($row['slug']);
+foreach($sections as &$row) $row['public_url']='../'.codefy_section_url($row['slug'], $row['content_mode'] ?? 'legacy');
 unset($row);
 $sectionStats = ['published'=>0,'drafts'=>0,'blocks'=>0];
 foreach ($sections as $section) {
@@ -237,7 +237,7 @@ if($editSlug!==''){
     if(!$editingSection){http_response_code(404);exit('القسم المطلوب غير موجود.');}
     $hasLegacyTemplate=is_file(dirname(__DIR__).DIRECTORY_SEPARATOR.$editingSection['slug'].'.php');
     $isLegacyTemplate=$editingSection['content_mode']==='legacy'&&$hasLegacyTemplate;
-    $editingSection['public_url']=$hasLegacyTemplate?'../'.rawurlencode($editingSection['slug']).'.php':'../'.codefy_section_url($editingSection['slug']);
+    $editingSection['public_url']='../'.codefy_section_url($editingSection['slug'], $editingSection['content_mode'] ?? 'legacy');
     $query=$pdo->prepare('SELECT block_type AS type,payload AS data FROM codefy_section_blocks WHERE section_slug=:slug ORDER BY sort_order,id');
     $query->execute(['slug'=>$editSlug]);
     foreach($query as $block){$data=$block['data'];if(is_string($data))$data=json_decode($data,true);$blocks[]=['type'=>$block['type'],'data'=>is_array($data)?$data:[]];}

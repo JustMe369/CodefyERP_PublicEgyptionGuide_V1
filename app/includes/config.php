@@ -108,11 +108,19 @@ $SECTIONS = [
 require_once __DIR__ . '/admin-db.php';
 codefy_apply_database_content();
 
-/** Resolve a section to its original PHP page or the CMS renderer. */
-function codefy_section_url(string $slug): string {
+/** Resolve a section to its original PHP page or the CMS renderer.
+ *
+ * In the public context $SECTIONS only holds published sections (see
+ * codefy_apply_database_content).  When $contentMode is supplied — as the
+ * admin controller does — the lookup is skipped so that draft sections still
+ * resolve to the correct URL instead of falling through to 'index.php'.
+ */
+function codefy_section_url(string $slug, ?string $contentMode = null): string {
     global $SECTIONS;
-    if (!isset($SECTIONS[$slug])) return 'index.php';
-    if (($SECTIONS[$slug]['content_mode'] ?? 'legacy') === 'legacy' && is_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . $slug . '.php')) {
+    $inRegistry = isset($SECTIONS[$slug]);
+    if ($contentMode === null && !$inRegistry) return 'index.php';
+    $resolved = $contentMode ?? ($SECTIONS[$slug]['content_mode'] ?? 'legacy');
+    if ($resolved === 'legacy' && is_file(dirname(__DIR__) . DIRECTORY_SEPARATOR . $slug . '.php')) {
         return rawurlencode($slug) . '.php';
     }
     return 'section.php?slug=' . rawurlencode($slug);

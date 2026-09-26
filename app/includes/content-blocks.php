@@ -106,10 +106,13 @@ function codefy_render_section_content(string $slug): void {
     global $SECTIONS, $SITE;
     if (!isset($SECTIONS[$slug])) return;
     $section = $SECTIONS[$slug];
-    $blocks = codefy_db()->prepare('SELECT block_type AS type, payload AS data FROM codefy_section_blocks WHERE section_slug = :slug ORDER BY sort_order, id');
+    $pdo = codefy_db();
+    $blocks = $pdo->prepare('SELECT block_type AS type, payload AS data FROM codefy_section_blocks WHERE section_slug = :slug ORDER BY sort_order, id');
     $blocks->execute(['slug' => $slug]);
-    echo '<main id="main-content" class="px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:ms-72 flex-grow min-h-screen">';
+    $page_title = $section['title'];
+    $page_description = $section['subtitle'];
     require __DIR__ . '/breadcrumb.php';
+    echo '<main id="main-content" class="px-4 pt-6 pb-24 sm:px-6 lg:px-8 lg:ms-72 flex-grow min-h-screen">';
     echo '<section class="cms-section-page mb-24">';
     echo '<header class="cms-section-hero"><div class="cms-section-icon" aria-hidden="true">' . codefy_content_e($section['icon']) . '</div><div><span class="cms-section-kicker">' . codefy_content_e($SITE['name']) . ' · ' . (int)$section['number'] . '</span><h1>' . codefy_content_e($section['title']) . '</h1><p>' . codefy_content_e($section['subtitle']) . '</p></div></header>';
     echo '<div class="cms-section-content">';

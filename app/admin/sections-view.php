@@ -6,10 +6,10 @@ $availableMediaAssets = is_array($mediaAssets ?? null) ? $mediaAssets : [];
 $currentBlocks = is_array($blocks ?? null) ? $blocks : [];
 $token = (string)($csrf ?? '');
 $isNew = $editing === null;
-$isLegacyTemplate = (bool)($isLegacyTemplate ?? ($editing && ($editing['content_mode'] ?? '') === 'legacy'));
-$hasLegacyTemplate = (bool)($hasLegacyTemplate ?? ($editing && ($editing['content_mode'] ?? '') === 'legacy'));
+$isLegacyTemplate = (bool)($isLegacyTemplate ?? false);
+$hasLegacyTemplate = (bool)($hasLegacyTemplate ?? ($editing && is_file(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . ($editing['slug'] ?? '') . '.php') && ($editing['content_mode'] ?? '') === 'legacy'));
 $status = $editing && !empty($editing['is_published']);
-$fallbackPreview = $editing ? '../section.php?slug=' . rawurlencode((string)($editing['slug'] ?? '')) : '../index.php';
+$fallbackPreview = $editing ? (($editing['public_url'] ?? null) ?: ('../section.php?slug=' . rawurlencode((string)($editing['slug'] ?? '')))) : '../index.php';
 $previewCandidate = trim((string)($publicPreview ?? $fallbackPreview));
 $previewParts = parse_url($previewCandidate);
 $previewIsSameOrigin = is_array($previewParts) && !isset($previewParts['user'], $previewParts['pass'])
