@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $subtitle=$requiredText($_POST,'subtitle',240,false);
         $icon=$requiredText($_POST,'icon',32);
         $accent=$scalarText($_POST,'accent','primary');
-        $mode=$scalarText($_POST,'content_mode',$isEdit?'legacy':'builder');
+        $mode=$scalarText($_POST,'content_mode',$isEdit?($editingRecord['content_mode'] ?? 'builder'):'builder');
         $canPublish = admin_can('sections.publish');
         if (!$canPublish) $mode = 'builder';
         $published=$canPublish && isset($_POST['is_published'])&&$_POST['is_published']==='1';
