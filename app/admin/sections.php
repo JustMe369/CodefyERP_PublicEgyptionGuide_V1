@@ -2,6 +2,8 @@
 require __DIR__ . '/_bootstrap.php';
 $user = admin_require_role('admin');
 $pdo = codefy_db();
+// This controller uses the same section registry and URL resolver as the public guide.
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/content-blocks.php';
 
 $coreSlugs = ['login','bulk-import','relationships','assignments','pricing','readiness','analysis-config'];
@@ -194,6 +196,11 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 $sections=$pdo->query("SELECT s.slug,s.title,s.subtitle,s.icon,s.accent,s.content_mode,s.sort_order,s.is_published,(SELECT count(*) FROM codefy_section_blocks b WHERE b.section_slug=s.slug) AS block_count FROM codefy_guide_sections s ORDER BY s.sort_order,s.slug")->fetchAll();
 foreach($sections as &$row) $row['public_url']='../'.codefy_section_url($row['slug']);
 unset($row);
+$sectionStats = ['published'=>0,'drafts'=>0,'blocks'=>0];
+foreach ($sections as $section) {
+    $sectionStats[!empty($section['is_published']) ? 'published' : 'drafts']++;
+    $sectionStats['blocks'] += (int)($section['block_count'] ?? 0);
+}
 $editingSection=null; $blocks=[];
 $editSlug=trim((string)($_GET['edit']??''));
 if($editSlug!==''){

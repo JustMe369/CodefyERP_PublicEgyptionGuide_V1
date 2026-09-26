@@ -1,5 +1,26 @@
 (() => {
     'use strict';
+    const search = document.querySelector('[data-section-search]');
+    const statusFilter = document.querySelector('[data-section-status]');
+    const sectionRows = Array.from(document.querySelectorAll('[data-section-row]'));
+    const resultCount = document.querySelector('[data-section-filter-count]');
+    const noResults = document.querySelector('[data-filter-empty]');
+    function filterSections() {
+        const query = (search?.value || '').trim().toLocaleLowerCase();
+        const status = statusFilter?.value || 'all';
+        let visible = 0;
+        sectionRows.forEach(row => {
+            const matchesText = `${row.dataset.title || ''} ${row.dataset.slug || ''}`.toLocaleLowerCase().includes(query);
+            const matchesStatus = status === 'all' || row.dataset.status === status;
+            const show = matchesText && matchesStatus;
+            row.hidden = !show;
+            if (show) visible++;
+        });
+        if (resultCount) resultCount.textContent = `عرض ${visible} من ${sectionRows.length} أقسام`;
+        if (noResults) noResults.hidden = visible !== 0;
+    }
+    search?.addEventListener('input', filterSections);
+    statusFilter?.addEventListener('change', filterSections);
     const form = document.querySelector('[data-section-form]');
     if (!form) return;
     const stack = form.querySelector('[data-block-stack]');

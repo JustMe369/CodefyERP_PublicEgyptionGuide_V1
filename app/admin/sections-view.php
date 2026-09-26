@@ -53,15 +53,25 @@ $userName = (string)($user['name'] ?? $user['display_name'] ?? 'مدير الن�
         <div class="cms-layout">
             <aside class="section-rail" aria-label="أقسام الدليل">
                 <div class="rail-heading"><div><span class="eyebrow">مكتبة المحتوى</span><h2>الأقسام <span><?= count($allSections) ?></span></h2></div><a href="sections.php" class="rail-add" aria-label="إنشاء قسم جديد">＋</a></div>
+                <div class="rail-stats" aria-label="ملخص الأقسام">
+                    <span><strong><?= (int)($sectionStats['published'] ?? 0) ?></strong><small>منشور</small></span>
+                    <span><strong><?= (int)($sectionStats['drafts'] ?? 0) ?></strong><small>مسودة</small></span>
+                    <span><strong><?= (int)($sectionStats['blocks'] ?? 0) ?></strong><small>كتلة محتوى</small></span>
+                </div>
+                <?php if ($allSections): ?><div class="section-filters">
+                    <label class="section-search"><span class="sr-only">ابحث في الأقسام</span><span aria-hidden="true">⌕</span><input type="search" data-section-search placeholder="ابحث بالاسم أو الرابط" autocomplete="off"></label>
+                    <label class="sr-only" for="section-status-filter">تصفية حسب حالة النشر</label><select id="section-status-filter" data-section-status><option value="all">كل الحالات</option><option value="published">المنشورة</option><option value="draft">المسودات</option></select>
+                    <p class="section-filter-count" data-section-filter-count aria-live="polite"><?= count($allSections) ?> أقسام</p>
+                </div><?php endif; ?>
                 <?php if ($allSections): ?><ol class="section-list">
                     <?php foreach ($allSections as $row): $slug = (string)($row['slug'] ?? ''); $active = $editing && $slug === (string)($editing['slug'] ?? ''); $rowPreview = (string)($row['public_url'] ?? ('../section.php?slug=' . rawurlencode($slug))); ?>
-                    <li><a class="section-item<?= $active ? ' selected' : '' ?>" href="sections.php?edit=<?= rawurlencode($slug) ?>"<?= $active ? ' aria-current="page"' : '' ?>>
+                    <li data-section-row data-title="<?= admin_e((string)($row['title'] ?? '')) ?>" data-slug="<?= admin_e($slug) ?>" data-status="<?= !empty($row['is_published']) ? 'published' : 'draft' ?>"><a class="section-item<?= $active ? ' selected' : '' ?>" href="sections.php?edit=<?= rawurlencode($slug) ?>"<?= $active ? ' aria-current="page"' : '' ?>>
                         <span class="section-order"><?= sprintf('%02d', (int)($row['sort_order'] ?? 0)) ?></span><span class="section-icon"><?= admin_e((string)($row['icon'] ?? '▤')) ?></span>
                         <span class="section-copy"><strong><?= admin_e((string)($row['title'] ?? 'قسم بلا عنوان')) ?></strong><small dir="ltr"><?= admin_e($slug) ?></small></span>
                         <span class="publish-dot<?= !empty($row['is_published']) ? ' is-live' : '' ?>" title="<?= !empty($row['is_published']) ? 'منشور' : 'مسودة' ?>"></span>
                     </a><a class="section-row-preview" href="<?= admin_e($rowPreview) ?>" target="_blank" rel="noopener" aria-label="معاينة <?= admin_e((string)($row['title'] ?? 'القسم')) ?>">↗</a></li>
                     <?php endforeach; ?>
-                </ol><?php else: ?><div class="rail-empty"><span aria-hidden="true">▤</span><strong>لا توجد أقسام بعد</strong><p>ابدأ بإنشاء أول قسم للدليل.</p></div><?php endif; ?>
+                </ol><div class="rail-empty filter-empty" data-filter-empty hidden><strong>لا توجد نتائج مطابقة</strong><p>غيّر كلمات البحث أو حالة النشر.</p></div><?php else: ?><div class="rail-empty"><span aria-hidden="true">▤</span><strong>لا توجد أقسام بعد</strong><p>ابدأ بإنشاء أول قسم للدليل.</p></div><?php endif; ?>
                 <div class="rail-legend"><span class="publish-dot is-live"></span> منشور <span class="publish-dot"></span> مسودة</div>
             </aside>
 

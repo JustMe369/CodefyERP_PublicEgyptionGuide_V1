@@ -95,6 +95,10 @@ function codefy_db(): PDO {
         $connectionPassword = $connection['password'];
         $emulatePreparesDefault = $connection['emulate_prepares'] ? 'true' : 'false';
     }
+    if (!$dsn && !codefy_env('PGHOST') && !codefy_env('PGDATABASE') && !codefy_env('PGUSER') && !codefy_env('PGPASSWORD')) {
+        // Never fall back to localhost: a silent 127.0.0.1:5432 attempt hides a missing deployment secret.
+        throw new RuntimeException('No PostgreSQL configuration found. Set DATABASE_URL, CODEFY_DATABASE_DSN, or the PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD variables in the runtime environment.');
+    }
     if (!$dsn) {
         $host = codefy_env('PGHOST', '127.0.0.1');
         $port = codefy_env('PGPORT', '5432');
