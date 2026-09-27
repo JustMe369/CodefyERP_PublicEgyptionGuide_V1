@@ -83,10 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $params['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
             }
 
-            $statement = $pdo->prepare('UPDATE codefy_admin_users SET ' . implode(', ', $updateFields) . ' WHERE id = :user_id');
-            $statement->execute($params);
-            codefy_admin_audit($pdo, (int)$user['id'], 'update', 'admin_user', (string)$userId);
-            admin_flash('success', 'تم تحديث المستخدم بنجاح.');
+            try {
+                $statement = $pdo->prepare('UPDATE codefy_admin_users SET ' . implode(', ', $updateFields) . ' WHERE id = :user_id');
+                $statement->execute($params);
+                codefy_admin_audit($pdo, (int)$user['id'], 'update', 'admin_user', (string)$userId);
+                admin_flash('success', 'تم تحديث المستخدم بنجاح.');
+            } catch (PDOException $e) {
+                error_log('PDOException in update_user: ' . $e->getMessage());
+                throw new Exception('Database error during user update: ' . $e->getMessage());
+            }
         } elseif ($action === 'delete_user') {
             admin_require_permission('users.manage');
             $userId = filter_var($_POST['user_id'] ?? null, FILTER_VALIDATE_INT);
