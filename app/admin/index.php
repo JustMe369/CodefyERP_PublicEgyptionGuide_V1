@@ -30,6 +30,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             codefy_admin_audit($pdo, (int)$user['id'], 'update', 'site_settings', null, ['keys' => array_keys($values)]);
             $pdo->commit();
             admin_flash('success', 'تم حفظ إعدادات الموقع.');
+        } elseif ($action === 'create_user') {
+            admin_require_permission('users.manage');
+            $displayName = trim((string)($_POST['display_name'] ?? ''));
+            $email = trim((string)($_POST['email'] ?? ''));
+            $role = trim((string)($_POST['role'] ?? ''));
+            $password = (string)($_POST['password'] ?? '');
+
+            if ($displayName === '' || strlen($displayName) > 120) throw new InvalidArgumentException('الاسم المعروض مطلوب وبحد أقصى 120 حرفاً.');
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 254) throw new InvalidArgumentException('البريد الإلكتروني غير صالح أو طويل جداً.');
+            if (!in_array($role, ['admin', 'editor'])) throw new InvalidArgumentException('الدور غير صالح.');
+            if (strlen($password) < 14) throw new InvalidArgumentException('كلمة المرور يجب أن تكون 14 حرفاً على الأقل.');
+
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            $statement = $pdo->prepare('INSERT INTO codefy_admin_users (display_name, email, role, password, created_at, updated_at) VALUES (:display_name, :email, :role, :password, now(), now())');
+            $statement->execute([
+                'display_name' => $displayName,
+                'email' => $email,
+                'role' => $role,
+                'password' => $hashedPassword,
+            ]);
+            codefy_admin_audit($pdo, (int)$user['id'], 'create', 'admin_user', $pdo->lastInsertId());
+            admin_flash('success', 'تم إنشاء المستخدم بنجاح.');
+        } elseif ($action === 'update_user') {
+            admin_require_permission('users.manage');
+            $userId = filter_var($_POST['user_id'] ?? null, FILTER_VALIDATE_INT);
+            $displayName = trim((string)($_POST['display_name'] ?? ''));
+            $email = trim((string)($_POST['email'] ?? ''));
+            $role = trim((string)($_POST['role'] ?? ''));
+            $newPassword = (string)($_POST['new_password'] ?? '');
+            $isActive = isset($_POST['is_active']) && $_POST['is_active'] === '1';
+
+            if ($userId === false || $userId < 1) throw new InvalidArgumentException('معرف المستخدم غير صالح.');
+            if ($displayName === '' || strlen($displayName) > 120) throw new InvalidArgumentException('الاسم المعروض مطلوب وبحد أقصى 120 حرفاً.');
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 254) throw new InvalidArgumentException('البريد الإلكتروني غير صالح أو طويل جداً.');
+            if (!in_array($role, ['admin', 'editor'])) throw new InvalidArgumentException('الدور غير صالح.');
+            if ($userId === (int)$user['id'] && !$isActive) throw new InvalidArgumentException('لا يمكنك إلغاء تنشيط حسابك الخاص.');
+
+            $updateFields = ['display_name = :display_name', 'email = :email', 'role = :role', 'is_active = :is_active', 'updated_at = now()'];
+            $params = [
+                'display_name' => $displayName,
+                'email' => $email,
+                'role' => $role,
+                'is_active' => $isActive ? 'true' : 'false',
+                'user_id' => $userId,
+            ];
+
+            if (!empty($newPassword)) {
+                if (strlen($newPassword) < 14) throw new InvalidArgumentException('كلمة المرور الجديدة يجب أن تكون 14 حرفاً على الأقل.');
+                $updateFields[] = 'password = :password';
+                $params['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
+            }
+
+            $statement = $pdo->prepare('UPDATE codefy_admin_users SET ' . implode(', ', $updateFields) . ' WHERE id = :user_id');
+            $statement->execute($params);
+            codefy_admin_audit($pdo, (int)$user['id'], 'update', 'admin_user', (string)$userId);
+            admin_flash('success', 'تم تحديث المستخدم بنجاح.');
+        } elseif ($action === 'delete_user') {
+            admin_require_permission('users.manage');
+            $userId = filter_var($_POST['user_id'] ?? null, FILTER_VALIDATE_INT);
+
+            if ($userId === false || $userId < 1) throw new InvalidArgumentException('معرف المستخدم غير صالح.');
+            if ($userId === (int)$user['id']) throw new InvalidArgumentException('لا يمكنك حذف حسابك الخاص.');
+
+            $statement = $pdo->prepare('DELETE FROM codefy_admin_users WHERE id = :user_id');
+            $statement->execute(['user_id' => $userId]);
+            codefy_admin_audit($pdo, (int)$user['id'], 'delete', 'admin_user', (string)$userId);
+            admin_flash('success', 'تم حذف المستخدم بنجاح.');
         } elseif ($action === 'save_sections') {
             admin_require_permission('sections.edit');
             admin_require_permission('sections.publish');
@@ -83,6 +151,7 @@ $settings = [];
 if (admin_can('settings.manage')) foreach ($pdo->query('SELECT setting_key, setting_value FROM codefy_site_settings') as $row) $settings[$row['setting_key']] = $row['setting_value'];
 $sections = admin_can('sections.view') ? $pdo->query('SELECT slug, title, subtitle, icon, sort_order, is_published FROM codefy_guide_sections ORDER BY sort_order')->fetchAll() : [];
 $audit = admin_can('audit.view') ? $pdo->query('SELECT a.action, a.entity_type, a.created_at, u.display_name FROM codefy_admin_audit_log a LEFT JOIN codefy_admin_users u ON u.id = a.admin_id ORDER BY a.created_at DESC LIMIT 8')->fetchAll() : [];
+$adminUsers = admin_can('users.manage') ? $pdo->query('SELECT id, display_name, email, role, is_active, last_login_at FROM codefy_admin_users ORDER BY id DESC')->fetchAll() : [];
 $flash = admin_take_flash();
 $roleDisplay = admin_role_name((string)($user['role'] ?? ''));
 $userInitial = 'م';
@@ -166,6 +235,7 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
         <?php if (false): ?>
         <section id="users" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">الصلاحيات والدخول</span><h2>حسابات لوحة الإدارة</h2><p>أنشئ حسابات مدير أو محرر، وغيّر صلاحياتها أو أوقفها. تُحفظ كلمات المرور بعد تشفيرها.</p></div></div>
+            <?php if (admin_can('users.manage')): ?>
             <form method="post" class="user-create-form">
                 <input type="hidden" name="_csrf" value="<?= admin_e(admin_csrf_token()) ?>"><input type="hidden" name="action" value="create_user">
                 <label>الاسم<input name="display_name" maxlength="120" required></label>
@@ -184,12 +254,21 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
                     <td><input form="<?= $formId ?>" type="password" name="new_password" minlength="14" autocomplete="new-password" placeholder="اتركها فارغة للإبقاء عليها"></td>
                     <td><label class="switch"><input form="<?= $formId ?>" type="hidden" name="is_active" value="0"><input form="<?= $formId ?>" type="checkbox" name="is_active" value="1" <?= codefy_bool($account['is_active']) ? 'checked' : '' ?> <?= (int)$account['id'] === (int)$user['id'] ? 'disabled' : '' ?>><span></span><span class="switch-label"><?= codefy_bool($account['is_active']) ? 'نشط' : 'موقوف' ?></span></label><?php if ((int)$account['id'] === (int)$user['id']): ?><input form="<?= $formId ?>" type="hidden" name="is_active" value="1"><?php endif; ?></td>
                     <td><span class="last-login"><?= $account['last_login_at'] ? admin_e(date('Y-m-d H:i', strtotime($account['last_login_at']))) : 'لم يسجل الدخول' ?></span></td>
-                    <td><button class="button light" form="<?= $formId ?>" type="submit">حفظ</button></td>
+                    <td><button class="button light" form="<?= $formId ?>" type="submit">حفظ</button>
+                        <?php if ((int)$account['id'] !== (int)$user['id']): ?>
+                            <form id="user-delete-<?= (int)$account['id'] ?>" method="post" onsubmit="return confirm('هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.');">
+                                <input type="hidden" name="_csrf" value="<?= admin_e(admin_csrf_token()) ?>">
+                                <input type="hidden" name="action" value="delete_user">
+                                <input type="hidden" name="user_id" value="<?= (int)$account['id'] ?>">
+                                <button class="button danger" type="submit">حذف</button>
+                            </form>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody></table></div>
+            <?php else: ?><p class="muted">لا تملك الصلاحيات لإدارة المستخدمين.</p><?php endif; ?>
         </section>
-        <?php endif; ?>
 
         <?php if (admin_can('audit.view')): ?><section id="activity" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">المتابعة والأمان</span><h2>آخر النشاطات</h2><p>سجل تغييرات لوحة الإدارة وتوقيت تنفيذها.</p></div></div>
