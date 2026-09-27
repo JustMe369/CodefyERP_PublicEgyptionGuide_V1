@@ -52,6 +52,7 @@ $asset = $SITE['assets'];
     <link rel="stylesheet" href="<?= $asset ?>/CSS/tailwind.generated.css">
     <link rel="stylesheet" href="<?= $asset ?>/CSS/styles.css">
     <link rel="stylesheet" href="<?= $asset ?>/CSS/navbar.css">
+    <link rel="stylesheet" href="<?= $asset ?>/CSS/sidebar-transitions.css">
     <link rel="stylesheet" href="<?= $asset ?>/CSS/global-theme.css">
     <link rel="stylesheet" href="<?= $asset ?>/CSS/mobile.css">
     <link rel="stylesheet" href="<?= $asset ?>/CSS/footer.css">

@@ -1,0 +1,349 @@
+/* =========================================================
+   Sidebar Transitions — shadcn/ui Sidebar contract (pure CSS)
+   Data-attribute selectors are purge-proof.  This file
+   provides the *new* shadcn-style rules; existing class-based
+   rules in styles.css continue to work via backward-compat
+   classes the controller sets (body.sidebar-is-collapsed,
+   aside.sidebar-collapsed, translate-x-*).
+   ========================================================= */
+
+/* ── Variables (restated from footer.css for self-containedness) ── */
+:root {
+    --sidebar-width: 18rem;
+    --sidebar-width-mobile: 20rem;
+    --sidebar-collapsed-width: 5rem;
+    --sidebar-border: rgba(59, 130, 246, 0.15);
+}
+
+/* ── Variants (Sidebar side / variant contract) ── */
+[data-sidebar="sidebar"] {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+}
+
+/* floating variant — sits inside viewport with gap */
+[data-sidebar="sidebar"][data-variant="floating"] {
+    top: 1rem;
+    bottom: 1rem;
+    inset-inline-start: 1rem;
+    width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+}
+
+/* inset variant — sticky, requires SidebarInset content sibling */
+[data-sidebar="sidebar"][data-variant="inset"] {
+    position: sticky;
+    top: 1rem;
+}
+
+/* ── Collapsible modes (desktop, lg+) ────────────────────────── */
+@media (min-width: 1024px) {
+    /* icon mode: collapsed → narrow rail width */
+    [data-sidebar="sidebar"][data-collapsible="icon"][data-state="collapsed"] {
+        width: var(--sidebar-collapsed-width) !important;
+        min-width: var(--sidebar-collapsed-width) !important;
+        max-width: var(--sidebar-collapsed-width) !important;
+    }
+
+    /* icon mode: expanded → full width */
+    [data-sidebar="sidebar"][data-collapsible="icon"][data-state="expanded"] {
+        width: var(--sidebar-width);
+        min-width: var(--sidebar-width);
+        max-width: var(--sidebar-width);
+    }
+
+    /* offcanvas mode: hidden → slide offscreen (side-aware in RTL) */
+    [data-sidebar="sidebar"][data-collapsible="offcanvas"][data-side="right"][data-state="hidden"] {
+        transform: translateX(100%);
+    }
+    [data-sidebar="sidebar"][data-collapsible="offcanvas"][data-side="left"][data-state="hidden"] {
+        transform: translateX(-100%);
+    }
+}
+
+/* ── Icon mode: hide text-only elements when collapsed ───────── */
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-brand-text,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-brand-subtitle,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-text,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-subtitle,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-badge,
+[data-sidebar="sidebar"][data-state="collapsed"] .navigation-header,
+[data-sidebar="sidebar"][data-state="collapsed"] .footer-content,
+[data-sidebar="sidebar"][data-state="collapsed"] .search-container {
+    display: none !important;
+}
+
+/* Icon mode: show control buttons in collapsed state */
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-icon-button,
+[data-sidebar="sidebar"][data-state="collapsed"] #sidebar-collapse-toggle {
+    display: flex !important;
+}
+
+/* Icon mode: reorient brand container to column (centered logo) */
+[data-sidebar="sidebar"][data-state="collapsed"] .collapsible-brand-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+}
+
+[data-sidebar="sidebar"][data-state="collapsed"] #brand-container {
+    width: 100% !important;
+    padding-inline: 0 !important;
+}
+
+[data-sidebar="sidebar"][data-state="collapsed"] #brand-container .logo-container {
+    margin-inline: auto !important;
+}
+
+/* Icon mode: nav links centered with icon-only */
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link,
+[data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"] {
+    min-height: 4.25rem !important;
+    padding: 0.65rem 0.5rem !important;
+    justify-content: center !important;
+    border-color: transparent !important;
+}
+
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:hover {
+    transform: translateX(0) !important;
+    background: transparent !important;
+}
+
+/* Icon mode: icon container enlarged in collapsed state */
+[data-sidebar="sidebar"][data-state="collapsed"] .collapsible-nav-icon,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    margin: 0 auto !important;
+    border: 1px solid rgba(148, 163, 184, 0.15) !important;
+    border-radius: 1rem !important;
+    font-size: 1.35rem !important;
+    box-shadow:
+        0 10px 15px -3px rgba(15, 23, 42, 0.08),
+        0 4px 6px -2px rgba(15, 23, 42, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Active icon glow in collapsed mode */
+[data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"].active .sidebar-menu-icon,
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link.active .collapsible-nav-icon {
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+    border-color: var(--primary-600);
+    box-shadow:
+        0 25px 30px -12px rgba(37, 99, 235, 0.5),
+        0 15px 15px -10px rgba(37, 99, 235, 0.35),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2),
+        0 0 0 1px rgba(37, 99, 235, 0.3);
+    color: white !important;
+    transform: scale(1.1);
+    animation: activePulse 2s infinite ease-in-out;
+}
+
+/* Collapsed nav reveal animation */
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-icon {
+    animation: collapsedNavReveal 0.45s both;
+}
+
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:nth-child(1) { animation-delay: 40ms; }
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:nth-child(2) { animation-delay: 80ms; }
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:nth-child(3) { animation-delay: 120ms; }
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:nth-child(4) { animation-delay: 160ms; }
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:nth-child(5) { animation-delay: 200ms; }
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:nth-child(6) { animation-delay: 240ms; }
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:nth-child(7) { animation-delay: 280ms; }
+
+/* Collapsed tooltip (edge hover) */
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link[title]::after,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-button[title]::after {
+    position: absolute;
+    top: 50%;
+    inset-inline-start: calc(100% + 0.75rem);
+    z-index: 70;
+    width: max-content;
+    max-width: 13rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--border-primary);
+    border-radius: 0.65rem;
+    background: var(--bg-secondary);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+    color: var(--text-primary);
+    content: attr(title);
+    font-size: 0.72rem;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) translateX(0.35rem);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link[title]:hover::after,
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link[title]:focus-visible::after,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-button[title]:hover::after,
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-button[title]:focus-visible::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Reduced motion for collapsed animations */
+@media (prefers-reduced-motion: reduce) {
+    [data-sidebar="sidebar"][data-state="collapsed"] .nav-link,
+    [data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-icon {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* ── Main content offset (mirrors footer.css; data-attribute contract) ── */
+@media (min-width: 1024px) {
+    body[data-sidebar-state="collapsed"] #main-content {
+        margin-inline-start: var(--sidebar-collapsed-width) !important;
+        width: calc(100% - var(--sidebar-collapsed-width)) !important;
+    }
+    body[data-sidebar-state="expanded"] #main-content,
+    body:not([data-sidebar-state]) #main-content {
+        margin-inline-start: var(--sidebar-width) !important;
+        width: calc(100% - var(--sidebar-width)) !important;
+    }
+}
+
+/* ── Active nav link (data-sidebar-active contract) ── */
+/* Replaces .nav-link.active — server-rendered + controller-synced */
+[data-sidebar="menu-button"][data-sidebar-active="true"],
+.nav-link.active {
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.10), rgba(37, 99, 235, 0.02)) !important;
+    color: var(--primary-700) !important;
+    font-weight: 700 !important;
+    position: relative !important;
+}
+
+[data-sidebar="menu-button"][data-sidebar-active="true"]::after,
+.nav-link.active::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: var(--primary-600);
+    border-radius: 4px;
+}
+
+/* Dark theme active link override */
+[data-theme="dark-blue"] [data-sidebar="menu-button"][data-sidebar-active="true"],
+[data-theme="dark-blue"] .nav-link.active {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.12), rgba(37, 99, 235, 0.08)) !important;
+    color: #60a5fa !important;
+}
+
+/* Light theme active link override */
+[data-theme="light"] [data-sidebar="menu-button"][data-sidebar-active="true"],
+[data-theme="light"] .nav-link.active {
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.10), rgba(37, 99, 235, 0.02)) !important;
+    color: var(--primary-700) !important;
+}
+
+/* ── SidebarRail ── */
+[data-sidebar="rail"] {
+    position: absolute;
+    z-index: 10;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: 6px;
+    cursor: col-resize;
+}
+
+/* Rail visible on desktop icon mode (collapsed rail on the edge) */
+@media (min-width: 1024px) {
+    [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="rail"] {
+        display: block;
+        opacity: 0.6;
+    }
+    [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="rail"]:hover {
+        opacity: 1;
+    }
+}
+
+/* Hide rail on mobile */
+@media (max-width: 1023px) {
+    [data-sidebar="rail"] {
+        display: none;
+    }
+}
+
+/* ── Region layout: sticky header / footer / scrollable content ── */
+[data-sidebar="header"] {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+[data-sidebar="content"] {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+[data-sidebar="group"] {
+    padding: 0.5rem 0;
+}
+
+[data-sidebar="group-label"] {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+/* ── Mobile off-canvas (sidebar-transitions complement mobile.css) ── */
+@media (max-width: 1023px) {
+    [data-sidebar="sidebar"][data-sidebar-state="closed"] {
+        transform: translateX(100%);
+    }
+    [data-sidebar="sidebar"][data-sidebar-state="open"] {
+        transform: translateX(0);
+    }
+}
+
+/* ── Collapse button hidden on mobile (existing CSS also enforces) ── */
+@media (max-width: 1023px) {
+    [data-sidebar="trigger"] {
+        display: none;
+    }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+    [data-sidebar="sidebar"],
+    [data-sidebar="sidebar"][data-state="collapsed"] .nav-link {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* ── Keyframes (shared with styles.css) ── */
+@keyframes activePulse {
+    0%, 100% {
+        box-shadow:
+            0 25px 30px -12px rgba(37, 99, 235, 0.5),
+            0 15px 15px -10px rgba(37, 99, 235, 0.35),
+            inset 0 2px 4px rgba(255, 255, 255, 0.2),
+            0 0 0 1px rgba(37, 99, 235, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 30px 40px -15px rgba(37, 99, 235, 0.6),
+            0 20px 20px -12px rgba(37, 99, 235, 0.4),
+            inset 0 2px 4px rgba(255, 255, 255, 0.25),
+            0 0 0 2px rgba(37, 99, 235, 0.4);
+    }
+}
+
+@keyframes collapsedNavReveal {
+    from { opacity: 0; transform: scale(0.78) translateY(0.4rem); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}

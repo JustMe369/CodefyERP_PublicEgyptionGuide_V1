@@ -26,29 +26,38 @@
         return document.getElementById(id);
     }
 
-    /* Track sidebar state via custom events from inline script */
+    /* Authoritative state source: sidebar.js writes data-sidebar-state on #sidebar */
+    function isSidebarOpen() {
+        const sidebar = getElement("sidebar");
+        if (!sidebar) return false;
+        return sidebar.getAttribute("data-sidebar-state") === "open";
+    }
+
+    /* Apply a new state once, keeping body scroll lock in sync on mobile */
+    function applySidebarState(isOpen) {
+        if (isOpen === sidebarOpen) return;
+        sidebarOpen = isOpen;
+        if (!checkMobile()) return;
+        document.body.style.overflow = sidebarOpen ? "hidden" : "";
+    }
+
+    /* Track sidebar state via data-sidebar-state set by sidebar.js */
     function trackSidebarState() {
         const sidebar = getElement("sidebar");
         if (!sidebar) return;
 
+        /* initial sync with CodefySidebar (covers restored mobile state) */
+        applySidebarState(isSidebarOpen());
+
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
-                if (mutation.attributeName === "class") {
-                    const isOpen = !sidebar.classList.contains("translate-x-full") &&
-                                   sidebar.classList.contains("translate-x-0");
-                    if (isOpen !== sidebarOpen) {
-                        sidebarOpen = isOpen;
-                        if (sidebarOpen) {
-                            document.body.style.overflow = "hidden";
-                        } else {
-                            document.body.style.overflow = "";
-                        }
-                    }
+                if (mutation.attributeName === "data-sidebar-state") {
+                    applySidebarState(sidebar.getAttribute("data-sidebar-state") === "open");
                 }
             });
         });
 
-        observer.observe(sidebar, { attributes: true, attributeFilter: ["class"] });
+        observer.observe(sidebar, { attributes: true, attributeFilter: ["data-sidebar-state"] });
     }
 
     /* Touch swipe gestures for sidebar (complementary enhancement) */
@@ -77,16 +86,15 @@
 
                 /* Swipe from right edge to open sidebar */
                 if (touchStartX < 30 && Math.abs(diffX) > 50 && Math.abs(diffY) < 50 && diffX > 0) {
-                    const sidebar = getElement("sidebar");
-                    if (sidebar && sidebar.classList.contains("translate-x-full")) {
+                    if (!sidebarOpen) {
                         const event = new CustomEvent("sidebar:toggle");
                         window.dispatchEvent(event);
                     }
                 }
 
                 /* Swipe to close sidebar */
-                if (!sidebarOpen && Math.abs(diffX) > 100 && Math.abs(diffY) < 80) {
-                    const event = new CustomEvent("sidebar:toggle");
+                if (sidebarOpen && Math.abs(diffX) > 100 && Math.abs(diffY) < 80) {
+                    const event = new CustomEvent("sidebar:close");
                     window.dispatchEvent(event);
                 }
 

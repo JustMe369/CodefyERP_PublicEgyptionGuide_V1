@@ -26,7 +26,7 @@ $asset   = $SITE['assets'];
                     <path id="moon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" class="hidden" />
                 </svg>
             </button>
-            <button id="mobile-menu-btn" type="button" aria-label="فتح القائمة" aria-controls="sidebar" aria-expanded="false" class="text-slate-600 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
+            <button id="mobile-menu-btn" type="button" data-sidebar="trigger" data-sidebar-action="toggle-mobile" aria-label="فتح القائمة" aria-controls="sidebar" aria-expanded="false" class="text-slate-600 hover:text-slate-900 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors">
                 <svg id="icon-menu" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 <svg id="icon-close" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>

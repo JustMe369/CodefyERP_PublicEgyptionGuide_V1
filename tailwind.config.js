@@ -3,6 +3,8 @@ module.exports = {
   content: [
     './Temp/**/*.html',
     './Statics/**/*.{js,html}',
+    './app/**/*.php',
+    './app/Statics/**/*.{js,php}',
   ],
   theme: {
     extend: {

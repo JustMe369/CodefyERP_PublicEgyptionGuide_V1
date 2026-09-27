@@ -83,9 +83,13 @@ function admin_can(string $permission, ?array $user = null): bool {
 
 function admin_require_permission(string $permission): array {
     $user = admin_require_user();
+    // Superusers have all permissions automatically
+    if (($user['role'] ?? '') === 'superuser') {
+        return $user;
+    }
     if (!admin_can($permission, $user)) {
         http_response_code(403);
-        exit('ليست twinkie صلاحية ل تنفيذ هذا الإجراء.');
+        exit('ليست لديك صلاحية لتنفيذ هذا الإجراء.');
     }
     return $user;
 }

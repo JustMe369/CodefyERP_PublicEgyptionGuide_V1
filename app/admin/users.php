@@ -135,9 +135,10 @@ $userStats = ['active'=>0,'inactive'=>0,'roles'=>count(array_filter($roles,stati
 foreach ($users as $account) $userStats[codefy_bool($account['is_active'])?'active':'inactive']++;
 $canAssignSuperuser = ($user['role'] ?? '') === 'superuser';
 $canManageTargetSuperuser = $canAssignSuperuser;
-$canCreateUsers = admin_can('users.create', $user);
-$canUpdateUsers = admin_can('users.update', $user);
-$canDeleteUsers = admin_can('users.delete', $user);
+$isSuperuser = ($user['role'] ?? '') === 'superuser';
+$canCreateUsers = $isSuperuser || admin_can('users.create', $user);
+$canUpdateUsers = $isSuperuser || admin_can('users.update', $user);
+$canDeleteUsers = $isSuperuser || admin_can('users.delete', $user);
 $currentRoleName = admin_role_name((string)($user['role'] ?? ''));
 $flash = admin_take_flash();
 $csrf = admin_csrf_token();

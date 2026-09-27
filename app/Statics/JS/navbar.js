@@ -1,3 +1,4 @@
+/* DEPRECATED: Sidebar state is now managed by sidebar.js (window.CodefySidebar). These stubs delegate to the controller when available. */
 /**
  * Navbar standalone companion script
  * Works cleanly whether loaded as standalone navbar component or alongside scripts.js
@@ -7,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.codefyAppLoaded || window.codefyNavbarLoaded) {
         // Initialize sidebar functionality regardless
         initializeSidebarCollapseControls();
-        initSidebar();
+        // initSidebar() skipped - sidebar.js owns all sidebar listeners when available
         return;
     }
     window.codefyAppLoaded = true;
@@ -32,6 +33,9 @@ function initializeSidebarCollapseControls() {
 
 // Sidebar Navigation & Mobile Drawer
 function initSidebar() {
+    // Delegate to sidebar.js when available
+    if (window.CodefySidebar && window.CodefySidebar._initialized) return;
+
     const sidebar = document.getElementById('sidebar');
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -70,6 +74,12 @@ function initSidebar() {
 }
 
 function openSidebar() {
+    // Delegate to sidebar.js when available
+    if (window.CodefySidebar && window.CodefySidebar._initialized) {
+        window.CodefySidebar.setOpenMobile(true);
+        return;
+    }
+
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
@@ -84,6 +94,12 @@ function openSidebar() {
 }
 
 function closeSidebar() {
+    // Delegate to sidebar.js when available
+    if (window.CodefySidebar && window.CodefySidebar._initialized) {
+        window.CodefySidebar.closeMobile();
+        return;
+    }
+
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     
@@ -98,6 +114,9 @@ function closeSidebar() {
 }
 
 function updateActiveSection() {
+    // Delegate to sidebar.js when available (server-rendered data-sidebar-active + controller sync)
+    if (window.CodefySidebar && window.CodefySidebar._initialized) return;
+
     const currentHash = window.location.hash.substring(1) || 'login';
     const navLinks = document.querySelectorAll('.nav-link');
     
