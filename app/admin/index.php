@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!in_array($role, ['admin', 'editor'])) throw new InvalidArgumentException('الدور غير صالح.');
             if ($userId === (int)$user['id'] && !$isActive) throw new InvalidArgumentException('لا يمكنك إلغاء تنشيط حسابك الخاص.');
 
-            $updateFields = ['display_name = :display_name', 'email = :email', 'role = :role', 'is_active = :is_active', 'updated_at = now()'];
+            $updateFields = ['display_name = :display_name', 'email = :email', 'role = :role', 'is_active = CAST(:is_active AS boolean)', 'updated_at = now()'];
             $params = [
                 'display_name' => $displayName,
                 'email' => $email,
@@ -83,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $params['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
             }
 
+            // Ensure PDO emulates prepares for Supabase pooler (matches codefy_db() logic)
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
             try {
                 $statement = $pdo->prepare('UPDATE codefy_admin_users SET ' . implode(', ', $updateFields) . ' WHERE id = :user_id');
                 $statement->execute($params);
