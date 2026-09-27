@@ -6,3 +6,103 @@
 .settings-form textarea{width:100%;min-height:86px;border:1px solid #dce3ed;border-radius:8px;padding:10px;color:#202c40;font:inherit;font-size:12px;resize:vertical}.settings-form .field-wide{grid-column:1/-1}
 @media(max-width:1000px){.user-create-form{grid-template-columns:repeat(2,minmax(0,1fr))}.user-create-form .button{grid-column:1/-1;justify-self:start}}
 @media(max-width:520px){.user-create-form{grid-template-columns:1fr}.user-create-form .button{grid-column:auto}}
+
+/* Admin navigation uses the same restrained sidebar treatment as the guide. */
+:root{
+	--admin-sidebar-bg:#fff;
+	--admin-sidebar-fg:#18181b;
+	--admin-sidebar-muted:#71717a;
+	--admin-sidebar-border:#e4e4e7;
+	--admin-sidebar-accent:#f4f4f5;
+	--admin-sidebar-primary:#2563eb;
+}
+
+.admin-sidebar{
+	padding:20px 12px;
+	border-inline-end:1px solid var(--admin-sidebar-border);
+	background:var(--admin-sidebar-bg);
+	box-shadow:1px 0 0 var(--admin-sidebar-border);
+	color:var(--admin-sidebar-fg);
+}
+
+.admin-brand{
+	gap:10px;
+	padding:4px 8px 20px;
+	color:var(--admin-sidebar-fg);
+}
+
+.admin-brand .brand-mark{
+	width:36px;
+	height:36px;
+	border:1px solid #dbeafe;
+	border-radius:8px;
+	background:#eff6ff;
+	box-shadow:none;
+	color:var(--admin-sidebar-primary);
+	font-size:19px;
+}
+
+.admin-brand strong{font-size:14px;font-weight:700}
+.admin-brand small{color:var(--admin-sidebar-muted)}
+
+.admin-sidebar nav{gap:3px}
+
+.admin-sidebar .side-link{
+	min-height:40px;
+	gap:10px;
+	padding:8px 10px;
+	border:1px solid transparent;
+	border-radius:6px;
+	color:var(--admin-sidebar-muted);
+	font-size:13px;
+	font-weight:500;
+	transition:background-color 140ms ease,color 140ms ease,border-color 140ms ease;
+}
+
+.admin-sidebar .side-link:hover{
+	background:var(--admin-sidebar-accent);
+	color:var(--admin-sidebar-fg);
+}
+
+.admin-sidebar .side-link.active{
+	border-color:transparent;
+	background:var(--admin-sidebar-accent);
+	box-shadow:none;
+	color:var(--admin-sidebar-fg);
+	font-weight:600;
+}
+
+.admin-sidebar .side-link:focus-visible,
+.admin-sidebar .public-link:focus-visible{
+	outline:2px solid var(--admin-sidebar-primary);
+	outline-offset:2px;
+}
+
+.admin-sidebar .public-link{
+	display:flex;
+	align-items:center;
+	min-height:40px;
+	padding:10px;
+	border-top:1px solid var(--admin-sidebar-border);
+	border-radius:6px;
+	color:var(--admin-sidebar-muted);
+	font-size:12px;
+	transition:background-color 140ms ease,color 140ms ease;
+}
+
+.admin-sidebar .public-link:hover{
+	background:var(--admin-sidebar-accent);
+	color:var(--admin-sidebar-fg);
+}
+
+@media(max-width:720px){
+	.admin-sidebar{padding:12px 16px;border-inline-end:0;border-bottom:1px solid var(--admin-sidebar-border);box-shadow:none}
+	.admin-brand{padding:0 3px 10px}
+	.admin-sidebar nav{gap:3px}
+	.admin-sidebar .side-link{min-height:38px;padding:8px 10px}
+	.admin-sidebar .public-link{display:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+	.admin-sidebar .side-link,.admin-sidebar .public-link{transition:none}
+}

@@ -33,7 +33,7 @@ $currentSlug = codefy_current_slug();
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" class="hidden" id="smart-moon-path" />
                         </svg>
                     </button>
-                    <button id="sidebar-collapse-toggle" data-sidebar="trigger" data-sidebar-action="toggle" type="button" aria-label="طي الشريط الجانبي" aria-controls="sidebar" aria-expanded="true" title="طي الشريط الجانبي" class="sidebar-collapse-button collapse-toggle">
+                    <button id="sidebar-collapse-toggle" data-sidebar="trigger" data-sidebar-action="toggle" type="button" aria-label="طي الشريط الجانبي" aria-controls="sidebar" aria-expanded="true" class="sidebar-collapse-button collapse-toggle">
                         <div class="collapse-particles absolute inset-0 pointer-events-none overflow-hidden rounded-full" aria-hidden="true"></div>
                         <div class="collapse-icon-wrapper relative flex h-full w-full items-center justify-center">
                             <svg class="collapse-icon-expanded absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-5 w-5 text-white transition-all duration-500 ease-out" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>

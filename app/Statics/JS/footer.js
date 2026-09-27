@@ -14,11 +14,12 @@
         const footer = document.getElementById('codefy-floating-footer');
         if (!footer) return;
 
+        const revealDistance = 200;
         let scheduled = false;
         function updateVisibility() {
             scheduled = false;
             const remaining = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
-            footer.classList.toggle('is-visible', remaining <= 24);
+            footer.classList.toggle('is-visible', remaining <= revealDistance);
         }
         function scheduleUpdate() {
             if (scheduled) return;
