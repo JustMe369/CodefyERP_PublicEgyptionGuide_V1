@@ -2,6 +2,16 @@
 require __DIR__ . '/_bootstrap.php';
 $user = admin_require_user();
 $pdo = codefy_db();
+// Force emulated prepares for Supabase pooler compatibility (reuse logic from codefy_parse_database_url)
+$databaseUrl = codefy_env('DATABASE_URL');
+if ($databaseUrl) {
+    $parts = parse_url((string)$databaseUrl);
+    $host = (string)($parts['host'] ?? '');
+    $port = (int)($parts['port'] ?? 5432);
+    if ($host && (str_ends_with($host, '.pooler.supabase.com') || str_ends_with($host, '.supabase.co')) && in_array($port, [5432, 6543], true)) {
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+    }
+}
 $allowedSettings = ['name', 'brand_suffix', 'subtitle', 'copyright', 'version', 'home_eyebrow', 'home_title', 'home_intro', 'navigation_label', 'search_placeholder'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -83,8 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $params['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
             }
 
-            // Ensure PDO emulates prepares for Supabase pooler (matches codefy_db() logic)
-            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
             try {
                 $statement = $pdo->prepare('UPDATE codefy_admin_users SET ' . implode(', ', $updateFields) . ' WHERE id = :user_id');
                 $statement->execute($params);
@@ -239,10 +247,9 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
             <?php else: ?><div class="notice">يمكن لمدير النظام فقط تعديل إعدادات الموقع العامة.</div><?php endif; ?>
         </section>
 
-        <?php if (false): ?>
+        <?php if (admin_can('users.manage')): ?>
         <section id="users" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">الصلاحيات والدخول</span><h2>حسابات لوحة الإدارة</h2><p>أنشئ حسابات مدير أو محرر، وغيّر صلاحياتها أو أوقفها. تُحفظ كلمات المرور بعد تشفيرها.</p></div></div>
-            <?php if (admin_can('users.manage')): ?>
             <form method="post" class="user-create-form">
                 <input type="hidden" name="_csrf" value="<?= admin_e(admin_csrf_token()) ?>"><input type="hidden" name="action" value="create_user">
                 <label>الاسم<input name="display_name" maxlength="120" required></label>
@@ -274,8 +281,9 @@ if (preg_match('/^./us', (string)$user['name'], $initialMatch)) $userInitial = $
                 </tr>
             <?php endforeach; ?>
             </tbody></table></div>
-            <?php else: ?><p class="muted">لا تملك الصلاحيات لإدارة المستخدمين.</p><?php endif; ?>
         </section>
+
+        <?php endif; ?>
 
         <?php if (admin_can('audit.view')): ?><section id="activity" class="panel">
             <div class="panel-heading"><div><span class="eyebrow">المتابعة والأمان</span><h2>آخر النشاطات</h2><p>سجل تغييرات لوحة الإدارة وتوقيت تنفيذها.</p></div></div>
