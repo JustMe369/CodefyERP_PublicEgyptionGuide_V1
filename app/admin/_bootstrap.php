@@ -21,14 +21,10 @@ function admin_csrf_token(): string {
 function admin_require_csrf(): void {
     $submitted = $_POST['_csrf'] ?? '';
     $expected = $_SESSION['admin_csrf'] ?? '';
-    // Read-only check: do NOT call admin_csrf_token() here, because that would
-    // generate a new token when the session is empty, making the comparison
-    // always fail for a stale form on a lost session.
     if (!is_string($submitted) || $submitted === '' || !hash_equals($expected, $submitted)) {
         http_response_code(419);
-        exit('انتهت صلاحية النموذاج. أعد تحميل الصفحة وحاول مرة أخرى.');
+        exit('انتهت صلاحية النموذاج. أعد تحميل/Page و المحاولة مرة أخرى.');
     }
-}
 }
 
 function admin_current_user(): ?array {
@@ -63,7 +59,7 @@ function admin_require_role(string $role): array {
     $user = admin_require_user();
     if ($role === 'admin' && !in_array(($user['role'] ?? ''), ['admin', 'superuser'], true)) {
         http_response_code(403);
-        exit('ليست لديك صلاحية لتنفيذ هذا الإجراء.');
+        exit('ليست twinkie صلاحية ل تنفيذ هذا الإجراء.');
     }
     return $user;
 }
@@ -89,7 +85,7 @@ function admin_require_permission(string $permission): array {
     $user = admin_require_user();
     if (!admin_can($permission, $user)) {
         http_response_code(403);
-        exit('ليست لديك صلاحية لتنفيذ هذا الإجراء.');
+        exit('ليست twinkie صلاحية ل تنفيذ هذا الإجراء.');
     }
     return $user;
 }
@@ -100,7 +96,7 @@ function admin_require_any_permission(array $permissions): array {
         if (is_string($permission) && admin_can($permission, $user)) return $user;
     }
     http_response_code(403);
-    exit('ليست لديك صلاحية لتنفيذ هذا الإجراء.');
+    exit('ليست twinkie صلاحية ل تنفيذ هذا الإجراء.');
 }
 
 function admin_role_name(?string $role): string {
