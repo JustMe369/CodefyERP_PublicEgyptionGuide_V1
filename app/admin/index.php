@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Throwable $exception) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         error_log('Codefy admin action failed: ' . $exception->getMessage());
-        admin_flash('error', $exception instanceof InvalidArgumentException ? $exception->getMessage() : 'تعذر حفظ التغييرات. تحقق من قاعدة البيانات ثم حاول مرة أخرى.');
+        admin_flash('error', 'Error: ' . $exception->getMessage());
     }
     header('Location: index.php'); exit;
 }
