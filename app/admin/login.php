@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $account = $statement->fetch();
             if ($account && password_verify((string)($_POST['password'] ?? ''), $account['password_hash'])) {
                 session_regenerate_id(true);
-                unset($_SESSION['admin_csrf']);
+                $_SESSION['admin_csrf'] = bin2hex(random_bytes(32));
                 $_SESSION['admin_user'] = ['id' => (int)$account['id'], 'email' => $account['email'], 'name' => $account['display_name'], 'role' => $account['role'], 'session_version' => (int)$account['session_version']];
                 $pdo->prepare('DELETE FROM codefy_admin_login_throttle WHERE ip_hash = :ip_hash')->execute(['ip_hash' => $ipHash]);
                 $pdo->prepare('UPDATE codefy_admin_users SET last_login_at = now() WHERE id = :id')->execute(['id' => $account['id']]);

@@ -20,10 +20,15 @@ function admin_csrf_token(): string {
 
 function admin_require_csrf(): void {
     $submitted = $_POST['_csrf'] ?? '';
-    if (!is_string($submitted) || !hash_equals(admin_csrf_token(), $submitted)) {
+    $expected = $_SESSION['admin_csrf'] ?? '';
+    // Read-only check: do NOT call admin_csrf_token() here, because that would
+    // generate a new token when the session is empty, making the comparison
+    // always fail for a stale form on a lost session.
+    if (!is_string($submitted) || $submitted === '' || !hash_equals($expected, $submitted)) {
         http_response_code(419);
-        exit('انتهت صلاحية النموذج. أعد تحميل الصفحة وحاول مرة أخرى.');
+        exit('انتهت صلاحية النموذاج. أعد تحميل الصفحة وحاول مرة أخرى.');
     }
+}
 }
 
 function admin_current_user(): ?array {
