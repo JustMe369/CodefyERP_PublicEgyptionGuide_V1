@@ -7,12 +7,35 @@
    aside.sidebar-collapsed, translate-x-*).
    ========================================================= */
 
-/* ── Variables (restated from footer.css for self-containedness) ── */
+/* ── shadcn/ui Sidebar Theming Variables (canonical) ───────────── */
+/* Light theme (:root) */
 :root {
     --sidebar-width: 18rem;
     --sidebar-width-mobile: 20rem;
     --sidebar-collapsed-width: 5rem;
     --sidebar-border: rgba(59, 130, 246, 0.15);
+
+    /* shadcn sidebar semantic variables — light */
+    --sidebar-background: #ffffff;
+    --sidebar-foreground: #1e293b;
+    --sidebar-primary: #2563eb;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f1f5f9;
+    --sidebar-accent-foreground: #1e293b;
+    --sidebar-border: #e2e8f0;
+    --sidebar-ring: #2563eb;
+}
+
+/* Dark-blue theme */
+[data-theme="dark-blue"] {
+    --sidebar-background: rgba(12, 32, 53, 0.95);
+    --sidebar-foreground: #e2f0ff;
+    --sidebar-primary: #4494d6;
+    --sidebar-primary-foreground: #0f172a;
+    --sidebar-accent: rgba(30, 64, 122, 0.3);
+    --sidebar-accent-foreground: #e2f0ff;
+    --sidebar-border: rgba(30, 74, 122, 0.6);
+    --sidebar-ring: #3b82f6;
 }
 
 /* ── Variants (Sidebar side / variant contract) ── */
@@ -20,6 +43,9 @@
     position: fixed;
     inset: 0;
     z-index: 50;
+    background: var(--sidebar-background);
+    color: var(--sidebar-foreground);
+    border-inline-end: 1px solid var(--sidebar-border);
 }
 
 /* floating variant — sits inside viewport with gap */
@@ -29,6 +55,8 @@
     inset-inline-start: 1rem;
     width: var(--sidebar-width);
     max-width: var(--sidebar-width);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* inset variant — sticky, requires SidebarInset content sibling */
@@ -74,77 +102,73 @@
     display: none !important;
 }
 
-/* Icon mode: show control buttons in collapsed state */
-[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-icon-button,
-[data-sidebar="sidebar"][data-state="collapsed"] #sidebar-collapse-toggle {
-    display: flex !important;
-}
-
-/* Icon mode: reorient brand container to column (centered logo) */
-[data-sidebar="sidebar"][data-state="collapsed"] .collapsible-brand-container {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 0.6rem !important;
-}
-
-[data-sidebar="sidebar"][data-state="collapsed"] #brand-container {
-    width: 100% !important;
-    padding-inline: 0 !important;
-}
-
-[data-sidebar="sidebar"][data-state="collapsed"] #brand-container .logo-container {
-    margin-inline: auto !important;
-}
-
-/* Icon mode: nav links centered with icon-only */
+/* Icon mode: nav links become centered icon-only blocks */
 [data-sidebar="sidebar"][data-state="collapsed"] .nav-link,
 [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"] {
     min-height: 4.25rem !important;
-    padding: 0.65rem 0.5rem !important;
+    padding-block: 0.65rem !important;
+    padding-inline: 0.5rem !important;
     justify-content: center !important;
+    flex-direction: column !important;
+    border-color: transparent !important;
+    margin-inline: 0.35rem !important;
+    align-items: center !important;
+}
+
+/* Prevent hover transform on collapsed nav links */
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:hover {
+    transform: none !important;
+    background: transparent !important;
     border-color: transparent !important;
 }
 
-[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:hover {
-    transform: translateX(0) !important;
-    background: transparent !important;
-}
-
-/* Icon mode: icon container enlarged in collapsed state */
-[data-sidebar="sidebar"][data-state="collapsed"] .collapsible-nav-icon,
-[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-icon {
+/* Icon container in collapsed mode — centered, isolated */
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-icon,
+[data-sidebar="sidebar"][data-state="collapsed"] .collapsible-nav-icon {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 2.75rem !important;
-    height: 2.75rem !important;
+    width: 3rem !important;
+    height: 3rem !important;
     margin: 0 auto !important;
-    border: 1px solid rgba(148, 163, 184, 0.15) !important;
-    border-radius: 1rem !important;
+    border: 1px solid var(--sidebar-border) !important;
+    border-radius: 12px !important;
     font-size: 1.35rem !important;
     box-shadow:
         0 10px 15px -3px rgba(15, 23, 42, 0.08),
         0 4px 6px -2px rgba(15, 23, 42, 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 0.9),
         inset 0 -1px 0 rgba(15, 23, 42, 0.05) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Text content wrapper hidden in collapsed mode */
+[data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-content,
+[data-sidebar="sidebar"][data-state="collapsed"] .collapsible-nav-content {
+    display: none !important;
 }
 
 /* Active icon glow in collapsed mode */
 [data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-button"].active .sidebar-menu-icon,
 [data-sidebar="sidebar"][data-state="collapsed"] .nav-link.active .collapsible-nav-icon {
-    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
-    border-color: var(--primary-600);
+    background: linear-gradient(135deg, var(--sidebar-primary), var(--sidebar-primary)) !important;
+    border-color: var(--sidebar-primary);
     box-shadow:
         0 25px 30px -12px rgba(37, 99, 235, 0.5),
         0 15px 15px -10px rgba(37, 99, 235, 0.35),
         inset 0 2px 4px rgba(255, 255, 255, 0.2),
         0 0 0 1px rgba(37, 99, 235, 0.3);
-    color: white !important;
+    color: var(--sidebar-primary-foreground) !important;
     transform: scale(1.1);
     animation: activePulse 2s infinite ease-in-out;
 }
 
-/* Collapsed nav reveal animation */
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:hover .sidebar-menu-icon,
+[data-sidebar="sidebar"][data-state="collapsed"] .nav-link:hover .collapsible-nav-icon {
+    transform: scale(1.15) !important;
+}
+
+/* Collapsed nav reveal animation — staggered */
 [data-sidebar="sidebar"][data-state="collapsed"] .nav-link,
 [data-sidebar="sidebar"][data-state="collapsed"] .sidebar-menu-icon {
     animation: collapsedNavReveal 0.45s both;
@@ -168,11 +192,11 @@
     width: max-content;
     max-width: 13rem;
     padding: 0.45rem 0.7rem;
-    border: 1px solid var(--border-primary);
+    border: 1px solid var(--sidebar-border);
     border-radius: 0.65rem;
-    background: var(--bg-secondary);
+    background: var(--sidebar-accent);
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
-    color: var(--text-primary);
+    color: var(--sidebar-accent-foreground);
     content: attr(title);
     font-size: 0.72rem;
     font-weight: 700;
@@ -216,8 +240,8 @@
 /* Replaces .nav-link.active — server-rendered + controller-synced */
 [data-sidebar="menu-button"][data-sidebar-active="true"],
 .nav-link.active {
-    background: linear-gradient(90deg, rgba(37, 99, 235, 0.10), rgba(37, 99, 235, 0.02)) !important;
-    color: var(--primary-700) !important;
+    background: var(--sidebar-accent) !important;
+    color: var(--sidebar-accent-foreground) !important;
     font-weight: 700 !important;
     position: relative !important;
 }
@@ -231,22 +255,32 @@
     transform: translateY(-50%);
     width: 4px;
     height: 60%;
-    background: var(--primary-600);
+    background: var(--sidebar-primary);
     border-radius: 4px;
 }
 
-/* Dark theme active link override */
+/* Dark theme active link override — keeps existing gradients for visual richness */
 [data-theme="dark-blue"] [data-sidebar="menu-button"][data-sidebar-active="true"],
 [data-theme="dark-blue"] .nav-link.active {
     background: linear-gradient(90deg, rgba(59, 130, 246, 0.12), rgba(37, 99, 235, 0.08)) !important;
     color: #60a5fa !important;
 }
 
-/* Light theme active link override */
+[data-theme="dark-blue"] [data-sidebar="menu-button"][data-sidebar-active="true"]::after,
+[data-theme="dark-blue"] .nav-link.active::before {
+    background: var(--sidebar-primary);
+}
+
+/* Light theme active link override — uses semantic variables */
 [data-theme="light"] [data-sidebar="menu-button"][data-sidebar-active="true"],
 [data-theme="light"] .nav-link.active {
-    background: linear-gradient(90deg, rgba(37, 99, 235, 0.10), rgba(37, 99, 235, 0.02)) !important;
-    color: var(--primary-700) !important;
+    background: var(--sidebar-accent) !important;
+    color: var(--sidebar-accent-foreground) !important;
+}
+
+[data-theme="light"] [data-sidebar="menu-button"][data-sidebar-active="true"]::after,
+[data-theme="light"] .nav-link.active::before {
+    background: var(--sidebar-primary);
 }
 
 /* ── SidebarRail ── */
@@ -257,6 +291,7 @@
     inset-inline-end: 0;
     width: 6px;
     cursor: col-resize;
+    background: var(--sidebar-border);
 }
 
 /* Rail visible on desktop icon mode (collapsed rail on the edge) */
@@ -282,6 +317,8 @@
     position: sticky;
     top: 0;
     z-index: 2;
+    background: var(--sidebar-background);
+    border-bottom: 1px solid var(--sidebar-border);
 }
 
 [data-sidebar="content"] {
@@ -297,6 +334,8 @@
     font-size: 0.55rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
+    color: var(--sidebar-foreground);
+    opacity: 0.6;
 }
 
 /* ── Mobile off-canvas (sidebar-transitions complement mobile.css) ── */
@@ -323,6 +362,84 @@
         transition: none !important;
         animation: none !important;
     }
+}
+
+/* ── SidebarInset content offset (shadcn contract) ────────────────── */
+[data-sidebar="inset"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+}
+
+/* Main content offset mirrors sidebar width via data attribute on body */
+@media (min-width: 1024px) {
+    body[data-sidebar-state="collapsed"] [data-sidebar="inset"] {
+        margin-inline-start: var(--sidebar-collapsed-width) !important;
+        width: calc(100% - var(--sidebar-collapsed-width)) !important;
+    }
+    body[data-sidebar-state="expanded"] [data-sidebar="inset"],
+    body:not([data-sidebar-state]) [data-sidebar="inset"] {
+        margin-inline-start: var(--sidebar-width) !important;
+        width: calc(100% - var(--sidebar-width)) !important;
+    }
+}
+
+/* ── Focus ring (shadcn sidebar-ring variable) ───────────────────── */
+[data-sidebar="menu-button"]:focus-visible,
+[data-sidebar="trigger"]:focus-visible,
+[data-sidebar="rail"]:focus-visible {
+    outline: 2px solid var(--sidebar-ring);
+    outline-offset: 2px;
+}
+
+/* Ensure focus ring is visible on dark theme */
+[data-theme="dark-blue"] [data-sidebar="menu-button"]:focus-visible,
+[data-theme="dark-blue"] [data-sidebar="trigger"]:focus-visible,
+[data-theme="dark-blue"] [data-sidebar="rail"]:focus-visible {
+    outline-color: var(--sidebar-ring);
+    outline-offset: 2px;
+}
+
+/* ── SidebarMenu group peer hover + badge hide ────────────────────── */
+/* Hide badge by default in collapsed state (group peer) */
+[data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="group"] [data-sidebar="menu-badge"] {
+    display: none !important;
+}
+
+/* Show badge on hover when expanded (group:hover peer) */
+[data-sidebar="sidebar"][data-state="expanded"] [data-sidebar="group"]:hover [data-sidebar="menu-badge"],
+[data-sidebar="sidebar"]:not([data-state="collapsed"]) [data-sidebar="group"]:hover [data-sidebar="menu-badge"] {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Also handle light theme explicitly */
+[data-theme="light"] [data-sidebar="sidebar"][data-state="expanded"] [data-sidebar="group"]:hover [data-sidebar="menu-badge"] {
+    display: inline-flex !important;
+}
+
+/* Badge styling when visible */
+[data-sidebar="menu-badge"] {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    background: var(--sidebar-accent);
+    color: var(--sidebar-accent-foreground);
+    white-space: nowrap;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+[data-sidebar="sidebar"][data-state="collapsed"] [data-sidebar="menu-badge"] {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+
+[data-sidebar="sidebar"][data-state="expanded"] [data-sidebar="group"]:hover [data-sidebar="menu-badge"] {
+    opacity: 1;
+    transform: scale(1);
 }
 
 /* ── Keyframes (shared with styles.css) ── */

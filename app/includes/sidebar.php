@@ -72,18 +72,18 @@ $currentSlug = codefy_current_slug();
                         <li data-sidebar="menu-item" class="sidebar-menu-item">
                             <a href="<?= e(codefy_section_url($slug)) ?>"
                                data-sidebar="menu-button"
+                               data-sidebar-action="navigate"
                                data-section="<?= e($slug) ?>"
                                data-sidebar-active="<?= ($currentSlug === $slug) ? 'true' : 'false' ?>"
                                aria-current="<?= ($currentSlug === $slug) ? 'page' : 'false' ?>"
-                               class="sidebar-menu-button nav-link collapsible-nav-item flex items-center justify-between rounded-2xl px-4 py-3.5 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 group border border-transparent hover:border-white/10">
-                                <div class="collapsible-nav-content sidebar-menu-content flex items-center gap-4">
-                                    <span class="collapsible-nav-icon sidebar-menu-icon text-2xl flex-shrink-0 group-hover:scale-125 transition-transform duration-300"><?= e($s['icon']) ?></span>
-                                    <div>
-                                        <div class="nav-text sidebar-menu-text font-bold text-sm text-slate-100 group-hover:text-primary-300 transition-opacity duration-300" style="opacity:1;"><?= e($s['title']) ?></div>
-                                        <div class="nav-subtitle sidebar-menu-subtitle text-[11px] text-slate-500 group-hover:text-slate-400 transition-opacity duration-300" style="opacity:1;"><?= e($s['subtitle']) ?></div>
-                                    </div>
+                               title="<?= e($s['title']) ?>"
+                               class="sidebar-menu-button nav-link collapsible-nav-item group/menu-button flex items-center gap-3 rounded-2xl px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300 border border-transparent hover:border-white/10">
+                                <span class="sidebar-menu-icon collapsible-nav-icon flex h-10 w-10 items-center justify-center text-2xl group-hover/menu-button:scale-125 transition-transform duration-300 flex-shrink-0"><?= e($s['icon']) ?></span>
+                                <div class="sidebar-menu-content collapsible-nav-content flex flex-col gap-0.5 flex-1 min-w-0">
+                                    <div class="sidebar-menu-text nav-text font-bold text-sm text-slate-100 group-hover/menu-button:text-primary-300 transition-opacity duration-300" style="opacity:1;"><?= e($s['title']) ?></div>
+                                    <div class="sidebar-menu-subtitle nav-subtitle text-[11px] text-slate-500 group-hover/menu-button:text-slate-400 transition-opacity duration-300" style="opacity:1;"><?= e($s['subtitle']) ?></div>
                                 </div>
-                                <span data-sidebar="menu-badge" class="nav-badge sidebar-menu-badge section-check-badge text-slate-500 group-hover:text-primary-400 transition-colors" data-badge-section="<?= e($slug) ?>">○</span>
+                                <span data-sidebar="menu-badge" class="sidebar-menu-badge nav-badge section-check-badge text-slate-500 group-hover/menu-button:text-primary-400 transition-colors" data-badge-section="<?= e($slug) ?>">○</span>
                             </a>
                         </li>
                     <?php endforeach; ?>
